@@ -35,7 +35,7 @@ jobs:
           extra-mypy-options: ""
           extra-isort-options: ""
 
-  publish-prod:
+  publish-test:
     name: Publish pushes to PyPi's test instance
     runs-on: ubuntu-latest
 
