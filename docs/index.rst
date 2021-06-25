@@ -10,6 +10,7 @@ Welcome to Nero Workgroup Creator's documentation!
    :maxdepth: 1
 
    client
+   account
 
 Indices and tables
 ==================
