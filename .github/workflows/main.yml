@@ -1,0 +1,96 @@
+on:
+  push:
+
+jobs:
+  linting:
+    name: Run MyPy
+    runs-on: ubuntu-latest
+
+    steps:
+	  - uses: actions/checkout@master
+	  - name: Set up Python
+		uses: actions/setup-python@v2
+		with:
+		  python-version: 3.9
+      - name: Prepare pip and
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: 
+        uses: ricardochaves/python-lint@v1.4.0
+          with:
+            python-root-list: "src tests"
+            use-pylint: false
+            use-pycodestyle: false
+            use-flake8: false
+            use-black: false
+            use-mypy: true
+            use-isort: false
+            extra-pylint-options: ""
+            extra-pycodestyle-options: ""
+            extra-flake8-options: ""
+            extra-black-options: ""
+            extra-mypy-options: ""
+            extra-isort-options: ""
+
+  publish-prod:
+    name: Publish pushes to PyPi's test instance
+	runs-on: ubuntu-latest
+
+    steps:
+	  - uses: actions/checkout@master
+	  - name: Set up Python
+		uses: actions/setup-python@v2
+		with:
+		  python-version: 3.9
+      - name: Prepare pip and install build
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+
+      - name: Build source and wheel distributions
+        run: |
+          python -m build .
+
+      - name: Publish pushes to PyPI test
+        if: github.event_name == 'push'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_UPLOAD_TEST }}
+          repository_url: https://test.pypi.org/legacy/
+
+  publish-prod:
+    name: Publish tags to PyPi production
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && jobs.linting.success
+    needs: linting
+	runs-on: ubuntu-latest
+
+    steps:
+	  - uses: actions/checkout@master
+	  - name: Set up Python
+		uses: actions/setup-python@v2
+		with:
+		  python-version: 3.9
+      - name: Prepare pip and install build
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+
+      - name: Build source and wheel distributions
+        run: |
+          python -m build .
+
+      - name: Publish pushes to PyPI test
+        if: github.event_name == 'push'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_UPLOAD_TEST }}
+          repository_url: https://test.pypi.org/legacy/
+
+      - name: Publish tags to PyPI production
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_UPLOAD_PROD }}
