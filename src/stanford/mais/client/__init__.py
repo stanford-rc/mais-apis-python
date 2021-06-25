@@ -80,6 +80,26 @@ class MAISClient():
     :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
     """
 
+    _default_timeout: Tuple[float, float] = (3.0, 3.0)
+    """The default timeout to use for requests.
+
+    This is a tuple of ints.  The first item is the timeout on connecting to
+    the server (along with TLS negotiation and sending out the request); the
+    second item is the timeout on receiving the response.
+
+    It's up to users to explicitly add the timeout to all requests they make,
+    either referencing this default timeout or setting their own.
+
+    Support for adding a timeout in a Session has been asked `many`_ `times`_
+    `before`_, but it not going to be implemented.
+
+    .. _many: https://github.com/psf/requests/issues/1130
+
+    .. _times: https://github.com/psf/requests/issues/2856
+
+    .. _before: https://github.com/psf/requests/issues/3054
+    """
+
     def __post_init__(
         self,
     ) -> None:
@@ -181,5 +201,4 @@ class MAISClient():
         """
         session = requests.Session()
         session.cert = str(self.cert)
-        session.timeout = (3, 3)
         return session
