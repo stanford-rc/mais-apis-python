@@ -14,14 +14,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Prepare pip and
+      - name: Prepare pip
         run: |
           python -m pip install --upgrade pip
 
       - name: 
         uses: ricardochaves/python-lint@v1.4.0
         with:
-          python-root-list: "src tests"
+          python-root-list: "src"
           use-pylint: false
           use-pycodestyle: false
           use-flake8: false
