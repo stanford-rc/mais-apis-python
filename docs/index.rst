@@ -9,6 +9,8 @@ Welcome to Nero Workgroup Creator's documentation!
 .. toctree::
    :maxdepth: 1
 
+   client
+
 Indices and tables
 ==================
 
