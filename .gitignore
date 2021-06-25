@@ -17,6 +17,7 @@ __pycache__
 
 # Ignore packaging stuff
 *.egg-info
+dist
 
 # Ignore docs stuff
 docs/_build
