@@ -1,4 +1,4 @@
-# vim: ts=4 sw=4 et
+# vim: et
 
 on:
   push:
@@ -20,20 +20,20 @@ jobs:
 
       - name: 
         uses: ricardochaves/python-lint@v1.4.0
-          with:
-            python-root-list: "src tests"
-            use-pylint: false
-            use-pycodestyle: false
-            use-flake8: false
-            use-black: false
-            use-mypy: true
-            use-isort: false
-            extra-pylint-options: ""
-            extra-pycodestyle-options: ""
-            extra-flake8-options: ""
-            extra-black-options: ""
-            extra-mypy-options: ""
-            extra-isort-options: ""
+        with:
+          python-root-list: "src tests"
+          use-pylint: false
+          use-pycodestyle: false
+          use-flake8: false
+          use-black: false
+          use-mypy: true
+          use-isort: false
+          extra-pylint-options: ""
+          extra-pycodestyle-options: ""
+          extra-flake8-options: ""
+          extra-black-options: ""
+          extra-mypy-options: ""
+          extra-isort-options: ""
 
   publish-prod:
     name: Publish pushes to PyPi's test instance
