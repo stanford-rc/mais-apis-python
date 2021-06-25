@@ -1,3 +1,5 @@
+# vim: ts=4 sw=4 et
+
 on:
   push:
 
@@ -7,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-	  - uses: actions/checkout@master
-	  - name: Set up Python
-		uses: actions/setup-python@v2
-		with:
-		  python-version: 3.9
+      - uses: actions/checkout@master
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
       - name: Prepare pip and
         run: |
           python -m pip install --upgrade pip
@@ -35,14 +37,14 @@ jobs:
 
   publish-prod:
     name: Publish pushes to PyPi's test instance
-	runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
-	  - uses: actions/checkout@master
-	  - name: Set up Python
-		uses: actions/setup-python@v2
-		with:
-		  python-version: 3.9
+      - uses: actions/checkout@master
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
       - name: Prepare pip and install build
         run: |
           python -m pip install --upgrade pip
@@ -64,14 +66,14 @@ jobs:
     name: Publish tags to PyPi production
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && jobs.linting.success
     needs: linting
-	runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
-	  - uses: actions/checkout@master
-	  - name: Set up Python
-		uses: actions/setup-python@v2
-		with:
-		  python-version: 3.9
+      - uses: actions/checkout@master
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
       - name: Prepare pip and install build
         run: |
           python -m pip install --upgrade pip
