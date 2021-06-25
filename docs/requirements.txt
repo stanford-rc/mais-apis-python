@@ -1,0 +1,17 @@
+# This requirements.txt file contains the list of required PyPi packages for
+# building the documentation.
+# 
+# It is listed separately for two reasons:
+# 1. Building documentation requires code that isn't needed elsewhere.
+# 2. The GitHub Action used to build the docs requires this file be here.
+
+# This file is a superset of the root requirements.txt file, and is divided
+# into two sections:
+
+# First, we have the requirements specific to Sphinx and documentation-building.
+sphinx<5.0>=4.0.2
+#stanford-theme
+sphinx-rtd-theme
+
+# What follows are everything from the root requirements.txt
+requests<3.0>=2.25.1
