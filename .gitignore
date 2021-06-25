@@ -1,0 +1,22 @@
+
+# Ignore editor files
+*.swp
+
+# Ignore venv
+bin
+include
+lib
+pyvenv.cfg
+__pycache__
+
+# Ignore certs
+*.pem
+*.cer
+*.key
+*.req
+
+# Ignore packaging stuff
+*.egg-info
+
+# Ignore docs stuff
+docs/_build
