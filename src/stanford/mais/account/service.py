@@ -288,7 +288,7 @@ class AccountServiceSEAS(AccountService):
     def _from_json(
         cls: Type['AccountServiceSEAS'],
         source: Dict[str, Union[str, List[Dict[str, str]]]],
-    ) -> 'AccountServiceKerberos':
+    ) -> 'AccountServiceSEAS':
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
 
@@ -444,7 +444,7 @@ class AccountServiceLeland(AccountService):
     def _from_json(
         cls: Type['AccountServiceLeland'],
         source: Dict[str, Union[str, List[Dict[str, str]]]],
-    ) -> 'AccountServiceKerberos':
+    ) -> 'AccountServiceLeland':
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
 
