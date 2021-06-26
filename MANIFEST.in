@@ -3,3 +3,7 @@ include VERSION
 # Include docs, but not the build directory.
 recursive-include docs *
 recursive-exclude docs/_build *
+
+# This script creates a test client key & cert, if you don't want to use the
+# one built in to the tests.
+include test_cert_create.sh
