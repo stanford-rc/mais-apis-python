@@ -96,15 +96,16 @@ class AccountService():
         else:
             return results
 
+    OptionalTupleOfStrings = Union[Tuple[()], Tuple[str, ...]]
     @staticmethod
     def _get_settings(
         source: Dict[str, Union[str, List[Dict[str, str]]]],
         service: str,
-        required_keys_single: Tuple[str],
-        required_keys_multiple: Tuple[str],
-        optional_keys_single: Tuple[str],
-        optional_keys_multiple: Tuple[str],
-    ) -> Dict[str, Union[None, str, Tuple[str]]]:
+        required_keys_single: OptionalTupleOfStrings = tuple(),
+        required_keys_multiple: OptionalTupleOfStrings = tuple(),
+        optional_keys_single: OptionalTupleOfStrings = tuple(),
+        optional_keys_multiple: OptionalTupleOfStrings = tuple(),
+    ) -> Dict[str, Union[None, str, Tuple[str, ...]]]:
         """Convenience method to pull settings out of a settings dict
 
         :param source: The dict for a single service, taken from the JSON array of services returned by the Account API.
@@ -129,8 +130,6 @@ class AccountService():
         if source['status'] != 'active':
             optional_keys_single += required_keys_single
             optional_keys_multiple += required_keys_multiple
-            required_keys_single = tuple()
-            required_keys_multiple = tuple()
 
         # Add all keys, required and optional
         settings = source['settings']
@@ -188,9 +187,7 @@ class AccountServiceKerberos(AccountService):
             source = source,
             service = 'kerberos',
             required_keys_single = ('principal',),
-            required_keys_multiple = tuple(),
             optional_keys_single = ('uid',),
-            optional_keys_multiple = tuple(),
         ))
 
         # Convert uid to an int
@@ -299,7 +296,6 @@ class AccountServiceSEAS(AccountService):
             required_keys_single = ('sunetidpreferred',),
             required_keys_multiple = ('sunetid',),
             optional_keys_single = ('local', 'forward', 'urirouteto'),
-            optional_keys_multiple = tuple(),
         ))
 
         # Call the constructor and return!
@@ -348,9 +344,7 @@ class AccountServiceEmail(AccountService):
             source = source,
             service = 'email',
             required_keys_single = ('accounttype',),
-            required_keys_multiple = tuple(),
             optional_keys_single = ('quota', 'admin'),
-            optional_keys_multiple = tuple(),
         ))
 
         # Convert quota to an int
@@ -404,9 +398,6 @@ class AccountServiceAutoreply(AccountService):
             source = source,
             service = 'autoreply',
             required_keys_single = ('forward', 'subj', 'msg'),
-            required_keys_multiple = tuple(),
-            optional_keys_single = tuple(),
-            optional_keys_multiple = tuple(),
         ))
 
         # Call the constructor and return!
@@ -452,10 +443,7 @@ class AccountServiceLeland(AccountService):
         kwargs.update(cls._get_settings(
             source = source,
             service = 'leland',
-            required_keys_single = tuple(),
-            required_keys_multiple = tuple(),
             optional_keys_single = ('shell',),
-            optional_keys_multiple = tuple(),
         ))
 
         # Call the constructor and return!
@@ -488,9 +476,6 @@ class AccountServicePTS(AccountService):
             source = source,
             service = 'pts',
             required_keys_single = ('uid',),
-            required_keys_multiple = tuple(),
-            optional_keys_single = tuple(),
-            optional_keys_multiple = tuple(),
         ))
 
         # Convert uid to an int
@@ -533,9 +518,6 @@ class AccountServiceAFS(AccountService):
             source = source,
             service = 'afs',
             required_keys_single = ('homedirectory',),
-            required_keys_multiple = tuple(),
-            optional_keys_single = tuple(),
-            optional_keys_multiple = tuple(),
         ))
 
         # Call the constructor and return!
