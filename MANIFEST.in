@@ -7,3 +7,7 @@ recursive-exclude docs/_build *
 # This script creates a test client key & cert, if you don't want to use the
 # one built in to the tests.
 include test_cert_create.sh
+
+# This script updates the version number to a datetime-specific version, so you
+# can push to Test PyPI without causion version conflicts.
+include update-version-for-test-push.py
