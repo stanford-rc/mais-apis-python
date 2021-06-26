@@ -54,7 +54,7 @@ R0XW
 def mais_client(snakeoil_cert):
     return MAISClient.uat(cert=snakeoil_cert, urls={
         'account': 'https://localhost/account/',
-    )
+    })
 
 # For tests that require a good Account API client, return one.
 @pytest.fixture(scope='session')

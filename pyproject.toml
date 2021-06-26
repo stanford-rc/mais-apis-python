@@ -16,3 +16,8 @@ no_color_output = true
 files = [
     "src"
 ]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
