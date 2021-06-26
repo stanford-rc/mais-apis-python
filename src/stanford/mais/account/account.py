@@ -26,7 +26,7 @@ import urllib.parse
 from . import service
 
 # Some imports are only needed when typechecking
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from . import AccountClient
 
 # Set up logging

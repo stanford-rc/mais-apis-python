@@ -26,6 +26,7 @@ from .account import *
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
+warn = logger.warn
 
 # We are the root for this module, so do library-wide logging configuration.
 # See https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
@@ -125,7 +126,7 @@ class AccountClient():
         # configure it.
         if self.session is None:
             self.__dict__['session'] = self.client.session()
-        self.session.headers['Accept']: 'application/json'
+        self.session.headers.update({'Accept': 'application/json'})
 
         # That's it!
         return None
@@ -334,7 +335,7 @@ class AccountView(AccountClient):
     def get(
         self,
         sunetid: str
-    ) -> Optional['Account']:
+    ) -> Account:
         """Fetch an Account.
 
         This is a **modified** convenience wrapper around
