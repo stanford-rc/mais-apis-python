@@ -21,6 +21,7 @@ import pytest
 
 # This is a "snakeoil" key and cert that can be used whenever MAISClient needs
 # a valid key & cert.
+# If you want to make a one, `test_cert_create.sh` can help!
 @pytest.fixture(scope='session')
 def snakeoil_cert(tmpdir_factory):
     snakeoil_path = tmpdir_factory.mktemp('certs') / 'snakeoil.pem'
