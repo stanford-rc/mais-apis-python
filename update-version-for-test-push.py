@@ -62,6 +62,7 @@ try:
 except ValueError:
     error(f"Version '{version_string}' is not in the expected three-part form")
     exit(1)
+info(f"Old version number was {a}.{b}.{c}")
 
 # Convert the versions to int.
 try:
