@@ -25,6 +25,10 @@ from typing import *
 import urllib.parse
 from . import service
 
+# Some imports are only needed when typechecking
+if typing.TYPE_CHECKING:
+    from . import AccountClient
+
 # Set up logging
 logger = logging.getLogger(__name__)
 debug = logger.debug
