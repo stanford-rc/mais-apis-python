@@ -33,6 +33,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
+warn = logger.warn
 
 # NOTE: It's expected that this module will be *-imported, so not only does this
 # define what gets included in Sphinx docs, this also determines what gets
@@ -239,7 +240,7 @@ class Account():
         if sunetid.endswith('@stanford.edu'):
             debug(f"Cleaning up an email address")
             sunetid = sunetid.removesuffix('@stanford.edu')
-            return cls.get(sunetid)
+            return cls.get(client=client, sunetid=sunetid)
 
         # Now it's time to try fetching the account information!
 
