@@ -100,14 +100,6 @@ jobs:
         run: |
           python -m build .
 
-      - name: Publish pushes to PyPI test
-        if: github.event_name == 'push'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_UPLOAD_TEST }}
-          repository_url: https://test.pypi.org/legacy/
-
       - name: Publish tags to PyPI production
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
