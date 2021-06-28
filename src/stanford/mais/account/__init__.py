@@ -91,15 +91,17 @@ class AccountClient():
     :raises TypeError: A client was not provided.
     """
 
-    session: Optional[requests.Session] = dataclasses.field(repr=False, default=None)
+    custom_session: Optional[requests.Session] = None
+    session: requests.Session = dataclasses.field(repr=False, init=False)
     """The Requests Session to use for API requests.
 
     This session container pre-configures our requests, including client
     certificate, timeouts, and headers.
 
-    This need not be provided at init-time, but it can be (which is useful for
-    mock testing).  If left unset (which is the default), a new session will be
-    requested from the client.
+    Normally, this should not be set, and a new session will be requested from
+    the client.  But if you would like to use a custom
+    :class:`requests.Session` instance (such as for mock testing), provide it
+    as the ``custom_session`` and it will be used for all requests.
     """
 
     _cache: Mapping[str, 'Account'] = dataclasses.field(repr=False, default_factory=dict)
@@ -124,8 +126,10 @@ class AccountClient():
 
         # Make a new Requests session (if it's not already provided), and
         # configure it.
-        if self.session is None:
-            self.__dict__['session'] = self.client.session()
+        if self.custom_session is not None:
+            object.__setattr__(self, 'session', self.custom_session)
+        else:
+            object.__setattr__(self, 'session', self.client.session())
         self.session.headers.update({'Accept': 'application/json'})
 
         # That's it!
@@ -208,7 +212,7 @@ class AccountClient():
         """
         return AccountView(
             client=self.client,
-            session=self.session,
+            custom_session=self.session,
             _cache=self._cache,
             account_filter=lambda candidate: (True if candidate.is_active else False)
         )
@@ -230,7 +234,7 @@ class AccountClient():
         """
         return AccountView(
             client=self.client,
-            session=self.session,
+            custom_session=self.session,
             _cache=self._cache,
             account_filter=lambda candidate: (True if candidate.is_active else False)
         )
@@ -275,7 +279,7 @@ class AccountClient():
         """
         return AccountView(
             client=self.client,
-            session=self.session,
+            custom_session=self.session,
             _cache=self._cache,
             account_filter=lambda candidate: (True if candidate.is_person else False)
         )
@@ -297,7 +301,7 @@ class AccountClient():
         """
         return AccountView(
             client=self.client,
-            session=self.session,
+            custom_session=self.session,
             _cache=self._cache,
             account_filter=lambda candidate: (False if candidate.is_person else True)
         )
