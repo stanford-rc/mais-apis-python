@@ -78,7 +78,7 @@ class AccountService():
 
     @staticmethod
     def _get_setting(
-        source: Dict[str, Union[str, List[Dict[str, str]]]],
+        settings: List[Dict[str, str]],
         target: str
     ) -> Union[None, str, Set[str]]:
         """Convenience method to pull a setting out of a settings dict.
@@ -86,7 +86,7 @@ class AccountService():
         :returns: If the setting was single-valued, return it as a string.  If the setting was multi-valued, return a set of strings.  If the setting was not found, return None.
         """
         results = set()
-        for setting in source:
+        for setting in settings:
             if setting['name'] == target:
                 results.add(setting['value'])
         if len(results) == 0:
@@ -105,7 +105,7 @@ class AccountService():
         required_keys_multiple: OptionalTupleOfStrings = tuple(),
         optional_keys_single: OptionalTupleOfStrings = tuple(),
         optional_keys_multiple: OptionalTupleOfStrings = tuple(),
-    ) -> Dict[str, Union[None, str, Tuple[str, ...]]]:
+    ) -> Dict[str, Union[None, str, Set[str]]]:
         """Convenience method to pull settings out of a settings dict
 
         :param source: The dict for a single service, taken from the JSON array of services returned by the Account API.
@@ -123,16 +123,24 @@ class AccountService():
         :returns: A dict, suitable for passing to the dataclass constructor (once ``name`` and ``is_active`` are included).
 
         :raises KeyError: A required setting is missing.
+
+        :raises TypeError: The 'settings' list is not actually a list.
         """
-        result = dict()
+        result: Dict[str, Union[None, str, Set[str]]] = dict()
 
         # Is this account inactive?  If yes, all keys are optional.
         if source['status'] != 'active':
             optional_keys_single += required_keys_single
             optional_keys_multiple += required_keys_multiple
 
+        # Make sure our settings list is a list.
+        # (Needed because we can't be sure with the type-checker.)
+        if isinstance(source['settings'], list):
+            settings = source['settings']
+        else:
+            raise TypeError(f"Service {service} has a non-list 'settings'")
+
         # Add all keys, required and optional
-        settings = source['settings']
         for k in (
             required_keys_single + required_keys_multiple +
             optional_keys_single + optional_keys_multiple
@@ -146,8 +154,9 @@ class AccountService():
 
         # Ensure multi-value keys are in sets
         for k in (required_keys_multiple + optional_keys_multiple):
-            if not isinstance(result[k], set):
-                result[k] = set(k,)
+            should_be_set = result[k]
+            if isinstance(should_be_set, str):
+                result[k] = set([should_be_set])
 
         # All done!
         return result
