@@ -141,6 +141,8 @@ class AccountService():
         if source['status'] != 'active':
             optional_keys_single += required_keys_single
             optional_keys_multiple += required_keys_multiple
+            required_keys_single = tuple()
+            required_keys_multiple = tuple()
 
         # Make sure our settings list is a list.
         # (Needed because we can't be sure with the type-checker.)
