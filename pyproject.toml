@@ -13,9 +13,11 @@ build-backend = "setuptools.build_meta"
 namespace_packages = true
 pretty = true
 no_color_output = true
-files = [
+mypy_path = [
     "src"
 ]
+# There is no support for putting `-p` / `-package` in the MyPy config file.
+# Feature requested: https://github.com/python/mypy/issues/10728
 
 [tool.pytest.ini_options]
 testpaths = [
