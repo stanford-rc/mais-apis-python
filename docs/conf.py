@@ -10,8 +10,15 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-#import os
-#import sys
+import pathlib
+import os
+import sys
+
+# Get the path to this config file, and convert to an absolute path.
+# Then, use that to work out the path to the `src` dir, and add it.
+conf_path = pathlib.Path(__file__).resolve()
+src_path = conf_path.parent / 'src'
+sys.path.insert(0, str(src_path))
 
 # -- Project information -----------------------------------------------------
 
