@@ -85,3 +85,15 @@ return ``None``.
    :members:
 
 .. _Account Validation:
+
+Accounts Validation
+===================
+
+The :class:`~stanford.mais.account.Account` class provides all of the tools
+needed to validate a single SUNetID (that is, determine if it is a valid
+SUNetID).  But if you have a list of SUNetIDs (particularly an unformatted
+list), the :mod:`stanford.mais.account.validate` module has function that can
+help.
+
+.. automodule:: stanford.mais.account.validate
+   :members:
