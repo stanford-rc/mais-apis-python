@@ -104,7 +104,7 @@ class AccountClient():
     as the ``custom_session`` and it will be used for all requests.
     """
 
-    _cache: Mapping[str, 'Account'] = dataclasses.field(repr=False, default_factory=dict)
+    _cache: MutableMapping[str, 'Account'] = dataclasses.field(repr=False, default_factory=dict)
     """Cache of already-seen accounts.
 
     This cache is used to store :class:`Account` instances already seen by this
