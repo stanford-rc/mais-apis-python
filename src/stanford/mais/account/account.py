@@ -270,7 +270,7 @@ class Account():
         # Process the services associated with the account.
 
         # First, define a table of known services, mapping each to its class.
-        known_services = {
+        known_services: Dict[str, Type[service.AccountService]] = {
             'kerberos': service.AccountServiceKerberos,
             'library': service.AccountServiceLibrary,
             'seas': service.AccountServiceSEAS,

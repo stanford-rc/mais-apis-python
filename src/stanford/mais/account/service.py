@@ -61,6 +61,15 @@ class AccountService():
     ``True`` if the service is active for the associated account.
     """
 
+    # This really should be marked as an @abc.abstractclass, but MyPy raises an
+    # error because of https://github.com/python/mypy/issues/5374
+    @classmethod
+    def _from_json(
+        cls,
+        source: Dict[str, Union[str, List[Dict[str, str]]]],
+    ):
+        raise NotImplementedError('AccountService._from_json() must be implemented in all subclasses.')
+
     @staticmethod
     def _json_to_dict(
         source: Dict[str, Union[str, List[Dict[str, str]]]],
