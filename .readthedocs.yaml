@@ -1,0 +1,27 @@
+# Configuration file for Read the Docs.
+
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for the
+# configuration file reference.
+version: 2
+
+# I think it's unlikely that people will want the non-HTML docs, but
+# if that's not true, please let us know and we'll change this!
+# http://github.com/stanford-rc/mais-apis-python/issues
+formats: []
+
+# We're building using Sphinx
+sphinx:
+  configuration: docs/conf.py
+
+# Use the latest version of Python that we explicitly support.
+python:
+  version: 3.9
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
+
+# The testing image is needed to use Python 3.9.
+build:
+  image: testing
