@@ -1,5 +1,8 @@
 include VERSION
 
+# Include py.typed files
+recursive-include src/stanford/mais/* py.typed
+
 # Include docs, but not the build directory.
 recursive-include docs *
 recursive-exclude docs/_build *
