@@ -53,11 +53,16 @@ class MAISClient():
     urls: Mapping[str, str]
     """A mapping of API to URL.
 
-    This mapping uses API names (like "account") as keys, and the base URL as
+    This mapping uses API names (like ``account``) as keys, and the base URL as
     the value.
 
     If you are setting up your own client instance, you will need to provide
-    entries for each API you plan on using.
+    entries for each API you plan on using.  If you are using the UAT or PROD
+    (production) environments, you can call :meth:`uat` or :meth:`prod`.  If
+    you are using a different environment, or developing a MaIS API locally,
+    you won't be able to use those methods, but you can study the code (more
+    specifically, the URLs they embed) to get an idea of which URL is needed
+    for which service.
 
     :raises TypeError: You did not provide a mapping.
     """
@@ -68,10 +73,16 @@ class MAISClient():
     This must refer to a single file.  The file must be in PEM format (the text
     format), and must have a single key followed by a certificate.  If the key
     is an EC key, then any necessary EC parameters may be included, before the
-    private key.
+    private key.  This is the same format that most programs (particularly web
+    servers) use, when you give them the server key & certificate in a single
+    file.
 
-    The key must *not* be password-protected.  A test load of the key and
-    certificate will be made before the constructor completes.
+    .. warning::
+       The private key must **not** be password-protected.  Enabling support
+       for this is covered in `<https://github.com/psf/requests/issues/1573>`_.
+
+    A test load of the key and certificate will be made before the constructor
+    completes.
 
     :raises FileNotFoundError: The file does not exist.
 
@@ -131,9 +142,10 @@ class MAISClient():
 
         The returned client has all of the URLs pre-configured.
 
-        *NOTE*: A new client instance is created every time you call this.  If
-        you want to take advantage of caching, only call this once per
-        thread/process.
+        .. note::
+           A new client instance is created every time you call this.  If
+           you want to take advantage of caching, call this only once per
+           thread/process.
 
         :param cert: The path to a file containing a client key & cert.  It must be provisioned by MaIS to operate in the PROD environment.
 
@@ -164,9 +176,10 @@ class MAISClient():
 
         The returned client has all of the URLs pre-configured.
 
-        *NOTE*: A new client instance is created every time you call this.  If
-        you want to take advantage of caching, only call this once per
-        thread/process.
+        .. note::
+           A new client instance is created every time you call this.  If
+           you want to take advantage of caching, call this only once per
+           thread/process.
 
         :param cert: The path to a file containing a client key & cert.  It must be provisioned by MaIS to operate in the UAT environment.
 
@@ -191,13 +204,15 @@ class MAISClient():
     def session(self) -> requests.Session:
         """Create a Requests session container.
 
-        This is a Requests Session instance, which has the certificate and
-        timeouts pre-configured.  All that remains is to set appropriate
-        'Accept' and 'Content-Type' headers, and it will be ready for use.
+        This is a Requests :class:`~requests.Session` instance, which has the
+        certificate and timeouts pre-configured.  All that remains is to set
+        appropriate 'Accept' and 'Content-Type' headers, and it will be ready
+        for use.
 
-        *NOTE*: A new container is created each time you call this.  If you
-        want to take advantage of caching, only call this once per
-        thread/process.
+        .. note::
+           A new container is created each time you call this.  If you
+           want to take advantage of caching, call this once per
+           thread/process.
         """
         session = requests.Session()
         session.cert = str(self.cert)
