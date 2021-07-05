@@ -5,7 +5,7 @@ Stanford MaIS APIs Python Client
 This is a Python client for interacting with Stanford MaIS APIs.
 
 The `Middleware and Integration Services`_ group, part of `University IT`_,
-provides many APIs for reading information from the _Registry_, the data store
+provides many APIs for reading information from the `Registry`_, the data store
 that contains information about people, accounts, groups, courses, and more.
 Although the data sets seem simple, come from many different sources (for
 example, student records and HR records).
@@ -16,6 +16,7 @@ some of those APIs.
 
 .. _Middleware and Integration Services: https://mais.stanford.edu/
 .. _University IT: https://uit.stanford.edu/
+.. _Registry: https://uit.stanford.edu/service/registry
 
 Example
 -------
@@ -131,7 +132,7 @@ Requirements
 At this time, there is no explicit support for threads, multiple processes, or
 async, though support may be added in the future.  Until then, you should be
 safe to use these modules, so long as you don't share instances across
-threads/packages.
+threads/processes.
 
 .. _Requests: https://docs.python-requests.org/
 .. _MaIS: https://mais.stanford.edu/
