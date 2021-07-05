@@ -73,3 +73,12 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = []
+
+# Set some RTD theme config.  This includes the entire navigation structure
+# into the sidebar of all pages.  However, expanding the sections isn't
+# provided yet on the RTD theme (see
+# https://github.com/readthedocs/sphinx_rtd_theme/issues/455).
+html_theme_options = {
+    'collapse_navigation': False,
+    'navigation_depth': 2,
+}
