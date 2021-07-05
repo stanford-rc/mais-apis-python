@@ -137,6 +137,18 @@ class Account():
     This contains the services currently associated with the account.  Each
     service has a service name, and the value is a dataclass which contains
     status and service-specific information.
+
+    It is a :class:`~collections.abc.Mapping` of :class:`str` (the service
+    name) to subclasses of
+    :class:`~stanford.mais.account.service.AccountService`.  To learn the key
+    name for each service, refer to the documentation for that subclass.
+
+    .. note::
+       From time to time, new services are defined.  Those services will
+       **not** appear in this mapping until a software update is released,
+       defining a new subclass for that service.  If you need to access the
+       service's data before that time, refer to the `services` key in the
+       parsed JSON.
     """
 
     last_updated: datetime.datetime
@@ -155,10 +167,10 @@ class Account():
       separator.
 
       * If the account is for a person (that is, `type` is "self"), then this
-        string will be `person/` followed by the RegID of the person.
+        string will be ``person/`` followed by the RegID of the person.
 
       * If the account is for a functional account (`type` is "functional"),
-        then this string will be `organization/` followed by the RegID of the
+        then this string will be ``organization/`` followed by the RegID of the
         Org which owns the functional account.
 
     * **statusDate**: The date when this account was last changed, in the
@@ -197,26 +209,28 @@ class Account():
         for the same input will return the same result instance, thanks to the
         use of a cache.
 
-        *WARNING*: This will looks up accounts of all types, both accounts for
-        people and also functional accounts.  Check the :meth:`type` before
-        assuming you are working with a SUNetID.
+        .. warning::
+           This will looks up accounts of all types, both accounts for
+           people and also functional accounts.  Check :meth:`is_person` before
+           assuming you are working with a SUNetID.
 
-        *WARNING*: This memoization means that, should an account change status
-        after lookup, that status change will not be noticed until after the
-        module is reloaded.  That means this code should *not* be used by
-        long-running client code.
+        .. warning::
+           This memoization means that, should an account change status
+           after lookup, that status change will not be noticed until after the
+           module is reloaded.  That means this code should *not* be used by
+           long-running client code.
 
         :param client: An :class:`AccountClient` representing our API endpoint.
 
-        :param sunetid: The to look up.  This must be an actual id, not an alias.
+        :param sunetid: The ID to look up.  This must be an actual id, not an alias.
 
         :raises ChildProcessError: Something went wrong on the server side (a 400 or 500 error was returned).
 
-        :raises IndexError: The input is too long.  Maybe the input is an alias?
-
-        :raises KeyError: The given SUNetID does not exist.
+        :raises KeyError: The given ID does not exist.  Maybe it was an alias?
 
         :raises PermissionError: You did not use a valid certificate, or do not have permissions to perform the operation.
+
+        :raises UnicodeEncodeError: The ID you provided included non-ASCII characters.
 
         :raises ValueError: The input contains non-ASCII characters.
 

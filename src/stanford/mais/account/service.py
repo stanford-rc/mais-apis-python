@@ -244,7 +244,7 @@ class AccountServiceSEAS(AccountService):
     """``seas`` service for an Account.
 
     The "Stanford Electronic Alias Service".  If this service is active, then
-    the account has an associated `@stanford.edu` email address, even if they
+    the account has an associated *@stanford.edu* email address, even if they
     don't have a Stanford email box.
 
     .. note::
@@ -427,7 +427,7 @@ class AccountServiceAutoreply(AccountService):
 class AccountServiceLeland(AccountService):
     """``leland`` service for an Account.
 
-    This represents the Stanford `Shared Computing`_ environment, originally
+    This represents the Stanford `Shared Computing`_ environment, once
     known as `Leland`_ and known today as `FarmShare`_.  If active, users are
     able to log in to FarmShare.
 
@@ -517,12 +517,16 @@ class AccountServiceAFS(AccountService):
     The path to the account's home directory.
 
     .. note::
-       This is used as the account's `homeDirectory` in LDAP.  As such, you
+       This is used as the account's ``homeDirectory`` in LDAP.  As such, you
        will probably want to override it.
 
     .. note::
        This setting assumes that AFS is mounted at path ``/afs`` on a ssytem.
-       This is normally, but not always, the case.
+       This is normally, but not always, the case.  This setting also assumes
+       that your system has an up-to-date copy of the
+       `CellServDB <https://docs.openafs.org/Reference/5/CellServDB.html>`_
+       file, which should be the case if you are using a packaged OpenAFS
+       client.
     """
 
     @classmethod

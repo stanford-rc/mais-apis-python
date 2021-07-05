@@ -40,6 +40,11 @@ class AccountValidationResults(NamedTuple):
 
     This class contains the results of an account validation, called via
     :func:`validate`.
+
+    .. note::
+       Many of these properties are collections.  That means, if you want to
+       use things like subscripting, you will want to convert to a
+       more-specific type (such as :class:`list` before using it).
     """
 
     raw: Optional[str]
@@ -55,28 +60,28 @@ class AccountValidationResults(NamedTuple):
     collection.  Otherwise, this will be the original list/set/tuple that was
     provided to :func:`validate`, but made into a set.
 
-    The set union of `full`, `base`, `inactive`, and `unknown` should equal
+    The set union of `full`, `base`, `inactive`, and `unknown` is equal to
     this list.
     """
 
     full: Collection[str]
     """
-    The list of active, full (or full-sponsored) SUNetIDs found in `raw_set`.
+    The set of active, full (or full-sponsored) SUNetIDs found in `raw_set`.
     """
 
     base: Collection[str]
     """
-    The list of active, base (or base-sponsored) SUNetIDs found in `raw_set`.
+    The set of active, base (or base-sponsored) SUNetIDs found in `raw_set`.
     """
 
     inactive: Collection[str]
     """
-    The list of inactive SUNetIDs found in `raw_set`.
+    The set of inactive SUNetIDs found in `raw_set`.
     """
 
     unknown: Collection[str]
     """
-    The list of entries from `raw_set` that are not SUNetIDs.
+    The set of entries from `raw_set` that are not SUNetIDs.
     """
 
 @functools.singledispatch
@@ -84,8 +89,8 @@ def validate(
     raw: str,
     client: stanford.mais.account.AccountClient,
 ) -> AccountValidationResults:
-    """Given a list of SUNetIDs, in string or collection form, validate and
-    check status.
+    """Given a list of SUNetIDs; as a string or a list, tuple, or set; validate
+    and check status.
 
     This takes a list of SUNetIDs, and returns a list of SUNetIDs which have
     been checked against the Accounts API for both activity and service level.
@@ -93,9 +98,16 @@ def validate(
     full-sponsored), active base (or base-sponsored), or inactive.
 
     If the input is a string, then the input string may be separated by commas,
-    and/or any kind of whitespace.  If the input is some other form of
-    collection (list, tuple, or set), the function assumes that all whitespace
-    etc. have been removed.
+    and/or whitespace, (where "whitespace" is a space, newline/linefeed, form
+    feed, carriage return, tab/horizontal tab, or vertical tab character).  If
+    the input is a list, tuple, or set; the function assumes that all
+    whitespace etc. have been removed.
+
+    .. note::
+       "List, tuple, or set" is used instead of the generic "collection"
+       because a :class:`str` is also a collection (of other :class:`str`).
+       See `typing issue #256 <https://github.com/python/typing/issues/256>`_
+       for the discussion around this issue.
 
     This is designed to catch most exceptions.  Exceptions related to
     validation (for example, attempting to validate an obviously-invalid
@@ -179,6 +191,9 @@ def _(
             debug(f"Account {sunetid} not found.")
             unknown.add(sunetid)
             continue
+
+        # Overwrite the input SUNetID with the normalized one.
+        sunetid = account.sunetid
 
         # Next, catch inactives
         if account.is_active is False:

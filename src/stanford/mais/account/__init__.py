@@ -50,7 +50,7 @@ class AccountClient():
 
     Once you have a client instantiated, you can use :meth:`get` to fetch an
     account.   For your convenience, instances of this class also implement
-    `__getitem__`, so instead of doing…
+    ``__getitem__``, so instead of doing…
 
     .. code-block:: default
 
@@ -70,7 +70,7 @@ class AccountClient():
     .. code-block:: default
 
        aclient = AccountClient(...)
-       lelandjr_exists = (True if 'lelandjr' in client else False)
+       lelandjr_exists = (True if 'lelandjr' in aclient else False)
 
     Through the use of caching, if you then decide to fetch the account
     after confirming its existance, the entry will be served from cache
@@ -84,7 +84,7 @@ class AccountClient():
     client: stanford.mais.client.MAISClient
     """A :class:`~stanford.mais.client.MAISClient` instance.
 
-    This configures the API endpoint (accessed via `client.urls['account']`)
+    This configures the API endpoint (accessed via ``client.urls['account']``)
     and client key/cert to use.  It must be provided when calling the class
     constructor.
 
@@ -100,8 +100,9 @@ class AccountClient():
 
     Normally, this should not be set, and a new session will be requested from
     the client.  But if you would like to use a custom
-    :class:`requests.Session` instance (such as for mock testing), provide it
-    as the ``custom_session`` and it will be used for all requests.
+    :class:`~requests.Session` instance (such as for mock testing), provide it
+    to the constructor as the ``custom_session`` and it will be used for all
+    requests.
     """
 
     _cache: MutableMapping[str, 'Account'] = dataclasses.field(repr=False, default_factory=dict)
@@ -141,12 +142,11 @@ class AccountClient():
     ) -> 'Account':
         """Fetch an Account.
 
-        This is a convenience wrapper around :meth:`Account.get`, which
-        provides this client as the `client`.  All other parameters provided
-        are passed through to :meth:`Account.get`, and the resulting instance
-        is returned.
+        This is a convenience wrapper around :meth:`Account.get`.  All other
+        parameters provided are passed through to :meth:`~Account.get`, and the
+        resulting instance is returned.
 
-        Refer to :meth:`~Account.get` for details on parameters, exceptions,
+        Refer to :meth:`Account.get` for details on parameters, exceptions,
         etc..
         """
         return Account.get(
@@ -186,7 +186,7 @@ class AccountClient():
     def only_active(
         self,
     ) -> 'AccountView':
-        """Create a modified ``AccountClient`` that can only see active
+        """Create a modified :class:``AccountClient`` that can only see active
         accounts.
 
         The returned client instance has been modified so that
@@ -220,7 +220,7 @@ class AccountClient():
     def only_inactive(
         self,
     ) -> 'AccountView':
-        """Create a modified ``AccountClient`` that can only see inactive
+        """Create a modified :class:``AccountClient`` that can only see inactive
         accounts.
 
         The returned client instance has been modified so that
@@ -242,8 +242,8 @@ class AccountClient():
     def only_people(
         self,
     ) -> 'AccountView':
-        """Create a modified ``AccountClient`` that can only see accounts of
-        people.
+        """Create a modified :class:``AccountClient`` that can only see
+        accounts of people.
 
         The returned client instance has been modified so that
         :meth:`~AccountClient.get` only returns the accounts of people.  If you
@@ -287,8 +287,8 @@ class AccountClient():
     def only_functional(
         self,
     ) -> 'AccountView':
-        """Create a modified ``AccountClient`` that can only see functional
-        accounts.
+        """Create a modified :class:``AccountClient`` that can only see
+        functional accounts.
 
         The returned client instance has been modified so that
         :meth:`~AccountClient.get` only returns functional accounts.  If you
