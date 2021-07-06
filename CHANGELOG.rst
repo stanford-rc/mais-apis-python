@@ -1,7 +1,15 @@
 Unreleased
 ----------
 
-Nothing yet…
+Fixed:
+
+* Although the project is fully typed, the PEP 561 marker file was missing (#2).
+
+Other:
+
+* Bandit and CodeQL checks are being performed on all pushes and pull requests.
+
+* The docs on Read the Docs were not building properly.
 
 0.50.1
 ------
