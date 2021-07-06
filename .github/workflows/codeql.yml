@@ -1,0 +1,32 @@
+# This GitHub Action runs CodeQL checks against the project.
+name: "CodeQL Checks"
+
+# This is run on every push, pull request, and on a schedule (to include any
+# new checks that are developed).
+# The schedule is 10 AM every Tuesday.
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 10 * * 2'
+
+jobs:
+  codeql-analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: python
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
