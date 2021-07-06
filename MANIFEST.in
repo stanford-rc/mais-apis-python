@@ -1,3 +1,4 @@
+include CHANGELOG.rst
 include VERSION
 
 # Include py.typed files
