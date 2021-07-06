@@ -11,6 +11,7 @@
 
    client
    account
+   changes
 
 Indices and tables
 ==================
