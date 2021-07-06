@@ -1,0 +1,31 @@
+# This configures Dependabot to monitor the package, and open pull requests
+# when dependencies update.
+#
+# Whenever an update happens, it's on us to check the changelog of the update,
+# and determine if we need to bump the minimum required version of the
+# dependency.  After that, we'll need to do a new release.
+#
+# Thanks to https://github.com/dependabot/dependabot-core/issues/2133,
+# https://github.com/dependabot/dependabot-core/pull/2281, and
+# https://github.com/dependabot/dependabot-core/pull/3423; as of about two
+# months ago Dependabot now supports python.cfg files, so we can use it!
+
+# For configuration format, see
+# https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/configuration-options-for-dependency-updates#directory
+version: 2
+
+# We have a single pip ecosystem.
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+
+    # Do checks at 10AM on Tuesdays, Stanford-time
+    schedule:
+      interval: daily
+      day: "tuesday"
+      time: "10:00"
+      timezone: "US/Pacific"
+
+    # Ping Karl directly for review
+    assignees:
+      - "akkornel"
