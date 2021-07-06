@@ -2,6 +2,16 @@
 Stanford MaIS APIs Python Client
 ================================
 
+.. image:: https://badge.fury.io/py/stanford-mais.svg
+   :target: https://badge.fury.io/py/stanford-mais
+   :alt: Badge showing the latest version available on PyPI
+.. image:: https://img.shields.io/pypi/pyversions/stanford-mais?style=plastic
+   :target: https://pypi.org/project/stanford-mais/
+   :alt: Badge showing supported Python versions
+.. image:: https://readthedocs.org/projects/mais-apis-python/badge/?version=latest
+   :target: https://mais-apis-python.readthedocs.io/en/latest/?badge=latest
+   :alt: Badge showing documentation build status
+
 This is a Python client for interacting with Stanford MaIS APIs.
 
 The `Middleware and Integration Services`_ group, part of `University IT`_,
