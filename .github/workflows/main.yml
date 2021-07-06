@@ -5,7 +5,7 @@ on:
 
 jobs:
   tests:
-    name: Run PyTest
+    name: Run PyTest and Bandit
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -26,6 +26,9 @@ jobs:
       - name: Run tests
         run: |
           pytest
+      - name: Run Bandit
+        run: |
+          bandit -r src
 
   linting:
     name: Run MyPy
