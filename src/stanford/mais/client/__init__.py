@@ -91,7 +91,7 @@ class MAISClient():
     :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
     """
 
-    _default_timeout: Tuple[float, float] = (3.0, 3.0)
+    _default_timeout: Tuple[float, float] = (3.0, 6.0)
     """The default timeout to use for requests.
 
     This is a tuple of ints.  The first item is the timeout on connecting to
