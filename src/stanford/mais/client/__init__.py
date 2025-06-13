@@ -68,14 +68,38 @@ class MAISClient():
     """
 
     cert: pathlib.Path
-    """The path to a TLS client key & cert.
+    """The path to a TLS client certificate.
 
-    This must refer to a single file.  The file must be in PEM format (the text
-    format), and must have a single key followed by a certificate.  If the key
-    is an EC key, then any necessary EC parameters may be included, before the
-    private key.  This is the same format that most programs (particularly web
-    servers) use, when you give them the server key & certificate in a single
-    file.
+    This may contain *either* a single TLS client certificate, *or* a TLS
+    private key followed by a certificate.  The latter format (combined key and
+    cert) was common in the old days; the former format (separate key and cert)
+    is preferred today.
+
+    The certificate (and key, if included) must be in PEM format (the text
+    format).  If a key is included, and it is an EC key, then any necessary EC
+    parameters may be included before the private key.
+
+    A test load will be made before the constructor completes.
+
+    :raises FileNotFoundError: The file does not exist.
+
+    :raises PermissionError: We do not have read permission on the file.
+
+    :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
+    """
+
+    key: Optional[pathlib.Path] = None
+    """The path to a TLS private key.
+
+    This must be the private key associated with the provided certificate, any
+    must only be set if the private key is in a separate file from the
+    certificate.  If the private key and certificate are in the same file, then
+    this must be set to `None`.
+
+    The file must be in PEM format (the text format), and must contain a single
+    key.  If the key is an EC key, then any necessary EC parameters may be
+    included, before the private key.  This is the same format that most
+    programs (particularly web servers) use.
 
     .. warning::
        The private key must **not** be password-protected.  Enabling support
@@ -127,7 +151,13 @@ class MAISClient():
 
         # Try to parse the client certificate.
         sslc = ssl.SSLContext()
-        sslc.load_cert_chain(str(self.cert))
+        if self.key is None:
+            sslc.load_cert_chain(str(self.cert))
+        else:
+            sslc.load_cert_chain(
+                str(self.cert),
+                keyfile=str(self.key),
+            )
 
         # That's it!
         return None
@@ -136,6 +166,7 @@ class MAISClient():
     def prod(
         cls: Type['MAISClient'],
         cert: pathlib.Path,
+        key: Optional[pathlib.Path] = None,
     ) -> 'MAISClient':
         """Return a client configured to connect to connect to production
         (PROD) APIs.
@@ -165,12 +196,14 @@ class MAISClient():
                 'workgroup': 'https://aswsweb.stanford.edu/mais/workgroupsvc/workgroups/2.0',
             },
             cert=cert,
+            key=key,
         )
 
     @classmethod
     def uat(
         cls: Type['MAISClient'],
         cert: pathlib.Path,
+        key: Optional[pathlib.Path] = None,
     ) -> 'MAISClient':
         """Return a client configured to connect to connect to UAT APIs.
 
@@ -199,6 +232,7 @@ class MAISClient():
                 'workgroup': 'https://aswsuat.stanford.edu/mais/workgroupsvc/workgroups/2.0/',
             },
             cert=cert,
+            key=key,
         )
 
     def session(self) -> requests.Session:
@@ -215,5 +249,11 @@ class MAISClient():
            thread/process.
         """
         session = requests.Session()
-        session.cert = str(self.cert)
+        if self.key is None:
+            session.cert = str(self.cert)
+        else:
+            session.cert = (
+                str(self.cert),
+                str(self.key),
+            )
         return session
