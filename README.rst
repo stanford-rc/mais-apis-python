@@ -70,6 +70,56 @@ Here is an example of how you can use the Accounts API through this SDK:
    # validated_results.inactive={'lelandjr'}
    # validated_results.unknown={'asld-gkm'}
 
+Here is an example of how you can use the Workgroup API through this SDK:
+
+.. code-block:: python
+
+    from stanford.mais.client import MAISClient
+    from stanford.mais.workgroup import WorkgroupClient
+    from pathlib import Path
+
+    # Keep this secret!
+    client_cert = Path('client.pem')
+
+    # Set up clients
+    client = MAISClient.prod(client_cert)  # You can also use .uat() for UAT.
+    workgroups = WorkgroupClient(client)
+
+    # Fetch a workgroup
+    sysadmins = workgroups.get('research-computing:sysadmins')
+    sysadmins = workgroups['research-computing:sysadmins'] # This works too!
+
+    # Create a workgroup
+    if 'research-computing:everyone' not in workgroups:
+        everyone = workgroups.create(
+            name='research-computing:everyone',
+            description='Everyone in Research Computing!',
+            privgroup=True
+        )
+    else:
+        everyone = workgroups['research-computing:everyone']
+
+    # Workgroup members & administrators are sets, so you can use them like sets!
+    missing_people = sysadmins.members.people - everyone.members.people
+    if len(missing_people) > 0:
+        print(
+            'Some sysadmins are missing from everyone: ' +
+            ','.join(missing_people)
+        )
+        everyone.members.people.update(sysadmins.members.people)
+
+    # Adding people also uses set operations
+    sysadmins.members.people.add(new_sysadmin)
+    everyone.members.people.add(new_sysadmin)
+
+    # Nesting workgroups also uses set operations
+    everyone.members.workgroups.add('research-computing:sysadmins')
+
+    # You can also access privgroups through this interface
+    sysadmins_privgroup = sysadmins.get_privgroup()
+    sysadmins_privgroup_members = sysadmins_privgroup.members
+    ldap_accounts = list((member.sunetid for member in sysadmins_privgroup_members))
+
 APIs Supported
 --------------
 
@@ -87,12 +137,12 @@ The following APIs are supported:
 Work is in progress on the following APIs:
 
 * `Workgroup`_: Full support for operations on individual workgroups.
-  Creating workgroups.  Modifying workgroup properties and membership.
-  Fetching privilege groups.  Checking and making linkages.  Integration with
-  the Accounts SDK (for workgroup membership).
+  Creating workgroups.  Searching for workgroup by name, or by member (member
+  SUNetID, member certificate, or member (nested) workgroup).
+  Modifying workgroup properties and membership.  Deleting workgroups.
+  Fetching privilege groups.  Checking and making linkages.
 
-  *Not currently planned*: Searching workgroups by an identifier (such as by
-  part of a name, or by a member).  Deleting workgroups.
+  *Not currently planned*: Anything related to workgroup integrations.
 
 Support is not planned for the following APIs, as the author does not
 currently have a need for them:
