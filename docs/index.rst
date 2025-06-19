@@ -10,6 +10,7 @@
 
    client
    account
+   workgroup
    changes
 
    genindex
