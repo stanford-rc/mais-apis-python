@@ -1,6 +1,10 @@
 Unreleased
 ----------
 
+Enhancements:
+
+* Add support for the Workgroup API.
+
 Fixed:
 
 * Although the project is fully typed, the PEP 561 marker file was missing (`#2`_).
