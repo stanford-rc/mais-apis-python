@@ -3,7 +3,7 @@ Unreleased
 
 Fixed:
 
-* Although the project is fully typed, the PEP 561 marker file was missing (#2).
+* Although the project is fully typed, the PEP 561 marker file was missing (`#2`_).
 
 Other:
 
@@ -22,3 +22,5 @@ Do a release that will hopefully actually push to prod!
 First alpha version!
 
 Includes support for the base client (MAISClient), and the Accounts API.
+
+.. _#2: https://github.com/stanford-rc/mais-apis-python/issues/2
