@@ -53,9 +53,9 @@ def test_no_certs():
     with pytest.raises(FileNotFoundError):
         MAISClient.prod(cert='/tmp/sdfsfdfmkdmksklfsdfdms')
 
-# Test with a malformed cert file
-def test_bad_cert(tmp_path):
-    bad_path = tmp_path / 'bad.pem'
+# Test with a malformed combined cert/key file
+def test_bad_certkey(tmpdir_factory):
+    bad_path = tmpdir_factory.mktemp('bad_certkey') / 'bad.pem'
     bad_file = bad_path.open('w', encoding='ascii')
     bad_file.write('''
 -----BEGIN EC PARAMETERS-----
