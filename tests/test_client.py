@@ -41,6 +41,15 @@ def test_good_uat(snakeoil_cert):
     for service in services:
         assert service in client.urls
 
+# Test if we can get a client with separate key and cert
+def test_good_prod_certkey(snakeoil_cert_key):
+    client = MAISClient.prod(
+        cert=snakeoil_cert_key[0],
+        key=snakeoil_cert_key[1],
+    )
+    for service in services:
+        assert service in client.urls
+
 # Ensure we throw if we don't have any URLs, or we don't provide a mapping.
 def test_no_urls(snakeoil_cert):
     with pytest.raises(TypeError):
@@ -76,3 +85,75 @@ njv+wh5wAf51OnJoMLohwwioq7TSMZWNCDLFHLbLf61moZB5raNv/UMGvVOEKgW3
     bad_file.close()
     with pytest.raises(ssl.SSLError):
         MAISClient.prod(cert=bad_path)
+
+# Test with a malformed cert file but good key file
+def test_bad_cert_good_key(tmpdir_factory):
+    bad_cert_good_key_path = tmpdir_factory.mktemp('bad_cert_good_key')
+    bad_cert_path = bad_cert_good_key_path / 'bad_cert.pem'
+    good_key_path = bad_cert_good_key_path / 'good_key.pem'
+    bad_cert_file = bad_cert_path.open('w', encoding='ascii')
+    good_key_file = good_key_path.open('w', encoding='ascii')
+    bad_cert_file.write('''
+-----BEGIN CERTIFICATE-----
+MIIBSTCB76ADAgECAhRN+mw8yUTAU0ENSqkoKaZhxkyhsjAKBggqhkjOPQQDAjAT
+MREwDwYDVQQDDAhzbmFrZW9pbDAeFw0yNTA2MjEyMDQwMDNaFw00NTA2MjEyMDQw
+MDNaMBMxETAPBgNVBAmMCHNuYWtlb2lsMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD
+QgAEtGcgWywoqw66S1uHCOQkutdqMEBOeoSvoTUX+wvg8MZBfihTmLNO6zrlqMo+
+QPrEgQaVfcYReeuJIGvn+DKk8KMhMB8wHQYDVR0OBBYEFMVhS8qvRIN1CTZj757M
+o0xg0txhMAoGCCqGSM49BAMCA0kAMEYCIQCp9eFScWdO0UyNMbqsG4mXez6ALY88
+H8lmT6mVTkHJOAIhAO1ayGcZKq1TI3DIpaNJHCWKAuUY5BLurfChzSvQSrDB
+-----END CERTIFICATE-----
+''')
+    good_key_file.write('''
+-----BEGIN EC PARAMETERS-----
+BggqhkjOPQMBBw==
+-----END EC PARAMETERS-----
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIDI9ntYm7msj7i9+DIM2D+ShZnSTxICDncOV1wFAlEijoAoGCCqGSM49
+AwEHoUQDQgAEtGcgWywoqw66S1uHCOQkutdqMEBOeoSvoTUX+wvg8MZBfihTmLNO
+6zrlqMo+QPrEgQaVfcYReeuJIGvn+DKk8A==
+-----END EC PRIVATE KEY-----
+''')
+    bad_cert_file.close()
+    good_key_file.close()
+    with pytest.raises(ssl.SSLError):
+        MAISClient.prod(
+            cert=bad_cert_path,
+            key=good_key_path,
+        )
+
+# Test with a good cert but bad key file
+def test_good_cert_bad_key(tmpdir_factory):
+    good_cert_bad_key_path = tmpdir_factory.mktemp('good_cert_bad_key')
+    good_cert_path = good_cert_bad_key_path / 'good_cert.pem'
+    bad_key_path = good_cert_bad_key_path / 'bad_key.pem'
+    good_cert_file = good_cert_path.open('w', encoding='ascii')
+    bad_key_file = bad_key_path.open('w', encoding='ascii')
+    good_cert_file.write('''
+-----BEGIN CERTIFICATE-----
+MIIBSDCB76ADAgECAhQN8DYs3urHr5LXpviDtiR8xQMG1jAKBggqhkjOPQQDAjAT
+MREwDwYDVQQDDAhzbmFrZW9pbDAeFw0yNTA2MjEyMDQwMDFaFw00NTA2MjEyMDQw
+MDFaMBMxETAPBgNVBAMMCHNuYWtlb2lsMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD
+QgAEGUOrb6DaRgG9g0YUwyZ/+Xl4z8LTHTeHXjVuBqzu1kjvhy1Tg21Znux9GN0P
+h5vkIQgG2jb2MW2Eq729iT6zD6MhMB8wHQYDVR0OBBYEFD8l9ywR8EYYDNnGfUlh
+3ZlDxw+dMAoGCCqGSM49BAMCA0gAMEUCICnCq8kbLVnWKFSp4TcA7lQo2XXjfgVp
+h0kkK0s3hoxMAiEAuJF9yRNgOwdLaUonyJ3iTT8kye30QbxP+wx8QGc/ayw=
+-----END CERTIFICATE-----
+''')
+    bad_key_file.write('''
+-----BEGIN EC PARAMETERS-----
+BggqhkjOPQMBBw==
+-----END EC PARAMETERS-----
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEII47Xsvzg4TxGjoz/ftPJ/Zfw3aEo6Og3SqPYA8zeqFfoAoGCCqGSM49
+AwEHoUQDQgAEGUOrb6DaRgG9g0YUwyZ/+Xl4z8LTHTEHXjVuBqzu1kjvhy1Tg21Z
+nux9GN0Ph5vkIQgG2jb2MW2Eq729iT6zDw==
+-----END EC PRIVATE KEY-----
+''')
+    good_cert_file.close()
+    bad_key_file.close()
+    with pytest.raises(ssl.SSLError):
+        MAISClient.prod(
+            cert=good_cert_path,
+            key=bad_key_path,
+        )
