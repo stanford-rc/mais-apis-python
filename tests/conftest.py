@@ -48,6 +48,40 @@ R0XW
     snakeoil_file.close()
     return snakeoil_path
 
+# This creates separate key and cert parameters, to test constructing a
+# MAISClient with separate files.
+@pytest.fixture(scope='session')
+def snakeoil_cert_key(tmpdir_factory):
+    snakeoil_path = tmpdir_factory.mktemp('cert_key')
+    snakeoil_key_path = snakeoil_path / 'snakeoil.key'
+    snakeoil_cert_path = snakeoil_path / 'snakeoil.pem'
+    snakeoil_key_file = snakeoil_key_path.open('w', encoding='ascii')
+    snakeoil_cert_file = snakeoil_cert_path.open('w', encoding='ascii')
+    snakeoil_key_file.write('''
+-----BEGIN EC PARAMETERS-----
+BggqhkjOPQMBBw==
+-----END EC PARAMETERS-----
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEILXkVDzoQTChgDgY0hOmVefCHjmBB6Mjlez4Zyk/pqdNoAoGCCqGSM49
+AwEHoUQDQgAEYpieO/7CHnAB/nU6cmgwuiHDCKirtNIxlY0IMsUctst/rWahkHmt
+o2/9Qwa9U4QqBbfUsrOB9Aj14U62VK2C2A==
+-----END EC PRIVATE KEY-----
+''')
+    snakeoil_cert_file.write('''
+-----BEGIN CERTIFICATE-----
+MIIBHzCBxwIUIKCkNzLR2prWEb/cu8zSAVj7QskwCgYIKoZIzj0EAwIwEzERMA8G
+A1UEAwwIc25ha2VvaWwwHhcNMjEwNjI2MDIxMzE4WhcNNDEwNjI2MDIxMzE4WjAT
+MREwDwYDVQQDDAhzbmFrZW9pbDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABGKY
+njv+wh5wAf51OnJoMLohwwioq7TSMZWNCDLFHLbLf61moZB5raNv/UMGvVOEKgW3
+1LKzgfQI9eFOtlStgtgwCgYIKoZIzj0EAwIDRwAwRAIgdJnUKczm8XAYZX8wGQ0H
+sAyGGkZVw52AnLoAOH1sqwwCIDM0TW7Oas8ZA7YdO7RLCYcOsLQyleOywuXepDmt
+R0XW
+-----END CERTIFICATE-----
+''')
+    snakeoil_key_file.close()
+    snakeoil_cert_file.close()
+    return (snakeoil_cert_path, snakeoil_key_path)
+
 # For tests that require a good MAIS client, return one.
 # NOTE: As tests are made for additional services, add those URLs here.
 @pytest.fixture(scope='session')
