@@ -149,7 +149,8 @@ class Workgroup:
             underscores.  The name portion must start with a letter or number.
 
         :param description: The workgroup description.  Required, but it can be
-            an empty string.  Limited to 255 printable ASCII characters.
+            an empty string.  Limited to 255 characters from the ISO 8859-1
+            ("Latin 1") character set.
 
         :param filter: Optional.  See :meth:`filter`.  Defaults to `NONE`.
 
@@ -210,11 +211,11 @@ class Workgroup:
             error(f"Proposed description is too long")
             raise IndexError('description')
 
-        # Check if the description has nonprintable characters or is non-ASCII
+        # Check if the description has nonprintable characters or is non-Latin1
         try:
-            description.encode('ASCII')
+            description.encode('latin1')
         except UnicodeError:
-            error('Proposed description is not ASCII')
+            error('Proposed description is not encodable in ISO 8859-1')
             raise ValueError('description')
         if not description.isprintable():
             error(f"Proposed description has non-printable characters")
