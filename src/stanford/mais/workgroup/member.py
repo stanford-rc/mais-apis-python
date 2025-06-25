@@ -371,7 +371,7 @@ class WorkgroupMembershipContainer(
             raise KeyError(value)
 
         # Resolve the workgroup for later calls
-        workgroup = self.workgroup
+        workgroup = self._workgroup_ref()
         if workgroup is None:
             raise EOFError('workgroup')
         debug(f"Workgroup {workgroup.name}: Adding {self.container_type} {value} to {self._collection_type}")
