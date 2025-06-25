@@ -1,7 +1,7 @@
 # vim: ts=4 sw=4 et
 # -*- coding: utf-8 -*-
 
-# © 2021 The Board of Trustees of the Leland Stanford Junior University.
+# © 2025 The Board of Trustees of the Leland Stanford Junior University.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import requests
+import responses
+
+from stanford.mais.client import MAISClient
+from stanford.mais.account import AccountClient
+from stanford.mais.workgroup import WorkgroupClient
+from stanford.mais.workgroup.tests.mock import add_workgroup_responses
 
 # These are fixtures that will be used in various tests.
 
@@ -83,14 +90,29 @@ R0XW
     return (snakeoil_cert_path, snakeoil_key_path)
 
 # For tests that require a good MAIS client, return one.
-# NOTE: As tests are made for additional services, add those URLs here.
-@pytest.fixture(scope='session')
+# Also make fixtures for each service's client
+# NOTE: These fixtures are all per-test, not per-session, because Responses
+# mocks get cleared at the end of the test.  So, we need to reset each time.
+@pytest.fixture()
 def mais_client(snakeoil_cert):
-    return MAISClient.uat(cert=snakeoil_cert, urls={
-        'account': 'https://localhost/account/',
-    })
+    #with responses.RequestsMock() as rsps:
+    mais_client = MAISClient(
+        urls={
+            'workgroup': 'http://example.com/wg/v2/',
+        },
+        cert=snakeoil_cert,
+    )
 
-# For tests that require a good Account API client, return one.
-@pytest.fixture(scope='session')
-def account_client(mais_client):
+    # Add the different responses for each of our APIs
+    add_workgroup_responses()
+
+    # Send out the MaIS Client, in our mocked-up environment!
+    return mais_client
+
+@pytest.fixture()
+def account_client(mais_client) -> AccountClient:
     return AccountClient(client=mais_client)
+
+@pytest.fixture()
+def workgroup_client(mais_client) -> WorkgroupClient:
+    return WorkgroupClient(client=mais_client)
