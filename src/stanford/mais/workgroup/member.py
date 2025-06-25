@@ -385,7 +385,7 @@ class WorkgroupMembershipContainer(
         )
 
         # Get the Requests session
-        session = workgroup._client.session
+        session = workgroup.client.client.session
 
         # Do a PUT call to make the add.
         # In addition to the path, we need to provide the identifier type.
@@ -394,7 +394,6 @@ class WorkgroupMembershipContainer(
                 fragment=url_path,
             ),
             json={'type': self.container_type},
-            timeout=workgroup._client.client._default_timeout
         )
 
         # Catch a number of bad errors.
@@ -451,7 +450,7 @@ class WorkgroupMembershipContainer(
         )
 
         # Get the Requests session
-        session = workgroup._client.session
+        session = workgroup.client.client.session
 
         # Do a DELETE call to do the removal.
         # In addition to the path, we need to provide the identifier type.
@@ -460,7 +459,6 @@ class WorkgroupMembershipContainer(
                 fragment=url_path,
             ),
             json={'type': self.container_type},
-            timeout=workgroup._client.client._default_timeout
         )
 
         # Catch a number of bad errors.

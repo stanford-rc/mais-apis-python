@@ -222,7 +222,7 @@ class Workgroup:
             raise ValueError('description')
 
         # Get the Requests session
-        session = client.session
+        session = client.client.session
 
         # Make the Workgroup.
         post_url = client._url(
@@ -230,14 +230,13 @@ class Workgroup:
         )
         debug(f"Filter is '{filter}' — Visibility is '{visibility}'")
         debug(f"Running POST to {post_url} to create workgroup")
-        response = client.session.post(
+        response = client.client.session.post(
             post_url,
             json={
                 'description': description,
                 'filter': str(filter),
                 'visibility': str(visibility),
             },
-            timeout=client.client._default_timeout
         )
 
         # Catch a number of bad errors.
@@ -308,7 +307,7 @@ class Workgroup:
             fragment=name,
         )
         debug(f"Doing GET of {get_url}")
-        response = client.session.get(
+        response = client.client.session.get(
             get_url,
         )
 
@@ -377,7 +376,7 @@ class Workgroup:
             fragment=self.name,
         )
         debug(f"Doing GET of {get_url}")
-        response = self.client.session.get(
+        response = self.client.client.session.get(
             get_url,
         )
 
@@ -933,11 +932,10 @@ class Workgroup:
             pathlib.PurePosixPath('privgroup')
         )
 
-        response = self._client.session.get(
+        response = self.client.client.session.get(
             self.client._url(
                 fragment=url_fragment,
             ),
-            timeout=self._client.client._default_timeout
         )
 
         # Catch a number of bad errors.
@@ -1008,7 +1006,7 @@ class Workgroup:
             raise EOFError('Workgroup has been deleted')
 
         # Make the request for the Workgroup.
-        response = self._client.session.put(
+        response = self.client.client.session.put(
             self.client._url(
                 fragment=self.name
             ),
@@ -1227,7 +1225,7 @@ class Workgroup:
             raise EOFError('Workgroup has (already) been deleted')
 
         # Make the request to delete the Workgroup.
-        response = self._client.session.delete(
+        response = self.client.client.session.delete(
             self.client._url(
                 fragment=self.name
             ),

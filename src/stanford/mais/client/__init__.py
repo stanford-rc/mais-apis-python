@@ -81,6 +81,10 @@ class MAISClient():
 
     A test load will be made before the constructor completes.
 
+    .. note:
+        If you provide your own ``session``, then this parameter is ignored,
+        though the test will still be performed
+
     :raises FileNotFoundError: The file does not exist.
 
     :raises PermissionError: We do not have read permission on the file.
@@ -108,6 +112,10 @@ class MAISClient():
     A test load of the key and certificate will be made before the constructor
     completes.
 
+    .. note:
+        If you provide your own ``session``, then this parameter is ignored.
+        though the test will still be performed
+
     :raises FileNotFoundError: The file does not exist.
 
     :raises PermissionError: We do not have read permission on the file.
@@ -115,7 +123,19 @@ class MAISClient():
     :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
     """
 
-    _default_timeout: Tuple[float, float] = (3.0, 6.0)
+    session: requests.Session = dataclasses.field(repr=False, init=False)
+    """The Requests Session to use for API requests.
+
+    In most cases, you should not provide a Session during instance creation.
+    The default behavior is to let the class constructor create the Session,
+    using the ``cert``, (optional) ``key``, and ``timeout`` parameters.  Some
+    headers are also pre-configured.
+
+    If you provide your own Session, then you are responsible for configuring
+    it, and the ``cert``, ``key``, and ``timeout`` parameters are ignored.
+    """
+
+    default_timeout: Tuple[float, float] = (3.0, 6.0)
     """The default timeout to use for requests.
 
     This is a tuple of ints.  The first item is the timeout on connecting to
@@ -128,6 +148,9 @@ class MAISClient():
     Support for adding a timeout in a Session has been asked `many`_ `times`_
     `before`_, but it not going to be implemented.
 
+    .. note:
+        If you provide your own ``session``, then this parameter is ignored.
+
     .. _many: https://github.com/psf/requests/issues/1130
 
     .. _times: https://github.com/psf/requests/issues/2856
@@ -138,6 +161,8 @@ class MAISClient():
     def __post_init__(
         self,
     ) -> None:
+        debug(f"In post_init for MAISClient")
+
         # Check if `urls` is a mapping.
         if not isinstance(self.urls, collections.abc.Mapping):
             raise TypeError('urls')
@@ -158,6 +183,28 @@ class MAISClient():
                 str(self.cert),
                 keyfile=str(self.key),
             )
+
+        # Do we need to create our own Session?
+        if not hasattr(self, 'session'):
+            debug('Creating Session')
+            # Set up a session with our cert/key, timeouts, and also specify
+            # that we want JSON responses.
+
+            new_session = requests.Session()
+            if self.key is None:
+                new_session.cert = str(self.cert)
+            else:
+                new_session.cert = (
+                    str(self.cert),
+                    str(self.key),
+                )
+            new_session.timeout = self.default_timeout
+            new_session.headers.update({
+                'Accept': 'application/json',
+            })
+            object.__setattr__(self, 'session', new_session)
+        else:
+            debug('Using client-provided session')
 
         # That's it!
         return None
@@ -234,26 +281,3 @@ class MAISClient():
             cert=cert,
             key=key,
         )
-
-    def session(self) -> requests.Session:
-        """Create a Requests session container.
-
-        This is a Requests :class:`~requests.Session` instance, which has the
-        certificate and timeouts pre-configured.  All that remains is to set
-        appropriate 'Accept' and 'Content-Type' headers, and it will be ready
-        for use.
-
-        .. note::
-           A new container is created each time you call this.  If you
-           want to take advantage of caching, call this once per
-           thread/process.
-        """
-        session = requests.Session()
-        if self.key is None:
-            session.cert = str(self.cert)
-        else:
-            session.cert = (
-                str(self.cert),
-                str(self.key),
-            )
-        return session

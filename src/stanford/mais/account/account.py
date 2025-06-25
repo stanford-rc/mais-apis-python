@@ -257,13 +257,12 @@ class Account():
         # Now it's time to try fetching the account information!
 
         # Get the Requests session
-        session = client.session
+        session = client.client.session
 
         # Make the request for the SUNetID.
         info(f"Fetching {sunetid} from the Account API…")
         response = session.get(
             urllib.parse.urljoin(client.client.urls['account'], sunetid),
-            timeout=client.client._default_timeout,
         )
 
         # Catch a number of bad errors.

@@ -170,20 +170,6 @@ class WorkgroupClient():
     constructor.
     """
 
-    custom_session: Optional[requests.Session] = None
-    session: requests.Session = dataclasses.field(repr=False, init=False)
-    """The Requests Session to use for API requests.
-
-    This session container pre-configures our requests, including client
-    certificate, timeouts, and headers.  It is provided here for your
-    convenience, if you want to use it.
-
-    .. note ::
-        If you would like to use a custom :class:`~requests.Session` instance
-        (such as for mock testing), provide it to the constructor as the
-        ``custom_session`` and it will be used for all requests.
-    """
-
     _cache: MutableMapping[str, weakref.ReferenceType['Workgroup']] = dataclasses.field(repr=False, default_factory=dict)
     """Cache of already-seen workgroups.
 
@@ -204,15 +190,6 @@ class WorkgroupClient():
         # Check the client type
         if not isinstance(self.client, stanford.mais.client.MAISClient):
             raise TypeError('client')
-
-        # Make a new Requests session (if it's not already provided), and
-        # configure it.
-        if self.custom_session is not None:
-            debug('Using custom session')
-            object.__setattr__(self, 'session', self.custom_session)
-        else:
-            object.__setattr__(self, 'session', self.client.session())
-        self.session.headers.update({'Accept': 'application/json'})
 
         # That's it!
         return None
@@ -375,7 +352,7 @@ class WorkgroupClient():
             fragment=get_fragment,
         )
         debug(f"Doing GET of {get_url}")
-        response = self.session.get(
+        response = self.client.session.get(
             get_url,
         )
 
@@ -447,7 +424,7 @@ class WorkgroupClient():
             },
         )
         debug(f"Doing GET of {get_url}")
-        response = self.session.get(
+        response = self.client.session.get(
             get_url,
         )
 
