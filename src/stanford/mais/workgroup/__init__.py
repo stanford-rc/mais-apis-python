@@ -479,9 +479,8 @@ class WorkgroupClient():
                 result_set.add(result)
 
         results = SearchByResults(
-            **dict(
-                ((k, frozenset(v)) for k, v in result_sets.items())
-            ),
+            is_member=frozenset(result_sets['members']),
+            is_administrator=frozenset(result_sets['administrators']),
         )
 
         # All done!
