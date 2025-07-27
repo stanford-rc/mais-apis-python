@@ -1,5 +1,5 @@
-# This GitHub Action runs CodeQL checks against the project.
-name: "CodeQL Checks"
+# This GitHub Action runs Bandit & CodeQL checks against the project.
+name: "Bandit & CodeQL Checks"
 
 # This is run on every push, pull request, and on a schedule (to include any
 # new checks that are developed).
@@ -11,8 +11,23 @@ on:
     - cron: '0 10 * * 2'
 
 jobs:
+  bandit-analyze:
+    name: Bandit Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Perform Bandit Analysis
+      uses: PyCQA/bandit-action@v1
+
   codeql-analyze:
-    name: Analyze
+    name: CodeQL Analyze
     runs-on: ubuntu-latest
     permissions:
       actions: read
