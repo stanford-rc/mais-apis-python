@@ -21,6 +21,7 @@ import responses
 
 from stanford.mais.client import MAISClient
 from stanford.mais.account import AccountClient
+from stanford.mais.account.tests.mock import add_account_responses
 from stanford.mais.workgroup import WorkgroupClient
 from stanford.mais.workgroup.tests.mock import add_workgroup_responses
 
@@ -98,12 +99,14 @@ def mais_client(snakeoil_cert):
     #with responses.RequestsMock() as rsps:
     mais_client = MAISClient(
         urls={
+            'account': 'http://example.com/accounts/',
             'workgroup': 'http://example.com/wg/v2/',
         },
         cert=snakeoil_cert,
     )
 
     # Add the different responses for each of our APIs
+    add_account_responses()
     add_workgroup_responses()
 
     # Send out the MaIS Client, in our mocked-up environment!
