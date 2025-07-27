@@ -283,7 +283,7 @@ class AccountServiceSEAS(AccountService):
     .. _Shared Email: https://uit.stanford.edu/service/sharedemail
     """
 
-    local: str
+    local: Optional[str]
     """
     This is an optional setting.  If the account has a Stanford email box,
     *and* the account wants emails delivered to that mailbox, then this is the
@@ -293,7 +293,7 @@ class AccountServiceSEAS(AccountService):
        Do not try to send emails directly to this email address.
     """
 
-    sunetid: str
+    sunetid: List[str]
     """
     This is a setting which may appear multiple times.  Each entry represents
     an `@stanford.edu` email address.  There will always be one entry matching
@@ -313,7 +313,7 @@ class AccountServiceSEAS(AccountService):
        ``people`` tree).
     """
 
-    forward: str
+    forward: Optional[List[str]]
     """
     This is an optional setting.  If present, emails received by this address
     will be forwarded to the emails listed in this setting.  Multiple emails
@@ -368,13 +368,13 @@ class AccountServiceEmail(AccountService):
     For people, this is ``personal``.  It *should not be used*.
     """
 
-    quota: int
+    quota: Optional[int]
     """
     This setting was specific to the Zimbra backend, and *should not be used*.
     It may disappear in the future.
     """
 
-    admin: str
+    admin: Optional[str]
     """
     This setting is obsolete, and *should not be used*.  It may disappear in
     the future.
@@ -470,7 +470,7 @@ class AccountServiceLeland(AccountService):
     .. _FarmShare: https://farmshare.stanford.edu/
     """
 
-    shell: str
+    shell: Optional[str]
     """
     The absolute path to the user's login shell.
 
