@@ -5,30 +5,38 @@ on:
 
 jobs:
   tests:
-    name: Run PyTest and Bandit
+    name: Run Tox & PyTest
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
 
     steps:
       - uses: actions/checkout@master
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
       - name: Prepare pip
         run: |
           python -m pip install --upgrade pip
       - name: Install prerequistes for testing
         run: |
-          python -m pip install .[test]
-      - name: Run tests
+          python -m pip install tox tox-gh
+      - name: Prepare Tox
         run: |
-          pytest
-      - name: Run Bandit
+          tox run -v --notest --skip-missing-interpreters false
+        env:
+          TOX_GH_MAJOR_MINOR: ${{ matrix.python }}
+      - name: Run Tox
         run: |
-          bandit -r src
+          tox run --skip-pkg-install
+        env:
+          TOX_GH_MAJOR_MINOR: ${{ matrix.python }}
 
   linting:
     name: Run MyPy
