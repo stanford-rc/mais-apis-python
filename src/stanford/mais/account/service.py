@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import dataclasses
+import enum
 import logging
 from typing import *
 
@@ -35,7 +36,28 @@ __all__ = (
     'AccountServicePTS',
     'AccountServiceAFS',
     'AccountServiceDialin',
+    'ServiceStatus',
 )
+
+# A service can have one of three different statuses
+@enum.unique
+class ServiceStatus(enum.Enum):
+    """The possible status of a service
+    """
+
+    ACTIVE = 'active'
+    """The account has and can use this service.
+    """
+
+    FROZEN = 'frozen'
+    """The account has this service, but it is inaccessible right now.
+    """
+
+    INACTIVE = 'inactive'
+    """The account does not have this service.
+
+    The account may have had the service in the past, but does not now.
+    """
 
 # Each account service has a different class.  Combine that with the base
 # class, and you've got enough stuff to put into its own file!
@@ -56,10 +78,17 @@ class AccountService():
     The name of the service.
     """
 
-    is_active: bool
+    status: ServiceStatus
     """
-    ``True`` if the service is active for the associated account.
+    The service's status.
     """
+
+    @property
+    def is_active(self) -> bool:
+        """
+        ``True`` if the service is active for the associated account.
+        """
+        return (True if self.status == ServiceStatus.ACTIVE else False)
 
     # This really should be marked as an @abc.abstractclass, but MyPy raises an
     # error because of https://github.com/python/mypy/issues/5374
@@ -82,7 +111,7 @@ class AccountService():
         """
         return {
             'name': source['name'],
-            'is_active': (True if source['status'] == "active" else False),
+            'status': ServiceStatus(source['status']),
         }
 
     @staticmethod
