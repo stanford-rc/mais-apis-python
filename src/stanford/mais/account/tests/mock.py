@@ -228,7 +228,7 @@ account_frozprsn = TestAccount(
         ),
         TestLeland(
             status='active',
-            shell='/bin/bash',
+            shell='/bin/bash', # nosec B604
         ),
         TestPTS(
             status='active',
@@ -277,7 +277,7 @@ account_affilite = TestAccount(
         ),
         TestLeland(
             status='active',
-            shell='/bin/bash',
+            shell='/bin/bash', # nosec B604
         ),
         TestPTS(
             status='active',
