@@ -23,3 +23,37 @@ mypy_path = [
 testpaths = [
     "tests",
 ]
+
+[tool.tox]
+requires = [
+    "tox>=4.28.3",
+]
+env_list = "py{39,310,311,312}-{minimal,latest}"
+
+[tool.tox.env_run_base]
+deps = [
+    "mypy >=0.910, <1.0",
+    "types-requests",
+    "pytest >=6.2.4, <6.3.0",
+    "pytest-responses",
+    "responses",
+]
+commands = [
+    ["pytest"],
+]
+
+[tool.tox.env.minimal]
+deps = [
+    "requests==2.30.0"
+]
+
+[tool.tox.env.latest]
+deps = [
+    "requests >2.32.0, <3.0"
+]
+
+[tool.tox.gh.python]
+"3.9" = ["py39-minimal", "py39-latest"]
+"3.10" = ["py310-minimal", "py310-latest"]
+"3.11" = ["py311-minimal", "py311-latest"]
+"3.12" = ["py312-minimal", "py312-latest"]
