@@ -84,6 +84,13 @@ class AccountValidationResults(NamedTuple):
     The set of entries from `raw_set` that are not SUNetIDs.
     """
 
+# For validation, we will have three functions:
+# * Our first function handles strings, and splitting them up.
+#   This is also the named function, so our documentation is here.
+# * The second function handles collections of strings.
+# * The third function does the actual validation work.
+# We have three functions because each function needs to process the validation
+# results a little bit, before returning them to the client.
 @functools.singledispatch
 def validate(
     raw: str,
@@ -143,7 +150,7 @@ def validate(
 
     # Validate the list entries.
     debug(f"Post-filter list has {len(raw_list_filtered)} items.")
-    result = validate(raw_list_filtered, client)
+    result = _validate(raw_list_filtered, client)
 
     # Add in our raw string, and we're done!
     return AccountValidationResults(
@@ -155,10 +162,12 @@ def validate(
         unknown=result.unknown,
     )
 
+# At this time, MyPy has a problem with the type-checking single-dispatch
+# functions.  See https://github.com/python/mypy/issues/13040
 @validate.register(list)
 @validate.register(tuple)
 @validate.register(set)
-def _(
+def _( # type: ignore[misc]
     raw: Union[List[str], Tuple[str], Set[str]],
     client: stanford.mais.account.AccountClient,
 ) -> AccountValidationResults:
@@ -169,20 +178,38 @@ def _(
     debug('Input: ' + ','.join(raw))
     debug(f"Input has {len(raw)} items.")
 
-    # Limit our accounts to only people
-    people = client.only_people()
-
     # If we were not given a set, then convert it into a set.
     if not isinstance(raw, set):
         raw = set(raw)
 
+    # Get the results
+    result = _validate(raw, client)
+
+    # Add in our original raw, and we're done!
+    return AccountValidationResults(
+        raw=None,
+        raw_set=raw,
+        full=result.full,
+        base=result.base,
+        inactive=result.inactive,
+        unknown=result.unknown,
+    )
+
+# Do the actual validation here!
+def _validate(
+    sunetids: Set[str],
+    client: stanford.mais.account.AccountClient,
+) -> AccountValidationResults:
     # Components of the output
     full = set()
     base = set()
     inactive = set()
     unknown = set()
 
-    for sunetid in raw:
+    # Limit our accounts to only people
+    people = client.only_people()
+
+    for sunetid in sunetids:
         # Catch unknown entries
         try:
             account = people.get(sunetid)
@@ -213,7 +240,7 @@ def _(
     debug(f"Validation results: full={len(full)} base={len(base)} inactive={len(inactive)} unknown={len(unknown)}")
     return AccountValidationResults(
         raw=None,
-        raw_set=raw,
+        raw_set=sunetids,
         full=full,
         base=base,
         inactive=inactive,
