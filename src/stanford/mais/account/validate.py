@@ -255,8 +255,8 @@ def _validate(
     return AccountValidationResults(
         raw=None,
         raw_set=sunetids,
-        full=full,
-        base=base,
-        inactive=inactive,
-        unknown=unknown,
+        full=frozenset(full),
+        base=frozenset(base),
+        inactive=frozenset(inactive),
+        unknown=frozenset(unknown),
     )
