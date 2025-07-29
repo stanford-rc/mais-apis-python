@@ -174,7 +174,8 @@ class MAISClient():
             self.__dict__['cert'] = pathlib.Path(self.cert)
 
         # Try opening the file, to confirm it can be opened.
-        self.cert.open(mode='r')
+        with self.cert.open(mode='r') as f:
+            pass
 
         # Try to parse the client certificate.
         sslc = ssl.SSLContext()
