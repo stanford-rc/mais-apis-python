@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import dataclasses
 import functools
 import logging
 import re
@@ -35,7 +36,8 @@ __all__ = (
 # class first.  That is so that we can reference the class name directly in
 # `validate`.
 
-class AccountValidationResults(NamedTuple):
+@dataclasses.dataclass(frozen=True)
+class AccountValidationResults:
     """Results of doing an account validation.
 
     This class contains the results of an account validation, called via
@@ -83,6 +85,18 @@ class AccountValidationResults(NamedTuple):
     """
     The set of entries from `raw_set` that are not SUNetIDs.
     """
+
+    # Manually define __slots__, for increased performance.
+    # Dataclasses can do this automatically, but only in Python 3.10+
+    __slots__ = (
+        'raw',
+        'raw_set',
+        'full',
+        'base',
+        'inactive',
+        'unknown',
+        '__weakref__',
+    )
 
 # For validation, we will have three functions:
 # * Our first function handles strings, and splitting them up.
