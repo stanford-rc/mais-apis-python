@@ -125,6 +125,8 @@ class Account():
     If `True`, this is a full SUNetID.  That means the SUNetID has services
     like email enabled.  A SUNetID can be "full" either by being associated
     with an active student, faculty, or staff member; or via sponsorship.
+    We check for full status by seeing if the SUNetID has the `leland` service
+    associated with it.
     *NOTE*: Some services (such as Library e-resources) are not available to
     all Full SUNetIDs, so this property does not imply access to *all*
     services.
