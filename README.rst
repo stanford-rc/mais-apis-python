@@ -17,10 +17,10 @@ This is a Python client for interacting with Stanford MaIS APIs.
 The `Middleware and Integration Services`_ group, part of `University IT`_,
 provides many APIs for reading information from the `Registry`_, the data store
 that contains information about people, accounts, groups, courses, and more.
-Although the data sets seem simple, come from many different sources (for
+Although the data stores seem simple, they come from many different sources (for
 example, student records and HR records).
 
-MaIS provides access to these data sets to authorized clients, through a set of
+MaIS provides access to these APIs to authorized clients, through a set of
 XML and JSON APIs.  This package provides a Python SDK for interfacing with
 some of those APIs.
 
@@ -33,7 +33,7 @@ Example
 
 Here is an example of how you can use the Accounts API through this SDK:
 
-.. code::
+.. code-block:: python
 
    from stanford.mais.client import MAISClient
    from stanford.mais.account import AccountClient
@@ -127,10 +127,11 @@ APIs Supported
 The following APIs are supported:
 
 * `Account`_: Full support for *Full Data* records for individual accounts,
-  for both people (SUNetIDs) and functional account.  All of the information
+  for both people (SUNetIDs) and functional accounts.  All of the information
   provided by the API is exposed, including service-specific settings.
   Support for 'views' that can act as if functional or inactive
-  account don't exist (so you don't have to filter them out).
+  accounts don't exist (so you don't have to filter them out).  Also provided
+  is code for quickly validating a collection of SUNetIDs.
 
   *Not implemented*: Retrieving a list of accounts that changed status in
   the past X days.
@@ -152,7 +153,7 @@ currently have a need for them:
 
 * `Person`_
 
-* `Privilege`_
+* `Privilege`_ (also known as "Authority")
 
 * `Student`_
 
@@ -172,10 +173,10 @@ Requirements
 * Python 3.9, or any later Python 3.x
 
   Older Python versions will be examined to see if they can be supported, but
-  it is highly unlikely that Python 3.5 or older will be supported.  Python 2
+  it is highly unlikely that Python 3.8 or older will be supported.  Python 2
   will not be supported.
 
-* `Requests`_ 2.25.1, or any later 2.x
+* `Requests`_ 2.30.0, or any later 2.x
 
 * A client certificate, issued by `MaIS`_, with permissions to the APIs you
   want to use, in the appropriate tier (such as PROD (production) or UAT).  See
@@ -195,8 +196,8 @@ async, though support may be added in the future.  Until then, you should be
 safe to use these modules, so long as you don't share instances across
 threads/processes.
 
-.. _Requests: https://docs.python-requests.org/
-.. _MaIS: https://mais.stanford.edu/
+.. _Requests: https://requests.readthedocs.io/
+.. _MaIS: https://uit.stanford.edu/team/mais
 .. _Getting Started: https://uit.stanford.edu/developers/apis/getting-started
 
 Copyright & Licensing
