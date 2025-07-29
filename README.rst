@@ -44,6 +44,7 @@ Here is an example of how you can use the Accounts API through this SDK:
 
    # Set up clients
    client = MAISClient.prod(client_cert)  # You can also use .uat() for UAT.
+                                          # Or use .uat1() for UAT1.
    accounts = AccountClient(client)
 
    # Fetch an account
