@@ -60,7 +60,7 @@ def test_no_urls(snakeoil_cert):
 # Ensure we throw if no certs are provided.
 def test_no_certs():
     with pytest.raises(FileNotFoundError):
-        MAISClient.prod(cert='/tmp/sdfsfdfmkdmksklfsdfdms')
+        MAISClient.prod(cert='/tmp/sdfsfdfmkdmksklfsdfdms') # nosec: B108
 
 # Test with a malformed combined cert/key file
 def test_bad_certkey(tmpdir_factory):
