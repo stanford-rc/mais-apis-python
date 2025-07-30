@@ -34,7 +34,7 @@ env_list = "py{39,310,311,312}-{minimal,latest}"
 deps = [
     "mypy >=0.910, <1.0",
     "types-requests",
-    "pytest >=6.2.4, <6.3.0",
+    "pytest >=8.4.1, <8.5.0",
     "pytest-responses",
     "responses",
 ]
