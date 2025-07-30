@@ -39,7 +39,7 @@ deps = [
     "responses",
 ]
 commands = [
-    ["pytest"],
+    ["pytest", "--strict-config", "--strict-markers", "-W", "error"],
 ]
 set_env = { PYTHONTRACEMALLOC = "20" }
 
