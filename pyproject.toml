@@ -58,3 +58,6 @@ deps = [
 "3.10" = ["py310-minimal", "py310-latest"]
 "3.11" = ["py311-minimal", "py311-latest"]
 "3.12" = ["py312-minimal", "py312-latest"]
+
+[tool.bandit.assert_used]
+skips = [ "tests/*.py" ]
