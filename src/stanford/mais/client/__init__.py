@@ -32,6 +32,33 @@ info = logger.info
 # See https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
 logging.getLogger('stanford.mais.client').addHandler(logging.NullHandler())
 
+# Define a Named Tuple for the most detailed form of timeout
+class Timeout(NamedTuple):
+    """A custom timeout for use with Requests.
+
+    See `the Requests documentation`_ for more information on timeouts.
+
+    .. _the Requests documentation: https://requests.readthedocs.io/en/latest/user/advanced/#timeouts
+    """
+
+    connect: float
+    """The connection timeout.
+
+    This should be larger than a multiple of 3.0, due to TCP mechanics.
+
+    .. warning::
+       If connecting to a DNS name which has multiple IPs, each IP will be
+       tried, and so the total timeout will be this value multiplied by the
+       number of IPs.
+    """
+
+    read: float
+    """The read timeout.
+
+    How long to wait for data, once the request has been sent off.  This
+    timeout resets whenever a single byte of data is received from the server.
+    """
+
 # This class primarily defines our API endpoints, and related general stuff
 # that is not specific to any one MaIS API. 
 
@@ -48,8 +75,8 @@ class MAISClient():
     For convenience, you may wish to use one of the ready-made constructors,
     :meth:`MAISClient.prod` and :meth:`MAISClient.uat`.
     :meth:`MAISClient.uat1` is also available for the temporary UAT1
-    environment.  If you use one of those, you need only provide a client
-    certificate path.
+    environment.  If you use one of those, then you do not need to provide the
+    ``urls``.
     """
 
     urls: Mapping[str, str]
@@ -130,34 +157,36 @@ class MAISClient():
 
     In most cases, you should not provide a Session during instance creation.
     The default behavior is to let the class constructor create the Session,
-    using the ``cert``, (optional) ``key``, and ``timeout`` parameters.  Some
-    headers are also pre-configured.
+    using the ``cert``, (optional) ``key``, and ``default_timeout`` parameters.
+    Some headers are also pre-configured.
 
     If you provide your own Session, then you are responsible for configuring
-    it, and the ``cert``, ``key``, and ``timeout`` parameters are ignored.
+    it, and the ``cert``, ``key``, and ``timeout`` parameters are
+    ignored.
     """
 
-    default_timeout: Tuple[float, float] = (3.0, 6.0)
-    """The default timeout to use for requests.
+    timeout: Union[Timeout, float, None] = None
+    """The timeout to use for requests.
 
-    This is a tuple of ints.  The first item is the timeout on connecting to
-    the server (along with TLS negotiation and sending out the request); the
-    second item is the timeout on receiving the response.
+    Requests `does`_ `not`_ `support`_ setting default timeouts, so we
+    internally subclass :class:`requests.Session` to implement a default
+    timeout.  This is the timeout that will be used.
 
-    It's up to users to explicitly add the timeout to all requests they make,
-    either referencing this default timeout or setting their own.
+    In addition, to match what Requests supports, we accept `None` (to not set
+    a specific timeout) and a single float (covering both timeouts).
 
-    Support for adding a timeout in a Session has been asked `many`_ `times`_
-    `before`_, but it not going to be implemented.
+    There are two separate timeouts, a connect timeout and a read timeout.
+    See the documentation of :class:`Timeout` for more information.
 
-    .. note:
-        If you provide your own ``session``, then this parameter is ignored.
+    You may either provide a single float (used for both timeouts), a
+    :class:`Timeout` tuple (to specify different connect and read timeouts), or
+    ``None`` (to not specify a timeout).
 
-    .. _many: https://github.com/psf/requests/issues/1130
+    .. _does: https://github.com/psf/requests/issues/1130
 
-    .. _times: https://github.com/psf/requests/issues/2856
+    .. _not: https://github.com/psf/requests/issues/2856
 
-    .. _before: https://github.com/psf/requests/issues/3054
+    .. _support: https://github.com/psf/requests/issues/3054
     """
 
     def __post_init__(
@@ -193,7 +222,7 @@ class MAISClient():
             # Set up a session with our cert/key, timeouts, and also specify
             # that we want JSON responses.
 
-            new_session = requests.Session()
+            new_session = _CustomSession()
             if self.key is None:
                 new_session.cert = str(self.cert)
             else:
@@ -201,7 +230,8 @@ class MAISClient():
                     str(self.cert),
                     str(self.key),
                 )
-            new_session.timeout = self.default_timeout
+            if self.timeout is not None:
+                new_session.timeout = self.timeout
             new_session.headers.update({
                 'Accept': 'application/json',
             })
@@ -217,6 +247,7 @@ class MAISClient():
         cls: Type['MAISClient'],
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
+        timeout: Union[Timeout, float, None] = None,
     ) -> 'MAISClient':
         """Return a client configured to connect to connect to production
         (PROD) APIs.
@@ -228,7 +259,11 @@ class MAISClient():
            you want to take advantage of caching, call this only once per
            thread/process.
 
-        :param cert: The path to a file containing a client key & cert.  It must be provisioned by MaIS to operate in the PROD environment.
+        :param cert: See :class:`MAISClient` for more information.
+
+        :param key: See :class:`MAISClient` for more information.
+
+        :param timeout: See :class:`MAISClient` for more information.
 
         :raises FileNotFoundError: The file does not exist.
 
@@ -247,6 +282,7 @@ class MAISClient():
             },
             cert=cert,
             key=key,
+            timeout=timeout,
         )
 
     @classmethod
@@ -254,6 +290,7 @@ class MAISClient():
         cls: Type['MAISClient'],
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
+        timeout: Union[Timeout, float, None] = None,
     ) -> 'MAISClient':
         """Return a client configured to connect to connect to UAT APIs.
 
@@ -264,7 +301,11 @@ class MAISClient():
            you want to take advantage of caching, call this only once per
            thread/process.
 
-        :param cert: The path to a file containing a client key & cert.  It must be provisioned by MaIS to operate in the UAT environment.
+        :param cert: See :class:`MAISClient` for more information.
+
+        :param key: See :class:`MAISClient` for more information.
+
+        :param timeout: See :class:`MAISClient` for more information.
 
         :raises FileNotFoundError: The file does not exist.
 
@@ -283,6 +324,7 @@ class MAISClient():
             },
             cert=cert,
             key=key,
+            timeout=timeout,
         )
 
     @classmethod
@@ -290,6 +332,7 @@ class MAISClient():
         cls: Type['MAISClient'],
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
+        timeout: Union[Timeout, float, None] = None,
     ) -> 'MAISClient':
         """Return a client configured to connect to connect to UAT1 APIs, used for Sequoia testing.
 
@@ -309,7 +352,11 @@ class MAISClient():
            you want to take advantage of caching, call this only once per
            thread/process.
 
-        :param cert: The path to a file containing a client key & cert.  It must be provisioned by MaIS to operate in the UAT environment.
+        :param cert: See :class:`MAISClient` for more information.
+
+        :param key: See :class:`MAISClient` for more information.
+
+        :param timeout: See :class:`MAISClient` for more information.
 
         :raises FileNotFoundError: The file does not exist.
 
@@ -325,4 +372,68 @@ class MAISClient():
             },
             cert=cert,
             key=key,
+            timeout=timeout,
+        )
+
+# Create a custom Requests Session class
+
+class _CustomSession(requests.Session):
+    """A custom Requests Session, with a default timeout.
+
+    Support for adding a timeout in a Session has been asked `many`_ `times`_
+    `before`_, but it not going to be implemented.  So, this class does that.
+
+    .. note:
+        If you provide your own ``session``, then this parameter is ignored.
+
+    .. _many: https://github.com/psf/requests/issues/1130
+
+    .. _times: https://github.com/psf/requests/issues/2856
+
+    .. _before: https://github.com/psf/requests/issues/3054
+    """
+
+    timeout: Union[None, float, Timeout] = None
+    """The timeout value that so many folks wish Session had.
+
+    This can be one of three things:
+
+    * `None`, which means to not specify a timeout.
+
+    * A tuple of two floats, both of which are seconds.  The first is for the
+      initial connection; the second is for reading.  See :class:`Timeout` for
+      details.
+
+    * A single float, used for both the connect and read timeouts.
+
+    See `the Requests documentation`_ for more information on timeouts.
+
+    .. _the Requests documentation: https://requests.readthedocs.io/en/latest/user/advanced/#timeouts
+    """
+
+    def send(
+        self,
+        request: requests.PreparedRequest,
+        **kwargs,
+    ) -> requests.Response:
+        """ Send a prepared Request, but possibly add a timeout
+
+        When a :class:`requests.Session` handles a
+        :meth:`~requests.Session.request`, the timeout is sent through as a
+        keyword argument to :meth:`~requests.Session.send`.  So, in order to
+        insert our default timeout, we override :meth:`~requests.Session.send`.
+
+        If the request was made with a timeout, we do not change that.
+        """
+
+        # Add our custom timeout, if one is not already provided
+        if ('timeout' not in kwargs) or (kwargs['timeout'] is None):
+            # Only set a timeout if we have one to set
+            if self.timeout is not None:
+                kwargs['timeout'] = self.timeout
+
+        # Send the modified request, and return its Response
+        return super().send(
+            request,
+            **kwargs
         )
