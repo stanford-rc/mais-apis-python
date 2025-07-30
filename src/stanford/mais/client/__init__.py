@@ -32,6 +32,21 @@ info = logger.info
 # See https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
 logging.getLogger('stanford.mais.client').addHandler(logging.NullHandler())
 
+# Define
+class _URLs(TypedDict, total=False):
+    """The different services that MaIS provides, and their API endpoints.
+
+    .. note::
+       Just because a service is listed here, does not mean this package
+       supports it.
+    """
+    account: str
+    course: str
+    person: str
+    privilege: str
+    student: str
+    workgroup: str
+
 # Define a Named Tuple for the most detailed form of timeout
 class Timeout(NamedTuple):
     """A custom timeout for use with Requests.
@@ -79,7 +94,7 @@ class MAISClient():
     ``urls``.
     """
 
-    urls: Mapping[str, str]
+    urls: _URLs
     """A mapping of API to URL.
 
     This mapping uses API names (like ``account``) as keys, and the base URL as
