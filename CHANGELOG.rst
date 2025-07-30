@@ -17,7 +17,17 @@ Fixed:
 
 * A number of Account services properties had incorrect types.
 
+* Setting timeouts works properly!  Before now, not all operations honored the
+  ``default_timeout`` that you might have set when you created your MAISClient.
+  The ``default_timeout`` property, has changed, and is now simply the
+  ``timeout`` property.
+
 Other:
+
+* Custom session support has gone through major changes!  Instead of providing
+  a custom Requests Session to each service's constructor (AccountClient,
+  WorkgroupClient, etc.), you now provide the custom Session to the
+  ``MAISClient``'s constructor, using the ``session`` argument.
 
 * Bandit and CodeQL checks are being performed on all pushes and pull requests.
 
