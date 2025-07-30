@@ -25,6 +25,8 @@ jobs:
 
     - name: Perform Bandit Analysis
       uses: PyCQA/bandit-action@v1
+      with:
+        configfile: pyproject.toml
 
   codeql-analyze:
     name: CodeQL Analyze
