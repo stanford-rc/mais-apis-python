@@ -178,7 +178,7 @@ class MAISClient():
             pass
 
         # Try to parse the client certificate.
-        sslc = ssl.SSLContext()
+        sslc = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         if self.key is None:
             sslc.load_cert_chain(str(self.cert))
         else:
