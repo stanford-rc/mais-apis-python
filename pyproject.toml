@@ -41,6 +41,7 @@ deps = [
 commands = [
     ["pytest"],
 ]
+set_env = { PYTHONTRACEMALLOC = "20" }
 
 [tool.tox.env.minimal]
 deps = [
