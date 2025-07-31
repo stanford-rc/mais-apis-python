@@ -22,9 +22,6 @@ from typing import Any, List, Literal, Optional, TypedDict, Union
 # PyPi imports
 import responses
 
-# Local imports
-from stanford.mais.workgroup.properties import WorkgroupFilterLiteral
-
 # Define the classes that our test data will use
 
 class ServiceSetting(TypedDict):
