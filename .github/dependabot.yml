@@ -29,3 +29,15 @@ updates:
     # Ping Karl directly for review
     assignees:
       - "akkornel"
+
+  # Check GitHub Actions at the same time
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: daily
+      day: "tuesday"
+      time: "10:00"
+      timezone: "US/Pacific"
+
+    assignees:
+      - "akkornel"
