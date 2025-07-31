@@ -45,7 +45,7 @@ __all__ = (
 
 # Define the type for search results
 
-def now() -> datetime.datetime:
+def _now() -> datetime.datetime:
     return datetime.datetime.now(tz=datetime.timezone.utc)
 @dataclasses.dataclass(
     frozen=True,
@@ -81,7 +81,7 @@ class PartialWorkgroup:
             Workgroup API provides.
     """
 
-    as_of: datetime.datetime = dataclasses.field(default_factory=now)
+    as_of: datetime.datetime = dataclasses.field(default_factory=_now)
     """The datetime when this search result was generated.
     """
 
