@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from collections.abc import Callable, MutableMapping
 import dataclasses
 import logging
 import requests
-from typing import *
 import stanford.mais.client
 from .account import *
 

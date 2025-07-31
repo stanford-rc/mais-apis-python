@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from collections.abc import Collection
 import dataclasses
 import functools
 import logging
 import re
-from typing import *
+from typing import Optional, Union
 import stanford.mais.account
 
 # Set up logging
@@ -182,7 +183,7 @@ def validate(
 @validate.register(tuple)
 @validate.register(set)
 def _( # type: ignore[misc]
-    raw: Union[List[str], Tuple[str], Set[str]],
+    raw: Union[list[str], tuple[str], set[str]],
     client: stanford.mais.account.AccountClient,
 ) -> AccountValidationResults:
     """
@@ -211,7 +212,7 @@ def _( # type: ignore[misc]
 
 # Do the actual validation here!
 def _validate(
-    sunetids: Set[str],
+    sunetids: set[str],
     client: stanford.mais.account.AccountClient,
 ) -> AccountValidationResults:
     # Components of the output

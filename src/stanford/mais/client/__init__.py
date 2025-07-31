@@ -21,7 +21,7 @@ import logging
 import pathlib
 import requests
 import ssl
-from typing import *
+from typing import NamedTuple, Optional, TypedDict, Union
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -259,7 +259,7 @@ class MAISClient():
 
     @classmethod
     def prod(
-        cls: Type['MAISClient'],
+        cls,
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
         timeout: Union[Timeout, float, None] = None,
@@ -302,7 +302,7 @@ class MAISClient():
 
     @classmethod
     def uat(
-        cls: Type['MAISClient'],
+        cls,
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
         timeout: Union[Timeout, float, None] = None,
@@ -344,7 +344,7 @@ class MAISClient():
 
     @classmethod
     def uat1(
-        cls: Type['MAISClient'],
+        cls,
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
         timeout: Union[Timeout, float, None] = None,

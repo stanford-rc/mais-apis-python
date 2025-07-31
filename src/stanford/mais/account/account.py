@@ -19,7 +19,7 @@ import dataclasses
 import datetime
 import logging
 import requests
-from typing import *
+from typing import Any, Optional, TYPE_CHECKING
 import urllib.parse
 from . import service
 
@@ -211,7 +211,7 @@ class Account():
 
     @classmethod
     def get(
-        cls: Type['Account'],
+        cls,
         client: 'AccountClient',
         sunetid: str,
     ) -> 'Account':
@@ -298,7 +298,7 @@ class Account():
         # Process the services associated with the account.
 
         # First, define a table of known services, mapping each to its class.
-        known_services: Dict[str, Type[service.AccountService]] = {
+        known_services: dict[str, type[service.AccountService]] = {
             'kerberos': service.AccountServiceKerberos,
             'library': service.AccountServiceLibrary,
             'seas': service.AccountServiceSEAS,

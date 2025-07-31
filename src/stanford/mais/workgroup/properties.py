@@ -17,7 +17,6 @@
 
 import enum
 import logging
-from typing import *
 
 # Set up logging
 

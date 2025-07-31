@@ -8,7 +8,8 @@
 # This is the compromise: We activate PEP 563, import typing now, and then
 # do whatever imports are needed just for the type-checker.
 from __future__ import annotations
-from typing import *
+from collections.abc import Iterator, Mapping, MutableSet
+from typing import Any, Literal, TYPE_CHECKING, Union
 if TYPE_CHECKING:
     from stanford.mais.workgroup import PartialWorkgroup
     from stanford.mais.workgroup.workgroup import Workgroup
@@ -16,7 +17,6 @@ if TYPE_CHECKING:
 # We now return you to your regularly-scheduled imports…
 
 import abc
-import collections.abc
 import datetime
 import enum
 import logging
@@ -138,7 +138,7 @@ class WorkgroupMembership:
 
     def update_from_upstream(
         self,
-        response_json: List[Mapping[str, Any]],
+        response_json: list[Mapping[str, Any]],
     ) -> None:
         """Report new membership details from upstream.
 
@@ -212,7 +212,7 @@ class WorkgroupMembership:
 
 
 class WorkgroupMembershipContainer(
-    collections.abc.MutableSet
+    MutableSet
 ):
     """A container for workgroup members: People, Certificates, or Workgroups.
     Instances of this class are used to hold one type of workgroup member.
@@ -236,7 +236,7 @@ class WorkgroupMembershipContainer(
         downstream clients like LDAP.
     """
 
-    _identifiers: Set[str]
+    _identifiers: set[str]
     """The set of identifiers within this container.
     """
 

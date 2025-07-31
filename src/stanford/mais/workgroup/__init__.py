@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from collections.abc import Collection, Mapping, MutableMapping
 import dataclasses
 import datetime
 import enum
 import logging
 import pathlib
 import requests
-from typing import *
+from typing import Literal, Union
 import urllib.parse
 import weakref
 import stanford.mais.client

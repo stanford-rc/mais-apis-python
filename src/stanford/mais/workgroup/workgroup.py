@@ -8,7 +8,8 @@
 # This is the compromise: We activate PEP 563, import typing now, and then
 # do whatever imports are needed just for the type-checker.
 from __future__ import annotations
-from typing import *
+from collections.abc import Mapping
+from typing import Any, TYPE_CHECKING, Union
 if TYPE_CHECKING:
     from stanford.mais.workgroup import WorkgroupClient
 
@@ -107,7 +108,7 @@ class Workgroup:
 
     @classmethod
     def create(
-        cls: Type[Workgroup],
+        cls,
         client: WorkgroupClient,
         name: str,
         description: str,
@@ -260,7 +261,7 @@ class Workgroup:
 
     @classmethod
     def get(
-        cls: Type[Workgroup],
+        cls,
         client: WorkgroupClient,
         name: str,
     ) -> Workgroup:
