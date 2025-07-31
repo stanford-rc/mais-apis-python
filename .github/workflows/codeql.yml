@@ -21,10 +21,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
     - name: Set up Python
-      uses: actions/setup-python@v5.6.0
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
       with:
         python-version: 3.9
 
@@ -41,7 +41,7 @@ jobs:
         bandit --configfile pyproject.toml --recursive --format sarif --output results.sarif src tests
 
     - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v3.29.3
+      uses: github/codeql-action/upload-sarif@d6bbdef45e766d081b84a2def353b0055f728d3e
       with:
         sarif_file: results.sarif
 
@@ -55,12 +55,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3.29.3
+      uses: github/codeql-action/init@d6bbdef45e766d081b84a2def353b0055f728d3e
       with:
         languages: python
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3.29.3
+      uses: github/codeql-action/analyze@d6bbdef45e766d081b84a2def353b0055f728d3e
