@@ -1,6 +1,20 @@
 # vim: ts=4 sw=4 et
 # -*- coding: utf-8 -*-
 
+# © 2021 The Board of Trustees of the Leland Stanford Junior University.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 # This file has a ton of references to classes that are defined in the same
 # file.  Pythons older than 3.14 (which implements PEP 649) cannot handle that
 # natively without this import.
