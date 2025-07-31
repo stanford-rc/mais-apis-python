@@ -22,10 +22,19 @@ from typing import List, Literal
 # PyPi imports
 import responses
 
-# Local imports
-from stanford.mais.workgroup.properties import WorkgroupFilterLiteral
-
 # Define the classes that our test data will use
+
+WorkgroupFilterLiteral = Literal[
+    'NONE',
+    'ACADEMIC_ADMINISTRATIVE',
+    'STUDENT',
+    'FACULTY',
+    'STAFF',
+    'FACULTY_STAFF',
+    'FACULTY_STUDENT',
+    'STAFF_STUDENT',
+    'FACULTY_STAFF_STUDENT',
+]
 
 @dataclasses.dataclass(frozen=True)
 class TestMember:

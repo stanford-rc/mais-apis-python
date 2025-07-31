@@ -34,18 +34,6 @@ __all__ = (
 # keep the size of the main module down.  You should expect that everything
 # which appears here will be included into the main module.
 
-WorkgroupFilterLiteral = Literal[
-    'NONE',
-    'ACADEMIC_ADMINISTRATIVE',
-    'STUDENT',
-    'FACULTY',
-    'STAFF',
-    'FACULTY_STAFF',
-    'FACULTY_STUDENT',
-    'STAFF_STUDENT',
-    'FACULTY_STAFF_STUDENT',
-]
-
 @enum.unique
 class WorkgroupFilter(enum.Enum):
     """Options for filtering Workgroup membership.
