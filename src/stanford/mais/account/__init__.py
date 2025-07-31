@@ -15,12 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Start with stdlib imports
 from collections.abc import Callable, MutableMapping
 import dataclasses
 import logging
 import requests
+
+# Finally, do local imports
+from stanford.mais.account.account import Account
 import stanford.mais.client
-from .account import *
 
 # Set up logging
 logger = logging.getLogger(__name__)
