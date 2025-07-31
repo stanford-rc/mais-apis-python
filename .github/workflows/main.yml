@@ -18,21 +18,26 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
+
       - name: Prepare pip
         run: |
           python -m pip install --upgrade pip
+
       - name: Install prerequistes for testing
         run: |
           python -m pip install tox tox-gh
+
       - name: Prepare Tox
         run: |
           tox run -v --notest --skip-missing-interpreters false
         env:
           TOX_GH_MAJOR_MINOR: ${{ matrix.python }}
+
       - name: Run Tox
         run: |
           tox run --skip-pkg-install
@@ -45,16 +50,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Prepare pip
         run: |
           python -m pip install --upgrade pip
+
       - name: Install prerequistes for testing
         run: |
           python -m pip install .[test]
+
       - name: Run MyPy
         run: |
           mypy --package stanford.mais
@@ -72,10 +81,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Prepare pip and install build
         run: |
           python -m pip install --upgrade pip
@@ -110,10 +121,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Prepare pip and install build
         run: |
           python -m pip install --upgrade pip
