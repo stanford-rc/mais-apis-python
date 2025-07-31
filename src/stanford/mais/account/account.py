@@ -15,6 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# This file has a few references to classes that are defined in the same
+# file.  Pythons older than 3.14 (which implements PEP 649) cannot handle that
+# natively without this import.
+# NOTE: At some point in the future, this annodation will be deprecated.
+from __future__ import annotations
+
+# Start with stdlib imports
 import dataclasses
 import datetime
 import logging
@@ -212,9 +219,9 @@ class Account():
     @classmethod
     def get(
         cls,
-        client: 'AccountClient',
+        client: AccountClient,
         sunetid: str,
-    ) -> 'Account':
+    ) -> Account:
         """Given a string, return an Account.
 
         This uses the MaIS Workgroup API to look up information for an account,

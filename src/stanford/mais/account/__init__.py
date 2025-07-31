@@ -15,6 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# This file has a ton of references to classes that are defined in the same
+# file.  Pythons older than 3.14 (which implements PEP 649) cannot handle that
+# natively without this import.
+# NOTE: At some point in the future, this annodation will be deprecated.
+from __future__ import annotations
+
 # Start with stdlib imports
 from collections.abc import Callable, MutableMapping
 import dataclasses
@@ -94,7 +100,7 @@ class AccountClient():
     :raises TypeError: A client was not provided.
     """
 
-    _cache: MutableMapping[str, 'Account'] = dataclasses.field(repr=False, default_factory=dict)
+    _cache: MutableMapping[str, Account] = dataclasses.field(repr=False, default_factory=dict)
     """Cache of already-seen accounts.
 
     This cache is used to store :class:`Account` instances already seen by this
@@ -120,7 +126,7 @@ class AccountClient():
     def get(
         self,
         sunetid: str,
-    ) -> 'Account':
+    ) -> Account:
         """Fetch an Account.
 
         This is a convenience wrapper around :meth:`Account.get`.  All other
@@ -138,7 +144,7 @@ class AccountClient():
     def __getitem__(
         self,
         item: str,
-    ) -> 'Account':
+    ) -> Account:
         """Fetch an Account.
 
         This works exactly like :meth:`get`.  See :meth:`get` and
@@ -166,7 +172,7 @@ class AccountClient():
 
     def only_active(
         self,
-    ) -> 'AccountView':
+    ) -> AccountView:
         """Create a modified :class:``AccountClient`` that can only see active
         accounts.
 
@@ -199,7 +205,7 @@ class AccountClient():
 
     def only_inactive(
         self,
-    ) -> 'AccountView':
+    ) -> AccountView:
         """Create a modified :class:``AccountClient`` that can only see inactive
         accounts.
 
@@ -220,7 +226,7 @@ class AccountClient():
 
     def only_people(
         self,
-    ) -> 'AccountView':
+    ) -> AccountView:
         """Create a modified :class:``AccountClient`` that can only see
         accounts of people.
 
@@ -264,7 +270,7 @@ class AccountClient():
 
     def only_functional(
         self,
-    ) -> 'AccountView':
+    ) -> AccountView:
         """Create a modified :class:``AccountClient`` that can only see
         functional accounts.
 
@@ -303,7 +309,7 @@ class AccountView(AccountClient):
 
     def __init__(
         self,
-        account_filter: Callable[['Account'], bool],
+        account_filter: Callable[[Account], bool],
         *args,
         **kwargs
     ) -> None:

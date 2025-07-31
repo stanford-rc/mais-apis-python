@@ -15,6 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# This file has some references to classes that are defined in the same
+# file.  Pythons older than 3.14 (which implements PEP 649) cannot handle that
+# natively without this import.
+# NOTE: At some point in the future, this annodation will be deprecated.
+from __future__ import annotations
+
+# Start with stdlib imports
 import dataclasses
 import enum
 import logging
@@ -227,7 +234,7 @@ class AccountServiceKerberos(AccountService):
     def _from_json(
         cls,
         source: dict[str, Union[str, list[dict[str, str]]]],
-    ) -> 'AccountServiceKerberos':
+    ) -> AccountServiceKerberos:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
 
@@ -263,7 +270,7 @@ class AccountServiceLibrary(AccountService):
     def _from_json(
         cls,
         source: dict[str, Union[str, list[dict[str, str]]]],
-    ) -> 'AccountServiceLibrary':
+    ) -> AccountServiceLibrary:
         # We don't have any settings.  Pull out common stuff and return.
         kwargs = cls._json_to_dict(source)
         return cls(**kwargs)
@@ -334,7 +341,7 @@ class AccountServiceSEAS(AccountService):
     def _from_json(
         cls,
         source: dict[str, Union[str, list[dict[str, str]]]],
-    ) -> 'AccountServiceSEAS':
+    ) -> AccountServiceSEAS:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
 
@@ -384,7 +391,7 @@ class AccountServiceEmail(AccountService):
     def _from_json(
         cls,
         source: dict[str, Union[str, list[dict[str, str]]]],
-    ) -> 'AccountServiceEmail':
+    ) -> AccountServiceEmail:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
 
@@ -438,7 +445,7 @@ class AccountServiceAutoreply(AccountService):
     def _from_json(
         cls,
         source: dict[str, Union[str, list[dict[str, str]]]],
-    ) -> 'AccountServiceAutoreply':
+    ) -> AccountServiceAutoreply:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
 
@@ -484,7 +491,7 @@ class AccountServiceLeland(AccountService):
     def _from_json(
         cls,
         source: dict[str, Union[str, list[dict[str, str]]]],
-    ) -> 'AccountServiceLeland':
+    ) -> AccountServiceLeland:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
 
@@ -516,7 +523,7 @@ class AccountServicePTS(AccountService):
     def _from_json(
         cls,
         source: dict[str, Union[str, list[dict[str, str]]]],
-    ) -> 'AccountServicePTS':
+    ) -> AccountServicePTS:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
 
@@ -562,7 +569,7 @@ class AccountServiceAFS(AccountService):
     def _from_json(
         cls,
         source: dict[str, Union[str, list[dict[str, str]]]],
-    ) -> 'AccountServiceAFS':
+    ) -> AccountServiceAFS:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
 
@@ -597,7 +604,7 @@ class AccountServiceDialin(AccountService):
     def _from_json(
         cls,
         source: dict[str, Union[str, list[dict[str, str]]]],
-    ) -> 'AccountServiceDialin':
+    ) -> AccountServiceDialin:
         # We don't have any settings.  Pull out common stuff and return.
         kwargs = cls._json_to_dict(source)
         return cls(**kwargs)
