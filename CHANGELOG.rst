@@ -33,6 +33,9 @@ Other:
 
 * The docs on Read the Docs were not building properly.
 
+* ``py.typed`` files are now provided, for type-checking support.  Also, more
+  things (like tuples and dicts) have typing information provided.
+
 0.50.1
 ------
 
