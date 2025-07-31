@@ -97,33 +97,33 @@ class WorkgroupFilter(enum.Enum):
         will be returned.
     """
 
-    NONE = 0
+    NONE = 'NONE'
     """No membership filters are set."""
 
-    ACADEMIC_ADMINISTRATIVE = 1
+    ACADEMIC_ADMINISTRATIVE = 'ACADEMIC_ADMINISTRATIVE'
     """Limit effective membership to faculty, staff, students, and sponsored
     SUNetIDs.
     """
 
-    STUDENT = 2
+    STUDENT = 'STUDENT'
     """Limit effective membership to students."""
 
-    FACULTY = 3
+    FACULTY = 'FACULTY'
     """Limit effective membership to faculty."""
 
-    STAFF = 4
+    STAFF = 'STAFF'
     """Limit effective membership to staff."""
 
-    FACULTY_STAFF = 5
+    FACULTY_STAFF = 'FACULTY_STAFF'
     """Limit effective membership to faculty & staff."""
 
-    FACULTY_STUDENT = 6
+    FACULTY_STUDENT = 'FACULTY_STUDENT'
     """Limit effective membership to faculty & students."""
 
-    STAFF_STUDENT = 7
+    STAFF_STUDENT = 'STAFF_STUDENT'
     """Limit effective membership to staff & students."""
 
-    FACULTY_STAFF_STUDENT = 8
+    FACULTY_STAFF_STUDENT = 'FACULTY_STAFF_STUDENT'
     """Limit effective membership to faculty, staff, and students.
 
     This is similar to, but more restrictive than, ``ACADEMIC_ADMINISTRATIVE``.
@@ -138,34 +138,18 @@ class WorkgroupFilter(enum.Enum):
         """
         return self.name
 
-    @staticmethod
-    def from_str(value: str) -> 'WorkgroupFilter':
+    @classmethod
+    def from_str(
+        cls,
+        value: str,
+    ) -> 'WorkgroupFilter':
         """Convert a string into an enum.
 
         :param visibility: The string to convert.  Is case-sensitive.
 
         :raises ValueError: The value provided does not match an enum value.
         """
-        if value == 'NONE':
-            return WorkgroupFilter.NONE
-        elif value == 'ACADEMIC_ADMINISTRATIVE':
-            return WorkgroupFilter.ACADEMIC_ADMINISTRATIVE
-        elif value == 'STUDENT':
-            return WorkgroupFilter.STUDENT
-        elif value == 'FACULTY':
-            return WorkgroupFilter.FACULTY
-        elif value == 'STAFF':
-            return WorkgroupFilter.STAFF
-        elif value == 'FACULTY_STAFF':
-            return WorkgroupFilter.FACULTY_STAFF
-        elif value == 'FACULTY_STUDENT':
-            return WorkgroupFilter.FACULTY_STUDENT
-        elif value == 'STAFF_STUDENT':
-            return WorkgroupFilter.STAFF_STUDENT
-        elif value == 'FACULTY_STAFF_STUDENT':
-            return WorkgroupFilter.FACULTY_STAFF_STUDENT
-        else:
-            raise ValueError(value)
+        return cls(value)
 
 @enum.unique
 class WorkgroupVisibility(enum.Enum):
@@ -181,12 +165,12 @@ class WorkgroupVisibility(enum.Enum):
         will be returned.
     """
 
-    STANFORD = 0
+    STANFORD = 'STANFORD'
     """The workgroup's lists of members and administrators are visibile to all
     authenticated users.
     """
 
-    PRIVATE = 1
+    PRIVATE = 'PRIVATE'
     """The workgroup's lists of members and administrators are only visibile to
     workgroup administrators.  To everyone else, the workgroup will appear
     empty.
@@ -209,17 +193,15 @@ class WorkgroupVisibility(enum.Enum):
         """
         return self.name
 
-    @staticmethod
-    def from_str(visibility: str) -> 'WorkgroupVisibility':
+    @classmethod
+    def from_str(
+        cls,
+        visibility: str,
+    ) -> 'WorkgroupVisibility':
         """Convert a string into an enum.
 
         :param visibility: The string to convert.  It is case-sensitive.
 
         :raises ValueError: The value provided does not match an enum value.
         """
-        if visibility == 'PRIVATE':
-            return WorkgroupVisibility.PRIVATE
-        elif visibility == 'STANFORD':
-            return WorkgroupVisibility.STANFORD
-        else:
-            raise ValueError(visibility)
+        return cls(visibility)
