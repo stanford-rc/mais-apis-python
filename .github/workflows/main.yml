@@ -97,7 +97,7 @@ jobs:
       - name: Publish pushes to PyPI test
         uses: pypa/gh-action-pypi-publish@v1.12.4
         with:
-          repository_url: https://test.pypi.org/legacy/
+          repository-url: https://test.pypi.org/legacy/
 
   publish-prod:
     name: Publish tags to PyPi production
