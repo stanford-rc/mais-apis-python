@@ -1,29 +1,30 @@
 # vim: ts=4 sw=4 et
 # -*- coding: utf-8 -*-
 
-# There are some needed type annotations where, if we imported them now, we
-# would make an import loop.  PEP 563 changes this, making all annotations into
-# strings, instead of Python types.  But we still need the imports for when the
-# type-checker runs.
-# This is the compromise: We activate PEP 563, import typing now, and then
-# do whatever imports are needed just for the type-checker.
+# This file has a ton of references to classes that are defined in the same
+# file.  Pythons older than 3.14 (which implements PEP 649) cannot handle that
+# natively without this import.
+# NOTE: At some point in the future, this annodation will be deprecated.
 from __future__ import annotations
-from collections.abc import Iterator, Mapping, MutableSet
-from typing import Any, Literal, TYPE_CHECKING, Union
-if TYPE_CHECKING:
-    from stanford.mais.workgroup import PartialWorkgroup
-    from stanford.mais.workgroup.workgroup import Workgroup
 
-# We now return you to your regularly-scheduled imports…
-
+# First, do stdlib imports
 import abc
+from collections.abc import Iterator, Mapping, MutableSet
 import datetime
 import enum
 import logging
 import pathlib
-# from typing import * was done up above
+from typing import Any, Literal, TYPE_CHECKING, Union
 import weakref
+
+# Finally, do local imports
 import stanford.mais.account
+
+# There are some needed type annotations where, if we imported them now, we
+# would make an import loop.  So, only import them when type-checking.
+if TYPE_CHECKING:
+    from stanford.mais.workgroup import PartialWorkgroup
+    from stanford.mais.workgroup.workgroup import Workgroup
 
 # Set up logging
 
@@ -86,26 +87,26 @@ class WorkgroupMembership:
     """
 
     @property
-    def people(self) -> 'WorkgroupMembershipPersonContainer':
+    def people(self) -> WorkgroupMembershipPersonContainer:
         """Access the list of workgroup members that are people.
         """
         return self._people
 
     @property
-    def workgroups(self) -> 'WorkgroupMembershipWorkgroupContainer':
+    def workgroups(self) -> WorkgroupMembershipWorkgroupContainer:
         """Access the list of nested workgroups.
         """
         return self._workgroups
 
     @property
-    def certificates(self) -> 'WorkgroupMembershipCertificateContainer':
+    def certificates(self) -> WorkgroupMembershipCertificateContainer:
         """Access the list of workgroup members that are certificates.
         """
         return self._certificates
 
     def __init__(
         self,
-        workgroup: 'Workgroup',
+        workgroup: Workgroup,
         collection_type: Literal['members', 'administrators'],
     ) -> None:
         """Return an empty workgroup-membership instance.
@@ -189,7 +190,7 @@ class WorkgroupMembership:
         return None
 
     def __len__(
-        self: 'WorkgroupMembership',
+        self,
     ) -> int:
         """The combined number of people, workgroups, and certificates in this
         set.
@@ -197,7 +198,7 @@ class WorkgroupMembership:
         return len(self.people) + len(self.workgroups) + len(self.certificates)
 
     def __repr__(
-        self: 'WorkgroupMembership',
+        self,
     ) -> str:
         pieces: list[str] = list()
 
@@ -240,7 +241,7 @@ class WorkgroupMembershipContainer(
     """The set of identifiers within this container.
     """
 
-    _workgroup_ref: weakref.ReferenceType['Workgroup']
+    _workgroup_ref: weakref.ReferenceType[Workgroup]
     """A reference to the containing workgroup.
     """
 
@@ -312,7 +313,7 @@ class WorkgroupMembershipContainer(
         return self._collection_type
 
     @property
-    def workgroup(self) -> Union['Workgroup', None]:
+    def workgroup(self) -> Union[Workgroup, None]:
         return self._workgroup_ref()
 
     def __contains__(
@@ -580,7 +581,7 @@ class WorkgroupMembershipWorkgroupContainer(WorkgroupMembershipContainer):
 
     def discard(
         self,
-        value: Union[str, 'PartialWorkgroup', 'Workgroup'],
+        value: Union[str, PartialWorkgroup, Workgroup],
     ) -> None:
         """Remove a workgroup from the set.
 

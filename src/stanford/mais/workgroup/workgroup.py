@@ -1,29 +1,30 @@
 # vim: ts=4 sw=4 et
 # -*- coding: utf-8 -*-
 
-# There are some needed type annotations where, if we imported them now, we
-# would make an import loop.  PEP 563 changes this, making all annotations into
-# strings, instead of Python types.  But we still need the imports for when the
-# type-checker runs.
-# This is the compromise: We activate PEP 563, import typing now, and then
-# do whatever imports are needed just for the type-checker.
+# This file has a ton of references to classes that are defined in the same
+# file.  Pythons older than 3.14 (which implements PEP 649) cannot handle that
+# natively without this import.
+# NOTE: At some point in the future, this annodation will be deprecated.
 from __future__ import annotations
+
+# Start with stdlib imports
 from collections.abc import Mapping
-from typing import Any, TYPE_CHECKING, Union
-if TYPE_CHECKING:
-    from stanford.mais.workgroup import WorkgroupClient
-
-# We now return you to your regularly-scheduled imports…
-
 import dataclasses
 import datetime
 import logging
 import pathlib
 import re
+from typing import Any, TYPE_CHECKING, Union
 import zoneinfo
-from stanford.mais.client import MAISClient
+
+# Finally, do local imports
 from stanford.mais.workgroup.properties import *
 from stanford.mais.workgroup.member import *
+
+# There are some needed type annotations where, if we imported them now, we
+# would make an import loop.  So, only import them when type-checking.
+if TYPE_CHECKING:
+    from stanford.mais.workgroup import WorkgroupClient
 
 # Set up logging
 
@@ -416,7 +417,7 @@ class Workgroup:
         # Error out if we didn't get our expected data.
         if 'from_json' not in kwargs or 'client' not in kwargs:
             raise NotImplementedError('Do not instantiate Workgroups directly.')
-        client: WorkgroupClient = kwargs['client']
+        client: 'WorkgroupClient' = kwargs['client']
         response_json: Mapping[str, Any] = kwargs['from_json']
 
         # We know that this workgroup exists right now.
@@ -621,7 +622,7 @@ class Workgroup:
         return self._last_update
 
     @property
-    def filter(self) -> 'WorkgroupFilter':
+    def filter(self) -> WorkgroupFilter:
         """The workgroup filter.
 
         This controls the effective membership of the workgroup.  See the
@@ -748,7 +749,7 @@ class Workgroup:
         return self._reusable
 
     @property
-    def visibility(self) -> 'WorkgroupVisibility':
+    def visibility(self) -> WorkgroupVisibility:
         """Is the workgroup's membership visible to others?
 
         See :class:`~stanford.mais.workgroup.properties.WorkgroupVisibility`
@@ -1077,7 +1078,7 @@ class Workgroup:
     @filter.setter  # type: ignore[no-redef,attr-defined]
     def filter(
         self,
-        value: Union[str, 'WorkgroupFilter'],
+        value: Union[str, WorkgroupFilter],
     ) -> None:
         """Set the new filter.
 
@@ -1172,7 +1173,7 @@ class Workgroup:
     @visibility.setter  # type: ignore[no-redef,attr-defined]
     def visibility(
         self,
-        value: Union['WorkgroupVisibility', str],
+        value: Union[WorkgroupVisibility, str],
     ) -> None:
         """Set the new visibility.
 
