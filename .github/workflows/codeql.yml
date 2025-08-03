@@ -23,27 +23,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-    - name: Set up Python
-      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+    - name: Perform Bandit Analysis
+      uses: PyCQA/bandit-action@67a458d90fa11fb1463e91e7f4c8f068b5863c7f
       with:
-        python-version: 3.9
-
-    - name: Prepare pip
-      run: |
-        python -m pip install --upgrade pip
-
-    - name: Install prerequistes for testing
-      run: |
-        python -m pip install bandit[sarif,toml]
-
-    - name: Run Bandit
-      run: |
-        bandit --configfile pyproject.toml --recursive --format sarif --output results.sarif src tests
-
-    - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@51f77329afa6477de8c49fc9c7046c15b9a4e79d
-      with:
-        sarif_file: results.sarif
+        configfile: pyproject.toml
 
   codeql-analyze:
     name: CodeQL Analyze
