@@ -170,11 +170,10 @@ an API, `reach out to us <mailto:srcc-support@stanford.edu>`_!
 Requirements
 ------------
 
-* Python 3.9, or any later Python 3.x
+* Python 3.11, or any later Python 3.x
 
-  Older Python versions will be examined to see if they can be supported, but
-  it is highly unlikely that Python 3.8 or older will be supported.  Python 2
-  will not be supported.
+  We will try to maintain support for whichever Python 3.x is present in the
+  oldstable release of Debian.  Python 2 will not be supported.
 
 * `Requests`_ 2.30.0, or any later 2.x.
 
