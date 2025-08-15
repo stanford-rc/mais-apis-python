@@ -176,7 +176,10 @@ Requirements
   it is highly unlikely that Python 3.8 or older will be supported.  Python 2
   will not be supported.
 
-* `Requests`_ 2.30.0, or any later 2.x
+* `Requests`_ 2.30.0, or any later 2.x.
+
+  We do allow Requests 2.28.2, as packaged in Debian bookworm, but we do not
+  currently test against it.
 
 * A client certificate, issued by `MaIS`_, with permissions to the APIs you
   want to use, in the appropriate tier (such as PROD (production) or UAT).  See
