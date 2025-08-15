@@ -50,7 +50,7 @@ deps = [
 
 [tool.tox.env.latest]
 deps = [
-    "requests >2.32.0, <3.0"
+    "requests >2.32.4, <3.0"
 ]
 
 [tool.tox.gh.python]
