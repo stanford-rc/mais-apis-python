@@ -28,7 +28,7 @@ testpaths = [
 requires = [
     "tox>=4.28.3",
 ]
-env_list = "py{311,312}-{minimal,latest}"
+env_list = "py{311,312,313}-{minimal,latest}"
 
 [tool.tox.env_run_base]
 deps = [
@@ -56,6 +56,7 @@ deps = [
 [tool.tox.gh.python]
 "3.11" = ["py311-minimal", "py311-latest"]
 "3.12" = ["py312-minimal", "py312-latest"]
+"3.13" = ["py313-minimal", "py313-latest"]
 
 [tool.bandit.assert_used]
 skips = [ "tests/*.py" ]
