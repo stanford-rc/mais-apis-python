@@ -104,6 +104,25 @@ class AccountService():
         cls,
         source: dict[str, str | list[dict[str, str]]],
     ):
+        """Instantiate a service using a JSON-sourced dict.
+
+        This class method must be implemented by each service's own subclass.
+        The class method is responsible for taking a JSON-sourced dict,
+        extracting the items specific to the service, and then calling the
+        class constructor ``cls``.
+
+        To help subclasses do their work, this class provides two static
+        methods:
+
+        * :meth:`_json_to_dict` takes the JSON-sourced dict, and extracts the
+          attributes common to every service.  It's a good way to start
+          building the dict of keyword arguments that will be passed through to
+          the class constructor.
+
+        * :meth:`_get_settings` is used by services that have a ``settings``
+          dict in their JSON.  It supports mandatory & optional settings, and
+          single- & multi-valued settings.  Not all services use this.
+        """
         raise NotImplementedError('AccountService._from_json() must be implemented in all subclasses.')
 
     @staticmethod
@@ -114,7 +133,15 @@ class AccountService():
         recognize.
 
         This is used when we are building a new instance, and only pulls out
-        the common stuff.  It ignores 
+        the attributes that every service has (the service name, and service
+        status).
+
+        This convenience static method is used by all of the services.  The
+        most-simple services use this method to pull common attributes from the
+        JSON dict, and then immediately pass that to the class
+        constructor.  Larger services start with this method's returned dict,
+        and then either add dict items directly, or using `_get_settings` to
+        extract items from the JSON dict.
         """
         return {
             'name': source['name'],
