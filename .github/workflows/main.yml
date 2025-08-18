@@ -64,8 +64,7 @@ jobs:
 
       - name: Run MyPy
         run: |
-          mypy --package stanford.mais
-          mypy tests/*.py
+          mypy .
 
   publish-test:
     name: Publish pushes to PyPi's test instance

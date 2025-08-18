@@ -64,8 +64,7 @@ jobs:
 
       - name: Run MyPy
         run: |
-          mypy --package stanford.mais
-          mypy tests/*.py
+          mypy .
 
   bandit:
     name: Run Bandit
