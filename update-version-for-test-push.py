@@ -2,6 +2,15 @@
 # vim: ts=4 sw=4 et
 # coding: -*- utf-8 -*-
 
+# This script takes the current version number (from the VERSION file,
+# containing a valid Public version identifier), and turns it into a
+# Developmental release.  It is meant to be run prior to uploading to Test
+# PyPi, so that the version uploaded is unique, and is also 'earlier' (in
+# version-numbering terms) than the public version identifier.
+
+# For more information about version numbering, see
+# https://packaging.python.org/en/latest/specifications/version-specifiers/
+
 # © 2021 The Board of Trustees of the Leland Stanford Junior University.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -73,37 +82,12 @@ except ValueError:
     error(f"Unable to parse '{a}', '{b}', or '{c}' as integers.")
     exit(1)
 
-# Transform the version number.
-# If the version is a.b.0, then we convert to a.{b-1}.99
-# If the version is a.b.c, where c!=0, then we convert to a.b.{c-1}.99
-d = None
-if c == 0:
-    b -= 1
-    c = 99
-else:
-    c -= 1
-    d = 99
-# If b was zero, we might have just dropped it to -1.
-# In that case, change b to 99, and reduce a.
-if b < 0:
-    a -= 1
-    b = 99
-# If a has been dropped to -1, that means both a _and_ b were 0.
-# In that case, something is wrong.
-if a < 0:
-    error(f"a was dropped to below 0.  b={b} & c={c}.")
-    exit(1)
-
-# Construct a string for the version number.
-# We start with a, b, and c.  If d is set, append it.
-# We then append the UTC datetime, to the second.
+# Append `.dev` and the current date & time (to the second).
 # NOTE: This can trigger a race condition, if multiple pushes happen around the
 # same time.  If that happens, I'm sorry, I hope you (future me?) gets a laugh
 # out of it!
 version_string = f"{a}.{b}.{c}"
-if d is not None:
-    version_string += f".{d}"
-version_string += ('.' + datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S'))
+version_string += ('.dev' + datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S'))
 info(f"New version number is {version_string}")
 
 # Seek back and truncate the version file
