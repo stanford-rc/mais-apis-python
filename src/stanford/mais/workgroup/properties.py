@@ -15,6 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# This file has a ton of references to classes that are defined in the same
+# file.  Pythons older than 3.14 (which implements PEP 649) cannot handle that
+# natively without this import.
+# NOTE: At some point in the future, this annodation will be deprecated.
+from __future__ import annotations
+
+# Start with stdlib imports
 import enum
 import logging
 
@@ -129,7 +136,7 @@ class WorkgroupFilter(enum.Enum):
     def from_str(
         cls,
         value: str,
-    ) -> 'WorkgroupFilter':
+    ) -> WorkgroupFilter:
         """Convert a string into an enum.
 
         :param visibility: The string to convert.  Is case-sensitive.
@@ -184,7 +191,7 @@ class WorkgroupVisibility(enum.Enum):
     def from_str(
         cls,
         visibility: str,
-    ) -> 'WorkgroupVisibility':
+    ) -> WorkgroupVisibility:
         """Convert a string into an enum.
 
         :param visibility: The string to convert.  It is case-sensitive.
