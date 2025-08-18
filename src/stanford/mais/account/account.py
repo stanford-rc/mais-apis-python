@@ -26,7 +26,7 @@ import dataclasses
 import datetime
 import logging
 import requests
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 import urllib.parse
 from . import service
 
@@ -58,15 +58,15 @@ class AccountServiceTypes():
     marked as optional.
     """
 
-    kerberos: Optional[service.AccountServiceKerberos]
-    library: Optional[service.AccountServiceLibrary]
-    seas: Optional[service.AccountServiceSEAS]
-    email: Optional[service.AccountServiceEmail]
-    autoreply: Optional[service.AccountServiceAutoreply]
-    leland: Optional[service.AccountServiceLeland]
-    pts: Optional[service.AccountServicePTS]
-    afs: Optional[service.AccountServiceAFS]
-    dialin: Optional[service.AccountServiceDialin]
+    kerberos: service.AccountServiceKerberos | None
+    library: service.AccountServiceLibrary | None
+    seas: service.AccountServiceSEAS | None
+    email: service.AccountServiceEmail | None
+    autoreply: service.AccountServiceAutoreply | None
+    leland: service.AccountServiceLeland | None
+    pts: service.AccountServicePTS | None
+    afs: service.AccountServiceAFS | None
+    dialin: service.AccountServiceDialin | None
 
     # Set slots, since dataclass slots support doesn't come until Python 3.10.
     __slots__ = (

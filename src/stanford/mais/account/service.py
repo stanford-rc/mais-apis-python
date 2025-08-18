@@ -25,7 +25,7 @@ from __future__ import annotations
 import dataclasses
 import enum
 import logging
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -290,7 +290,7 @@ class AccountServiceSEAS(AccountService):
     .. _Shared Email: https://uit.stanford.edu/service/sharedemail
     """
 
-    local: Optional[str]
+    local: str | None
     """
     This is an optional setting.  If the account has a Stanford email box,
     *and* the account wants emails delivered to that mailbox, then this is the
@@ -320,7 +320,7 @@ class AccountServiceSEAS(AccountService):
        ``people`` tree).
     """
 
-    forward: Optional[list[str]]
+    forward: list[str] | None
     """
     This is an optional setting.  If present, emails received by this address
     will be forwarded to the emails listed in this setting.  Multiple emails
@@ -375,13 +375,13 @@ class AccountServiceEmail(AccountService):
     For people, this is ``personal``.  It *should not be used*.
     """
 
-    quota: Optional[int]
+    quota: int | None
     """
     This setting was specific to the Zimbra backend, and *should not be used*.
     It may disappear in the future.
     """
 
-    admin: Optional[str]
+    admin: str | None
     """
     This setting is obsolete, and *should not be used*.  It may disappear in
     the future.
@@ -477,7 +477,7 @@ class AccountServiceLeland(AccountService):
     .. _FarmShare: https://farmshare.stanford.edu/
     """
 
-    shell: Optional[str]
+    shell: str | None
     """
     The absolute path to the user's login shell.
 

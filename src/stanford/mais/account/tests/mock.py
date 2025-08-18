@@ -17,7 +17,7 @@
 
 # Stdlib imports
 import dataclasses
-from typing import Any, List, Literal, Optional, TypedDict
+from typing import Any, List, Literal, TypedDict
 
 # PyPi imports
 import responses
@@ -89,15 +89,15 @@ class TestLibrary(TestService):
 class TestSEAS(TestService):
     sunetid: List[str]
     sunetidpreferred: str
-    local: Optional[str] = None
-    forward: Optional[List[str]] = None
-    urirouteto: Optional[str] = None
+    local: str | None = None
+    forward: List[str] | None = None
+    urirouteto: str | None = None
 
 @dataclasses.dataclass(frozen=True)
 class TestEmail(TestService):
     accounttype: Literal['personal', 'functional']
-    quota: Optional[int] = None
-    admin: Optional[str] = None
+    quota: int | None = None
+    admin: str | None = None
 
 @dataclasses.dataclass(frozen=True)
 class TestAutoreply(TestService):
@@ -107,7 +107,7 @@ class TestAutoreply(TestService):
 
 @dataclasses.dataclass(frozen=True)
 class TestLeland(TestService):
-    shell: Optional[str]
+    shell: str | None
 
 @dataclasses.dataclass(frozen=True)
 class TestPTS(TestService):

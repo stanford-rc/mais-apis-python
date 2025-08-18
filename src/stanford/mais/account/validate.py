@@ -20,7 +20,6 @@ import dataclasses
 import functools
 import logging
 import re
-from typing import Optional
 import stanford.mais.account
 
 # Set up logging
@@ -50,7 +49,7 @@ class AccountValidationResults:
        more-specific type (such as :class:`list` before using it).
     """
 
-    raw: Optional[str]
+    raw: str | None
     """
     The raw input provided for validation.  This is only provided when
     a string was provided to :func:`validate`.

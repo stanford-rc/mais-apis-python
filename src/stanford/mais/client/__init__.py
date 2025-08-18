@@ -28,7 +28,7 @@ import logging
 import pathlib
 import requests
 import ssl
-from typing import NamedTuple, Optional, TypedDict
+from typing import NamedTuple, TypedDict
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -143,7 +143,7 @@ class MAISClient():
     :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
     """
 
-    key: Optional[pathlib.Path] = None
+    key: pathlib.Path | None = None
     """The path to a TLS private key.
 
     This must be the private key associated with the provided certificate, any
@@ -268,7 +268,7 @@ class MAISClient():
     def prod(
         cls,
         cert: pathlib.Path,
-        key: Optional[pathlib.Path] = None,
+        key: pathlib.Path | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to connect to production
@@ -311,7 +311,7 @@ class MAISClient():
     def uat(
         cls,
         cert: pathlib.Path,
-        key: Optional[pathlib.Path] = None,
+        key: pathlib.Path | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to connect to UAT APIs.
@@ -353,7 +353,7 @@ class MAISClient():
     def uat1(
         cls,
         cert: pathlib.Path,
-        key: Optional[pathlib.Path] = None,
+        key: pathlib.Path | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to connect to UAT1 APIs, used for Sequoia testing.
