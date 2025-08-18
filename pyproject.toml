@@ -9,6 +9,55 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "stanford-mais"
+dynamic = ["version"]
+description = "Python client for Stanford MaIS APIs"
+
+authors = [
+    {name = "A. Karl Kornel", email = "akkornel@stanford.edu"},
+]
+
+readme = {file = "README.rst", content-type = "text/x-rst"}
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+requires-python = ">=3.11, <4.0"
+dependencies = [
+    "requests >=2.28.2, <3.0",
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx >=5.0, <9.0",
+    "sphinx-rtd-theme",
+]
+test = [
+    "mypy >=0.910, <1.0",
+    "types-requests",
+    "pytest >=8.4.1, <8.5.0",
+    "pytest-responses",
+    "requests >=2.30.0, <3.0",
+    "responses",
+    "bandit >=1.7.0",
+]
+
+[project.urls]
+Source = "https://github.com/stanford-rc/mais-apis-python"
+Documentation = "https://mais-apis-python.readthedocs.io"
+Issues = "https://github.com/stanford-rc/mais-apis-python/issues"
+
 [tool.mypy]
 namespace_packages = true
 pretty = true
