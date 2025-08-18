@@ -20,7 +20,7 @@ import dataclasses
 import functools
 import logging
 import re
-from typing import Optional, Union
+from typing import Optional
 import stanford.mais.account
 
 # Set up logging
@@ -183,7 +183,7 @@ def validate(
 @validate.register(tuple)
 @validate.register(set)
 def _( # type: ignore[misc]
-    raw: Union[list[str], tuple[str], set[str]],
+    raw: list[str] | tuple[str] | set[str],
     client: stanford.mais.account.AccountClient,
 ) -> AccountValidationResults:
     """

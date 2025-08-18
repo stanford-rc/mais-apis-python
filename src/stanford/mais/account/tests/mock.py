@@ -17,7 +17,7 @@
 
 # Stdlib imports
 import dataclasses
-from typing import Any, List, Literal, Optional, TypedDict, Union
+from typing import Any, List, Literal, Optional, TypedDict
 
 # PyPi imports
 import responses
@@ -26,7 +26,7 @@ import responses
 
 class ServiceSetting(TypedDict):
     name: str
-    value: Union[str, int]
+    value: str | int
 class ServiceJson(TypedDict):
     name: str
     status: Literal['active', 'inactive', 'frozen']

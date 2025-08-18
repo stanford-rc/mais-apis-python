@@ -28,7 +28,7 @@ import datetime
 import logging
 import pathlib
 import re
-from typing import Any, TYPE_CHECKING, Union
+from typing import Any, TYPE_CHECKING
 import zoneinfo
 
 # Finally, do local imports
@@ -1092,7 +1092,7 @@ class Workgroup:
     @filter.setter  # type: ignore[no-redef,attr-defined]
     def filter(
         self,
-        value: Union[str, WorkgroupFilter],
+        value: str | WorkgroupFilter,
     ) -> None:
         """Set the new filter.
 
@@ -1187,7 +1187,7 @@ class Workgroup:
     @visibility.setter  # type: ignore[no-redef,attr-defined]
     def visibility(
         self,
-        value: Union[WorkgroupVisibility, str],
+        value: WorkgroupVisibility | str,
     ) -> None:
         """Set the new visibility.
 

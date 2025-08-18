@@ -28,7 +28,7 @@ import logging
 import pathlib
 import requests
 import ssl
-from typing import NamedTuple, Optional, TypedDict, Union
+from typing import NamedTuple, Optional, TypedDict
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -187,7 +187,7 @@ class MAISClient():
     ignored.
     """
 
-    timeout: Union[Timeout, float, None] = None
+    timeout: Timeout | float | None = None
     """The timeout to use for requests.
 
     Requests `does`_ `not`_ `support`_ setting default timeouts, so we
@@ -269,7 +269,7 @@ class MAISClient():
         cls,
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
-        timeout: Union[Timeout, float, None] = None,
+        timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to connect to production
         (PROD) APIs.
@@ -312,7 +312,7 @@ class MAISClient():
         cls,
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
-        timeout: Union[Timeout, float, None] = None,
+        timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to connect to UAT APIs.
 
@@ -354,7 +354,7 @@ class MAISClient():
         cls,
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
-        timeout: Union[Timeout, float, None] = None,
+        timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to connect to UAT1 APIs, used for Sequoia testing.
 
@@ -415,7 +415,7 @@ class _CustomSession(requests.Session):
     .. _before: https://github.com/psf/requests/issues/3054
     """
 
-    timeout: Union[None, float, Timeout] = None
+    timeout: Timeout | float | None = None
     """The timeout value that so many folks wish Session had.
 
     This can be one of three things:

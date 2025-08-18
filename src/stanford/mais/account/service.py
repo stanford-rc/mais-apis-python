@@ -102,13 +102,13 @@ class AccountService():
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ):
         raise NotImplementedError('AccountService._from_json() must be implemented in all subclasses.')
 
     @staticmethod
     def _json_to_dict(
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> dict[str, Any]:
         """Given a dict parsed from JSON, extract all of the service keys we
         recognize.
@@ -125,7 +125,7 @@ class AccountService():
     def _get_setting(
         settings: list[dict[str, str]],
         target: str
-    ) -> Union[None, str, set[str]]:
+    ) -> None | str | set[str]:
         """Convenience method to pull a setting out of a settings dict.
 
         :returns: If the setting was single-valued, return it as a string.  If the setting was multi-valued, return a set of strings.  If the setting was not found, return None.
@@ -144,13 +144,13 @@ class AccountService():
     OptionalTupleOfStrings = Union[tuple[()], tuple[str, ...]]
     @staticmethod
     def _get_settings(
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
         service: str,
         required_keys_single: OptionalTupleOfStrings = tuple(),
         required_keys_multiple: OptionalTupleOfStrings = tuple(),
         optional_keys_single: OptionalTupleOfStrings = tuple(),
         optional_keys_multiple: OptionalTupleOfStrings = tuple(),
-    ) -> dict[str, Union[None, str, set[str]]]:
+    ) -> dict[str, None | str | set[str]]:
         """Convenience method to pull settings out of a settings dict
 
         :param source: The dict for a single service, taken from the JSON array of services returned by the Account API.
@@ -171,7 +171,7 @@ class AccountService():
 
         :raises TypeError: The 'settings' list is not actually a list.
         """
-        result: dict[str, Union[None, str, set[str]]] = dict()
+        result: dict[str, None | str | set[str]] = dict()
 
         # Is this account inactive?  If yes, all keys are optional.
         if source['status'] != 'active':
@@ -233,7 +233,7 @@ class AccountServiceKerberos(AccountService):
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> AccountServiceKerberos:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
@@ -269,7 +269,7 @@ class AccountServiceLibrary(AccountService):
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> AccountServiceLibrary:
         # We don't have any settings.  Pull out common stuff and return.
         kwargs = cls._json_to_dict(source)
@@ -340,7 +340,7 @@ class AccountServiceSEAS(AccountService):
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> AccountServiceSEAS:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
@@ -390,7 +390,7 @@ class AccountServiceEmail(AccountService):
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> AccountServiceEmail:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
@@ -444,7 +444,7 @@ class AccountServiceAutoreply(AccountService):
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> AccountServiceAutoreply:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
@@ -490,7 +490,7 @@ class AccountServiceLeland(AccountService):
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> AccountServiceLeland:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
@@ -522,7 +522,7 @@ class AccountServicePTS(AccountService):
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> AccountServicePTS:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
@@ -568,7 +568,7 @@ class AccountServiceAFS(AccountService):
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> AccountServiceAFS:
         # Start by pulling out the common stuff
         kwargs = cls._json_to_dict(source)
@@ -603,7 +603,7 @@ class AccountServiceDialin(AccountService):
     @classmethod
     def _from_json(
         cls,
-        source: dict[str, Union[str, list[dict[str, str]]]],
+        source: dict[str, str | list[dict[str, str]]],
     ) -> AccountServiceDialin:
         # We don't have any settings.  Pull out common stuff and return.
         kwargs = cls._json_to_dict(source)

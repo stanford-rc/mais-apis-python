@@ -22,7 +22,7 @@ import enum
 import logging
 import pathlib
 import requests
-from typing import Literal, Union
+from typing import Literal
 import urllib.parse
 import weakref
 import stanford.mais.client
@@ -619,7 +619,7 @@ class WorkgroupClient():
 
     def _url(
         self,
-        fragment: Union[pathlib.PurePosixPath, str, None] = None,
+        fragment: pathlib.PurePosixPath | str | None = None,
         query_dict: Mapping[str, str] = dict(),
     ) -> str:
         """Return a URL for a specific Workgroups API call.

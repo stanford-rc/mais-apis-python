@@ -28,7 +28,7 @@ import datetime
 import enum
 import logging
 import pathlib
-from typing import Any, Literal, TYPE_CHECKING, Union
+from typing import Any, Literal, TYPE_CHECKING
 import weakref
 
 # Finally, do local imports
@@ -327,7 +327,7 @@ class WorkgroupMembershipContainer(
         return self._collection_type
 
     @property
-    def workgroup(self) -> Union[Workgroup, None]:
+    def workgroup(self) -> Workgroup | None:
         return self._workgroup_ref()
 
     def __contains__(
@@ -575,7 +575,7 @@ class WorkgroupMembershipWorkgroupContainer(WorkgroupMembershipContainer):
 
     def add(
         self,
-        value: Union[str, 'PartialWorkgroup', 'Workgroup'],
+        value: str | PartialWorkgroup | Workgroup,
     ) -> None:
         """Add a workgroup to the set.
 
@@ -595,7 +595,7 @@ class WorkgroupMembershipWorkgroupContainer(WorkgroupMembershipContainer):
 
     def discard(
         self,
-        value: Union[str, PartialWorkgroup, Workgroup],
+        value: str | PartialWorkgroup | Workgroup,
     ) -> None:
         """Remove a workgroup from the set.
 
