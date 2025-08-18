@@ -45,12 +45,14 @@ set_env = { PYTHONTRACEMALLOC = "20" }
 
 [tool.tox.env.minimal]
 deps = [
-    "requests==2.30.0"
+    "requests==2.30.0",
+    "setuptools==66.1.1",
 ]
 
 [tool.tox.env.latest]
 deps = [
-    "requests >2.32.4, <3.0"
+    "requests >2.32.4, <3.0",
+    "setuptools >=80.9.0",
 ]
 
 [tool.tox.gh.python]
