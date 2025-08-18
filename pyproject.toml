@@ -44,7 +44,7 @@ docs = [
     "sphinx-rtd-theme",
 ]
 test = [
-    "mypy >=0.910, <1.0",
+    "mypy >= 1.0.0",
     "types-requests",
     "pytest >=8.4.1, <8.5.0",
     "pytest-responses",
