@@ -28,11 +28,11 @@ import logging
 import requests
 from typing import Any, TYPE_CHECKING
 import urllib.parse
-from . import service
+from stanford.mais.account import service
 
 # Some imports are only needed when typechecking
 if TYPE_CHECKING:
-    from . import AccountClient
+    from stanford.mais.account import AccountClient
 
 # Set up logging
 logger = logging.getLogger(__name__)
