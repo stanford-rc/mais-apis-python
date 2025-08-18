@@ -78,7 +78,7 @@ class PrivgroupEntry:
     def from_json(
         cls,
         json: dict[str, Any],
-    ) -> 'PrivgroupEntry':
+    ) -> PrivgroupEntry:
         """Make a privgroup entry from a Workgroups API JSON object.
         """
 
