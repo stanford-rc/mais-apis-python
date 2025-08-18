@@ -15,6 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# This file has a ton of references to classes that are defined in the same
+# file.  Pythons older than 3.14 (which implements PEP 649) cannot handle that
+# natively without this import.
+# NOTE: At some point in the future, this annodation will be deprecated.
+from __future__ import annotations
+
+# Start with stdlib imports
 import collections.abc
 import dataclasses
 import logging
@@ -263,7 +270,7 @@ class MAISClient():
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
         timeout: Union[Timeout, float, None] = None,
-    ) -> 'MAISClient':
+    ) -> MAISClient:
         """Return a client configured to connect to connect to production
         (PROD) APIs.
 
@@ -306,7 +313,7 @@ class MAISClient():
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
         timeout: Union[Timeout, float, None] = None,
-    ) -> 'MAISClient':
+    ) -> MAISClient:
         """Return a client configured to connect to connect to UAT APIs.
 
         The returned client has all of the URLs pre-configured.
@@ -348,7 +355,7 @@ class MAISClient():
         cert: pathlib.Path,
         key: Optional[pathlib.Path] = None,
         timeout: Union[Timeout, float, None] = None,
-    ) -> 'MAISClient':
+    ) -> MAISClient:
         """Return a client configured to connect to connect to UAT1 APIs, used for Sequoia testing.
 
         The returned client has all of the URLs pre-configured.
