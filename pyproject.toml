@@ -59,6 +59,7 @@ Documentation = "https://mais-apis-python.readthedocs.io"
 Issues = "https://github.com/stanford-rc/mais-apis-python/issues"
 
 [tool.mypy]
+explicit_package_bases = true
 namespace_packages = true
 pretty = true
 no_color_output = true
