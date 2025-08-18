@@ -15,6 +15,9 @@ dynamic = ["version"]
 description = "Python client for Stanford MaIS APIs"
 
 authors = [
+    {name = "Stanford Research Computing", email = "srcc-support@stanford.edu"},
+]
+maintainers = [
     {name = "A. Karl Kornel", email = "akkornel@stanford.edu"},
 ]
 

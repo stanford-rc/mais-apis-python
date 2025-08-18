@@ -26,7 +26,7 @@ sys.path.insert(0, str(src_path))
 
 project = 'Stanford MaIS APIs'
 copyright = '2021, The Board of Trustees of the Leland Stanford Junior University'
-author = 'Stanford Research Computing Center'
+author = 'Stanford Research Computing'
 
 # -- General configuration ---------------------------------------------------
 

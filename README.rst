@@ -24,9 +24,13 @@ MaIS provides access to these APIs to authorized clients, through a set of
 XML and JSON APIs.  This package provides a Python SDK for interfacing with
 some of those APIs.
 
+This package was created & is maintained by `Stanford Research Computing`_.  It
+is made available to others in the hope that it will be useful!
+
 .. _Middleware and Integration Services: https://mais.stanford.edu/
 .. _University IT: https://uit.stanford.edu/
 .. _Registry: https://uit.stanford.edu/service/registry
+.. _Stanford Research Computing: https://srcc.stanford.edu
 
 Example
 -------
