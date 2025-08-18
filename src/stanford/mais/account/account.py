@@ -50,7 +50,7 @@ __all__ = (
 # The Account class is big!  So it's in its own file.
 # (AccountServiceTypes is here as required support.)
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, slots=True, weakref_slot=True)
 class AccountServiceTypes():
     """The different types of services which may be attached to an Account.
 
@@ -67,20 +67,6 @@ class AccountServiceTypes():
     pts: service.AccountServicePTS | None
     afs: service.AccountServiceAFS | None
     dialin: service.AccountServiceDialin | None
-
-    # Set slots, since dataclass slots support doesn't come until Python 3.10.
-    __slots__ = (
-        'kerberos',
-        'library',
-        'seas',
-        'email',
-        'autoreply',
-        'leland',
-        'pts',
-        'afs',
-        'dialin',
-        '__weakref__',
-    )
 
 @dataclasses.dataclass(frozen=True)
 class Account():

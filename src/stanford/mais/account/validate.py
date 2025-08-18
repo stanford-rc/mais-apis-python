@@ -36,7 +36,7 @@ __all__ = (
 # class first.  That is so that we can reference the class name directly in
 # `validate`.
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, slots=True, weakref_slot=True)
 class AccountValidationResults:
     """Results of doing an account validation.
 
@@ -85,18 +85,6 @@ class AccountValidationResults:
     """
     The set of entries from `raw_set` that are not SUNetIDs.
     """
-
-    # Manually define __slots__, for increased performance.
-    # Dataclasses can do this automatically, but only in Python 3.10+
-    __slots__ = (
-        'raw',
-        'raw_set',
-        'full',
-        'base',
-        'inactive',
-        'unknown',
-        '__weakref__',
-    )
 
 # For validation, we will have three functions:
 # * Our first function handles strings, and splitting them up.
