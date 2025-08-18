@@ -358,16 +358,16 @@ class MAISClient():
     ) -> MAISClient:
         """Return a client configured to connect to connect to UAT1 APIs, used for Sequoia testing.
 
+        UAT1 is available for the Account, Authority (also known as
+        "Privilege") APIs, since those are the APIs that directly depend on
+        data from HR.
+
         The returned client has all of the URLs pre-configured.
 
-        .. warning::
-           There are no UAT1 APIs available for Course or Student, so those
-           APIs are not available through this client.
-
-        .. warning::
-           The only UAT1 Workgroup API is the XML-based 1.0 API.  This Python
-           package uses the JSON-based 2.0 API.  Therefore, this Python package
-           will not work with UAT1 at this time.
+        .. note::
+           UAT1 does have a Workgroup API, but it uses the XML-based 1.0 API.
+           This Python package uses the JSON-based 2.0 API.  Therefore, this
+           Python package will not work with UAT1 at this time.
 
         .. note::
            A new client instance is created every time you call this.  If
