@@ -199,7 +199,7 @@ class WorkgroupClient():
         self,
         *args,
         **kwargs,
-    ) -> 'Workgroup':
+    ) -> Workgroup:
         """Create a Workgroup.
 
         This is a convenience wrapper around :meth:`Workgroup.create`.  All other
@@ -227,7 +227,7 @@ class WorkgroupClient():
     def get(
         self,
         name: str,
-    ) -> 'Workgroup':
+    ) -> Workgroup:
         """Fetch a Workgroup.
 
         This is a convenience wrapper around :meth:`Workgroup.get`.  The
@@ -269,7 +269,7 @@ class WorkgroupClient():
     def __getitem__(
         self,
         name: str,
-    ) -> 'Workgroup':
+    ) -> Workgroup:
         """Fetch a Workgroup.
 
         This works exactly like :meth:`get`.  See :meth:`get` and
@@ -299,7 +299,7 @@ class WorkgroupClient():
     def search_by_name(
         self,
         search: str,
-    ) -> Collection['PartialWorkgroup']:
+    ) -> Collection[PartialWorkgroup]:
         """Search for workgroups by name, with wildcards supported.
 
         :param search: The string to search for.  ``*`` is the wildcard symbol.
@@ -389,7 +389,7 @@ class WorkgroupClient():
         self,
         target: str,
         target_type: Literal['CERTIFICATE', 'USER', 'WORKGROUP'],
-    ) -> 'SearchByResults':
+    ) -> SearchByResults:
         """Search for workgroups by target.
 
         :param target_type: The type of thing to search for.  Either a
