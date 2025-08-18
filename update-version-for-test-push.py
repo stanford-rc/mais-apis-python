@@ -67,19 +67,19 @@ version_file = version_path.open(mode='r+', encoding='ascii')
 debug('Reading version line')
 version_string = version_file.readline().rstrip("\n")
 try:
-    (a, b, c) = version_string.split('.')
+    (a_str, b_str, c_str) = version_string.split('.')
 except ValueError:
     error(f"Version '{version_string}' is not in the expected three-part form")
     exit(1)
-info(f"Old version number was {a}.{b}.{c}")
+info(f"Old version number was {a_str}.{b_str}.{c_str}")
 
 # Convert the versions to int.
 try:
-    a = int(a)
-    b = int(b)
-    c = int(c)
+    a = int(a_str)
+    b = int(b_str)
+    c = int(c_str)
 except ValueError:
-    error(f"Unable to parse '{a}', '{b}', or '{c}' as integers.")
+    error(f"Unable to parse '{a_str}', '{b_str}', or '{c_str}' as integers.")
     exit(1)
 
 # Append `.dev` and the current date & time (to the second).
