@@ -4,7 +4,7 @@
 # Build using setuptools & wheel.
 [build-system]
 requires = [
-    "setuptools >= 50.0.2",
+    "setuptools >= 66.1.1",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
