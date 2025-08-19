@@ -643,11 +643,9 @@ class WorkgroupClient():
             combined_path = url_path / pathlib.PurePosixPath(fragment)
 
         # If we've got a query dict, convert it to UTF-8 bytes and assemble.
-        # NOTE: A MyPy bug is throwing an error on `urlencode`.
-        # See https://github.com/python/typeshed/issues/4234 for details.
         query_str = ''
         if len(query_dict) > 0:
-            query_str = urllib.parse.urlencode(  # type: ignore[type-var]
+            query_str = urllib.parse.urlencode(
                 query=query_dict,
                 encoding='utf-8',
                 quote_via=urllib.parse.quote,
