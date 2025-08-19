@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 # Start with stdlib imports
+import abc
 import dataclasses
 import enum
 import logging
@@ -72,7 +73,7 @@ class ServiceStatus(enum.Enum):
 # Classes appear in this file in `__all__` order.
 
 @dataclasses.dataclass(frozen=True)
-class AccountService():
+class AccountService(abc.ABC):
     """Represents an account service.
 
     This is a base container representing a service, and stores the
@@ -97,9 +98,8 @@ class AccountService():
         """
         return (True if self.status == ServiceStatus.ACTIVE else False)
 
-    # This really should be marked as an @abc.abstractclass, but MyPy raises an
-    # error because of https://github.com/python/mypy/issues/5374
     @classmethod
+    @abc.abstractmethod
     def _from_json(
         cls,
         source: dict[str, str | list[dict[str, str]]],
@@ -123,7 +123,7 @@ class AccountService():
           dict in their JSON.  It supports mandatory & optional settings, and
           single- & multi-valued settings.  Not all services use this.
         """
-        raise NotImplementedError('AccountService._from_json() must be implemented in all subclasses.')
+        ...
 
     @staticmethod
     def _json_to_dict(
