@@ -5,7 +5,7 @@ on:
 
 jobs:
   common:
-    uses: .github/workflows/common.yml
+    uses: ./.github/workflows/common.yml
 
   publish-test:
     name: Publish pushes to PyPi's test instance
