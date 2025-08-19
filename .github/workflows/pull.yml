@@ -64,7 +64,7 @@ jobs:
 
       - name: Run MyPy
         run: |
-          mypy .
+          mypy --exclude build .
 
   bandit:
     name: Run Bandit
