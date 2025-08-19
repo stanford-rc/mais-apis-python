@@ -206,6 +206,22 @@ threads/processes.
 .. _MaIS: https://uit.stanford.edu/team/mais
 .. _Getting Started: https://uit.stanford.edu/developers/apis/getting-started
 
+Versions & Installation
+-----------------------
+
+Production releases are available through `PyPi`_.  The project name is
+`stanford-mais`_.  `Semantic versioning`_ is used for production releases.
+
+Non-production releases are available `on PyPi Test`_.  Non-production releases
+use pre-release version numbers.  To install the latest-available pre-release
+version, use a command like
+``pip install -i https://test.pypi.org/simple/ stanford-mais --pre``.
+
+.. _PyPi: https://pypi.org/
+.. _stanford-mais: https://pypi.org/project/stanford-mais/
+.. _Semantic versioning: https://semver.org
+.. _on PyPi Test: https://test.pypi.org/project/stanford-mais/
+
 Copyright & Licensing
 ---------------------
 
