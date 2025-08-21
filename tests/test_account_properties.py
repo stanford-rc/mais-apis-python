@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import datetime
 import itertools
 import pytest
 from stanford.mais.client import MAISClient
@@ -163,7 +164,70 @@ def test_description(account_client):
     assert oldfunctional.description == 'Functional Account'
     assert sharedmailbox.description == 'Shared Email Account'
 
-# TODO: Test last_updated
+def test_is_person(account_client):
+    # Fetch our accounts
+    fullprsn = account_client['fullprsn']
+    frozprsn = account_client['frozprsn']
+    formerpsn = account_client['formerpsn']
+    affilite = account_client['affilite']
+    afilbase = account_client['afilbase']
+    functional = account_client['functional']
+    oldfunctional = account_client['oldfunctional']
+    sharedmailbox = account_client['sharedmailbox']
+
+    # Check that is_person matches what we expect
+    assert fullprsn.is_person is True
+    assert frozprsn.is_person is True
+    assert formerpsn.is_person is True
+    assert affilite.is_person is True
+    assert afilbase.is_person is True
+    assert functional.is_person is False
+    assert oldfunctional.is_person is False
+    assert sharedmailbox.is_person is False
+
+def test_is_active(account_client):
+    # Fetch our accounts
+    fullprsn = account_client['fullprsn']
+    frozprsn = account_client['frozprsn']
+    formerpsn = account_client['formerpsn']
+    affilite = account_client['affilite']
+    afilbase = account_client['afilbase']
+    functional = account_client['functional']
+    oldfunctional = account_client['oldfunctional']
+    sharedmailbox = account_client['sharedmailbox']
+
+    # Check that is_active matches what we expect
+    assert fullprsn.is_active is True
+    assert frozprsn.is_active is True
+    assert formerpsn.is_active is False
+    assert affilite.is_active is True
+    assert afilbase.is_active is True
+    assert functional.is_active is True
+    assert oldfunctional.is_active is False
+    assert sharedmailbox.is_active is True
+
+def test_is_full(account_client):
+    # Fetch our accounts
+    fullprsn = account_client['fullprsn']
+    frozprsn = account_client['frozprsn']
+    formerpsn = account_client['formerpsn']
+    affilite = account_client['affilite']
+    afilbase = account_client['afilbase']
+    functional = account_client['functional']
+    oldfunctional = account_client['oldfunctional']
+    sharedmailbox = account_client['sharedmailbox']
+
+    # Check that is_full matches what we expect
+    assert fullprsn.is_full is True
+    assert frozprsn.is_full is True
+    assert formerpsn.is_full is False
+    assert affilite.is_full is True
+    assert afilbase.is_full is False
+    assert functional.is_full is False
+    assert oldfunctional.is_full is False
+    assert sharedmailbox.is_full is False
+
+# Test last_updated
 def test_last_updated(account_client):
     # Fetch our accounts
     fullprsn = account_client['fullprsn']
@@ -175,6 +239,24 @@ def test_last_updated(account_client):
     oldfunctional = account_client['oldfunctional']
     sharedmailbox = account_client['sharedmailbox']
 
-    # Test last-updated is decoded correctly
-    pass
+    # All our test accounts have the same last-updated datetime
+    expected_dt = datetime.datetime(
+        year=2020,
+        month=1,
+        day=3,
+        hour=15,
+        minute=14,
+        second=13,
+        microsecond=0,
+        tzinfo=datetime.timezone.utc,
+    )
 
+    # Test last-updated is decoded correctly
+    assert fullprsn.last_updated == expected_dt
+    assert frozprsn.last_updated == expected_dt
+    assert formerpsn.last_updated == expected_dt
+    assert affilite.last_updated == expected_dt
+    assert afilbase.last_updated == expected_dt
+    assert functional.last_updated == expected_dt
+    assert oldfunctional.last_updated == expected_dt
+    assert sharedmailbox.last_updated == expected_dt
