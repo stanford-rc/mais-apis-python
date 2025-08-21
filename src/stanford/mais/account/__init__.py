@@ -107,6 +107,22 @@ class AccountClient():
     client.  It speeds up repeated accesses of accounts.
     """
 
+    _filters: frozenset[Callable[[Account], bool]] = dataclasses.field(repr=False, default_factory=frozenset)
+    """Set of filters to apply on lookups.
+
+    The callables in this frozen set are evaluated when ``get()`` is called,
+    and has found an Account.  Each callable will be called with the Account as
+    the only parameter.  If any callable returns a ``False``, then a
+    ``KeyError`` will be raised, as if the lookup failed.
+
+    .. note::
+
+       If a callable returns ``False``, then there is no guarantee that all
+       callables will be called before the exception is raised.  The only
+       situation where all callables will be called is when all callables
+       return ``True``.
+    """
+
     def __post_init__(self) -> None:
         """Check provided constructor variables.
 
@@ -136,10 +152,19 @@ class AccountClient():
         Refer to :meth:`Account.get` for details on parameters, exceptions,
         etc..
         """
-        return Account.get(
+        # Fetch our account
+        account = Account.get(
             client=self,
             sunetid=sunetid,
         )
+
+        # Check against filters
+        for filter_func in self._filters:
+            if filter_func(account) is False:
+                raise KeyError(sunetid)
+
+        # All filters passed!
+        return account
 
     def __getitem__(
         self,
@@ -172,8 +197,8 @@ class AccountClient():
 
     def only_active(
         self,
-    ) -> AccountView:
-        """Create a modified :class:``AccountClient`` that can only see active
+    ) -> AccountClient:
+        """Create a modified :class:`AccountClient` that can only see active
         accounts.
 
         The returned client instance has been modified so that
@@ -197,16 +222,17 @@ class AccountClient():
            The 'client' returned by this method uses the same caches as this
            client.  Therefore, it must not be used across threads/processes.
         """
-        return AccountView(
+        new_filter = lambda candidate: (True if candidate.is_active else False) 
+        return AccountClient(
             client=self.client,
             _cache=self._cache,
-            account_filter=lambda candidate: (True if candidate.is_active else False)
+            _filters=self._filters | frozenset((new_filter,))
         )
 
     def only_inactive(
         self,
-    ) -> AccountView:
-        """Create a modified :class:``AccountClient`` that can only see inactive
+    ) -> AccountClient:
+        """Create a modified :class:`AccountClient` that can only see inactive
         accounts.
 
         The returned client instance has been modified so that
@@ -218,16 +244,17 @@ class AccountClient():
            The 'client' returned by this method uses the same caches as this
            client.  Therefore, it must not be used across threads/processes.
         """
-        return AccountView(
+        new_filter = lambda candidate: (False if candidate.is_active else True) 
+        return AccountClient(
             client=self.client,
             _cache=self._cache,
-            account_filter=lambda candidate: (False if candidate.is_active else True)
+            _filters=self._filters | frozenset((new_filter,))
         )
 
     def only_people(
         self,
-    ) -> AccountView:
-        """Create a modified :class:``AccountClient`` that can only see
+    ) -> AccountClient:
+        """Create a modified :class:`AccountClient` that can only see
         accounts of people.
 
         The returned client instance has been modified so that
@@ -262,16 +289,17 @@ class AccountClient():
            The 'client' returned by this method uses the same caches as this
            client.  Therefore, it must not be used across threads/processes.
         """
-        return AccountView(
+        new_filter = lambda candidate: (True if candidate.is_person else False) 
+        return AccountClient(
             client=self.client,
             _cache=self._cache,
-            account_filter=lambda candidate: (True if candidate.is_person else False)
+            _filters=self._filters | frozenset((new_filter,))
         )
 
     def only_functional(
         self,
-    ) -> AccountView:
-        """Create a modified :class:``AccountClient`` that can only see
+    ) -> AccountClient:
+        """Create a modified :class:`AccountClient` that can only see
         functional accounts.
 
         The returned client instance has been modified so that
@@ -283,65 +311,9 @@ class AccountClient():
            The 'client' returned by this method uses the same caches as this
            client.  Therefore, it must not be used across threads/processes.
         """
-        return AccountView(
+        new_filter = lambda candidate: (False if candidate.is_person else True) 
+        return AccountClient(
             client=self.client,
             _cache=self._cache,
-            account_filter=lambda candidate: (False if candidate.is_person else True)
+            _filters=self._filters | frozenset((new_filter,))
         )
-
-# This is where the accounts views functionality is implemented.
-# Although this class is fully documented, it is not intended for direct use by
-# clients.
-
-class AccountView(AccountClient):
-    """Create a new view into the Accounts API.
-
-    This has the same mandatory parameters as :class:`AccountClient`,
-    meaning you must at least provide a ``client`` parameter, but in
-    addition you must also provide a filter function.
-
-    The filter function must take an :class:`Account` as its only
-    parameter, and return a :class:`bool`.  If the filter function returns
-    ``False``, this view will act as if the account does not exist.
-
-    :param account_filter: The filter function.
-    """
-
-    def __init__(
-        self,
-        account_filter: Callable[[Account], bool],
-        *args,
-        **kwargs
-    ) -> None:
-        # Set up the AccountClient as normal
-        super().__init__(*args, **kwargs)
-
-        # Add the filter function
-        self.account_filter = account_filter
-
-    def get(
-        self,
-        sunetid: str
-    ) -> Account:
-        """Fetch an Account.
-
-        This is a **modified** convenience wrapper around
-        :meth:`AccountClient.get`, which provides this client as the `client`.
-        All other parameters provided are passed through to
-        :meth:`AccountClient.get`.
-
-        If an account is found, it is passed to the filter function.  If the
-        filter function returns ``True``, the account will be returned to the
-        caller; if the filter function returns ``False``, a :class:`KeyError`
-        will be raised.
-
-        Refer to :meth:`Account.get` for details on parameters, exceptions,
-        etc..
-
-        :raises KeyError: Either the account does not exist, or it does not match the filter.
-        """
-        candidate = super().get(sunetid)
-        if self.account_filter(candidate) is True:
-            return candidate
-        else:
-            raise KeyError(sunetid)
