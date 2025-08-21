@@ -75,6 +75,11 @@ def test_sunet_vs_email(account_client):
     with pytest.raises(KeyError):
         result = account_client['frozen.person@stanford.edu']
 
+# Test that support for the `in` keyword workd.
+def test_in(account_client):
+    assert 'fullprsn' in account_client
+    assert 'nobody' not in account_client
+
 """
 The next set of tests checks that AccountViews work.  It uses our test users:
 
