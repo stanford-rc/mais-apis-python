@@ -21,83 +21,13 @@ from stanford.mais.client import MAISClient
 from stanford.mais.account import AccountClient, Account
 from stanford.mais.account.validate import AccountValidationResults, validate
 
-
-
 """
-All test accounts (that aren't intentionally broken) have:
-    - sunetid
-    - name
-    - description
-    - last_updated
+This code tests everything in stanford.mais.account.validate.
+
+For information on our test users, see the code in test_account_properties.py.
 """
 
-"""
-These are our test users:
-    fullprsn:
-        is_person is True
-        is_active is True
-        is_full is True
-        has:
-            kerberos
-            library
-            seas
-            email
-            leland
-            pts
-            afs
-            dialin
-    frozprsn:
-        Like fullprsn, but Kerberos is frozen
-        Also has SUNetID aliases
-        Also has autoreply enabled
-    formerpsn:
-        is_person is True
-        is_active is False
-        is_full is False
-        has:
-            (nothing)
-    affilite:
-        is_person is True
-        is_active is True
-        is_full is True
-        has:
-            kerberos
-            seas
-            email
-            leland
-            pts
-            afs
-            dialin
-    afilbase:
-        is_person is True
-        is_active is True
-        is_full is False
-        has:
-            kerberos
-    functional:
-        is_person is False
-        is_active is True
-        is_full is False
-        has:
-            kerberos
-            pts
-            afs
-    oldfunctional:
-        is_person is False
-        is_active is False
-        is_full is False
-        has:
-            (nothing)
-    sharedmailbox:
-        is_person is False
-        is_active is True
-        is_full is False
-        has:
-            seas
-            email
-            autoreply
-"""
-
+# Check if each test user is (or is not) in the correct validation sets
 def test_validate_collections(account_client):
     # Start with a good case:
     input_good_tuple = (
@@ -183,6 +113,8 @@ def test_validate_collections(account_client):
     assert 'nobody' in validated_set.unknown
     assert len(validated_set.unknown) == 4
 
+# Test that, when presented with a string, `validate` handles different forms
+# of whitespace separator.
 def test_validate_string(account_client):
     # Start with a tuple of our SUNetIDs:
     input_good_tuple = (
@@ -291,4 +223,3 @@ def test_validate_string(account_client):
     assert 'sharedmailbox' in validated_string1.unknown
     assert 'nobody' in validated_string1.unknown
     assert len(validated_string1.unknown) == 4
-
