@@ -35,7 +35,7 @@ Other:
   Coverage reports are also being generated for runs.  Nothing's being done
   with it, though.
 
-* The docs on Read the Docs were not building properly.
+* The docs on Read the Docs are now building properly.
 
 * ``py.typed`` files are now provided, for type-checking support.  Also, more
   things (like tuples and dicts) have typing information provided.
