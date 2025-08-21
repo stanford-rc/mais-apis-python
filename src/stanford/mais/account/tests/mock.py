@@ -22,340 +22,492 @@ from typing import Any, List, Literal, TypedDict
 # PyPi imports
 import responses
 
-# Define the classes that our test data will use
-
-class ServiceSetting(TypedDict):
-    name: str
-    value: str | int
-class ServiceJson(TypedDict):
-    name: str
-    status: Literal['active', 'inactive', 'frozen']
-    settings: list[ServiceSetting]
-
-@dataclasses.dataclass(frozen=True)
-class TestService:
-    status: Literal['active', 'inactive', 'frozen']
-
-    def as_dict(self) -> ServiceJson:
-        # First, we need our service's name
-        # This comes from the class name, minus the "Test", and lowercased.
-        service_name = type(self).__name__.split('Test')[1].lower()
-
-        # Now, let's get all of the service's keys, but remove 'status'
-        # (Status is not a setting)
-        all_keys = dataclasses.asdict(self)
-        del all_keys['status']
-
-        # This is what we'll return as settings
-        settings_list: list[ServiceSetting] = list()
-
-        # Everything left in all_keys is a setting.
-        # We need to provide a list of name/value dicts
-        for setting_key in all_keys:
-            # Settings can be single- or multi-valued.
-            if isinstance(all_keys[setting_key], list):
-                # Our key is a multi-valued key.
-                # We need to add our setting name multiple times.
-                for setting_value in all_keys[setting_key]:
-                    settings_list.append(ServiceSetting(
-                        name=setting_key,
-                        value=setting_value,
-                    ))
-            # Settings without a value are not included in the JSON.
-            elif all_keys[setting_key] is not None:
-                # Our key is a single-valued key.  Easy!
-                settings_list.append(ServiceSetting(
-                    name=setting_key,
-                    value=all_keys[setting_key],
-                ))
-
-        # Return a dict, ready to be merged into a list of dicts!
-        return ServiceJson(
-            name=service_name,
-            status=self.status,
-            settings=settings_list,
-        )
-
-@dataclasses.dataclass(frozen=True)
-class TestKerberos(TestService):
-    principal: str
-    uid: int
-
-@dataclasses.dataclass(frozen=True)
-class TestLibrary(TestService):
-    pass
-
-@dataclasses.dataclass(frozen=True)
-class TestSEAS(TestService):
-    sunetid: List[str]
-    sunetidpreferred: str
-    local: str | None = None
-    forward: List[str] | None = None
-    urirouteto: str | None = None
-
-@dataclasses.dataclass(frozen=True)
-class TestEmail(TestService):
-    accounttype: Literal['personal', 'functional']
-    quota: int | None = None
-    admin: str | None = None
-
-@dataclasses.dataclass(frozen=True)
-class TestAutoreply(TestService):
-    forward: str
-    subj: str
-    msg: str
-
-@dataclasses.dataclass(frozen=True)
-class TestLeland(TestService):
-    shell: str | None
-
-@dataclasses.dataclass(frozen=True)
-class TestPTS(TestService):
-    uid: int
-
-@dataclasses.dataclass(frozen=True)
-class TestAFS(TestService):
-    homedirectory: str
-
-@dataclasses.dataclass(frozen=True)
-class TestDialin(TestService):
-    pass
-
-@dataclasses.dataclass(frozen=True)
-class TestAccount:
-    id: str
-    name: str
-    description: str
-    status: Literal['active', 'inactive', 'frozen']
-    statusDateStr: str
-    type: Literal['self', 'functional']
-    services: List[TestService]
-
-    def as_json(self) -> dict[str, Any]:
-        services_list = list(
-            (service.as_dict() for service in self.services)
-        )
-        return {
-            'id': self.id,
-            'name': self.name,
-            'description': self.description,
-            'status': self.status,
-            'statusDateStr': self.statusDateStr,
-            'type': self.type,
-            'services': services_list,
-        }
-
-
 # Make some test data!
 
-account_fullprsn = TestAccount(
-    id='fullprsn',
-    name='Full Person',
-    description='Staff - University IT',
-    type='self',
-    status='active',
-    statusDateStr='2020-01-03T15:14:13.00Z',
-    services=[
-        TestKerberos(
-            status='active',
-            principal='fullprsn',
-            uid=12345,
-        ),
-        TestLibrary(
-            status='active',
-        ),
-        TestSEAS(
-            status='active',
-            local="fullprsn@onmicrosoft.example.com",
-            sunetid=['fullprsn'],
-            sunetidpreferred='fullprsn',
-        ),
-        TestEmail(
-            status='active',
-            accounttype='personal',
-        ),
-        TestLeland(
-            status='active',
-            shell=None,
-        ),
-        TestPTS(
-            status='active',
-            uid=12345,
-        ),
-        TestAFS(
-            status='active',
-            homedirectory='/afs/te/users/f/u/fullprsn',
-        ),
-    ],
-)
+json_fullprsn = '''
+{
+  "services": [
+    {
+      "settings": [],
+      "name": "library",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "local",
+          "value": "fullprsn@onmicrosoft.example.com"
+        },
+        {
+          "name": "sunetidpreferred",
+          "value": "fullprsn"
+        },
+        {
+          "name": "sunetid",
+          "value": "fullprsn"
+        }
+      ],
+      "name": "seas",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "principal",
+          "value": "fullprsn"
+        },
+        {
+          "name": "uid",
+          "value": "12345"
+        }
+      ],
+      "name": "kerberos",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "accounttype",
+          "value": "personal"
+        },
+        {
+          "name": "quota",
+          "value": "1000"
+        },
+        {
+          "name": "admin",
+          "value": "fullprsn"
+        }
+      ],
+      "name": "email",
+      "status": "active"
+    },
+    {
+      "settings": [],
+      "name": "leland",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "homedirectory",
+          "value": "/afs/te/users/f/u/fullprsn"
+        }
+      ],
+      "name": "afs",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "uid",
+          "value": "12345"
+        }
+      ],
+      "name": "pts",
+      "status": "active"
+    }
+  ],
+  "owner": "person/24ba8de0d6eaf3188a7d3c228f1324b23",
+  "type": "self",
+  "name": "Person, Full",
+  "id": "fullprsn",
+  "description": "Staff - University IT",
+  "status": "active",
+  "url": "http://example.com/accounts/fullprsn",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
 
-account_frozprsn = TestAccount(
-    id='frozprsn',
-    name='Frozen Person',
-    description='Staff - University IT',
-    type='self',
-    status='active',
-    statusDateStr='2020-01-03T15:14:13.00Z',
-    services=[
-        TestKerberos(
-            status='frozen',
-            principal='frozprsn',
-            uid=12346,
-        ),
-        TestLibrary(
-            status='active',
-        ),
-        TestSEAS(
-            status='active',
-            local='frozprsn@onmicrosoft.example.com',
-            sunetid=['frozprsn', 'frozen.person'],
-            sunetidpreferred='frozen.person',
-            forward=['fperson@outside.com'],
-            urirouteto='http://geocities.com/neworleans/12/11/',
-        ),
-        TestEmail(
-            status='active',
-            accounttype='personal',
-        ),
-        TestAutoreply(
-            status='active',
-            forward='frozprsn@forward.example.com',
-            subj='Out of office',
-            msg=r'I am currently out of the office.\r\nI will respond when I return.',
-        ),
-        TestLeland(
-            status='active',
-            shell='/bin/bash', # nosec B604
-        ),
-        TestPTS(
-            status='active',
-            uid=12346,
-        ),
-        TestAFS(
-            status='active',
-            homedirectory='/afs/te/users/f/r/frozprsn',
-        ),
-    ],
-)
+json_frozprsn = '''
+{
+  "services": [
+    {
+      "settings": [],
+      "name": "library",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "subj",
+          "value": "Out of office"
+        },
+        {
+          "name": "msg",
+          "value": "I am currently out of the office.\\\\r\\\\nI will respond when I return."
+        },
+        {
+          "name": "forward",
+          "value": "frozprsn@forward.example.com"
+        }
+      ],
+      "name": "autoreply",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "local",
+          "value": "frozprsn@onmicrosoft.example.com"
+        },
+        {
+          "name": "sunetidpreferred",
+          "value": "frozprsn"
+        },
+        {
+          "name": "sunetid",
+          "value": "frozprsn"
+        },
+        {
+          "name": "sunetid",
+          "value": "frozen.person"
+        },
+        {
+          "name": "urirouteto",
+          "value": "http://geocities.com/neworleans/12/11/"
+        },
+        {
+          "name": "emailSystem",
+          "value": "office365"
+        }
+      ],
+      "name": "seas",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "principal",
+          "value": "frozprsn"
+        },
+        {
+          "name": "uid",
+          "value": "12346"
+        },
+        {
+          "name": "notgs",
+          "value": "1"
+        }
+      ],
+      "name": "kerberos",
+      "status": "frozen"
+    },
+    {
+      "settings": [
+        {
+          "name": "accounttype",
+          "value": "personal"
+        },
+        {
+          "name": "quota",
+          "value": "1000"
+        },
+        {
+          "name": "admin",
+          "value": "frozprsn"
+        }
+      ],
+      "name": "email",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "shell",
+          "value": "/bin/bash"
+        }
+      ],
+      "name": "leland",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "homedirectory",
+          "value": "/afs/te/users/f/r/frozprsn"
+        }
+      ],
+      "name": "afs",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "uid",
+          "value": "12346"
+        }
+      ],
+      "name": "pts",
+      "status": "active"
+    }
+  ],
+  "owner": "person/24c11a772540d9aec770213f3470e90dc",
+  "type": "self",
+  "name": "Person, Frozen",
+  "id": "frozprsn",
+  "description": "Staff - University IT",
+  "status": "active",
+  "url": "http://example.com/accounts/frozprsn",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
 
-account_formerpsn = TestAccount(
-    id='formerpsn',
-    name='Former Person',
-    description='Former Staff - University IT',
-    type='self',
-    status='inactive',
-    statusDateStr='2020-01-03T15:14:13.00Z',
-    services=[
-    ],
-)
+json_formerpsn = """
+{
+  "services": [
+    {
+      "settings": [
+        {
+          "name": "principal",
+          "value": "formerpsn"
+        }
+      ],
+      "name": "kerberos",
+      "status": "inactive"
+    },
+    {
+      "settings": [
+        {
+          "name": "shell",
+          "value": "/bin/tcsh"
+        }
+      ],
+      "name": "leland",
+      "status": "inactive"
+    }
+  ],
+  "owner": "person/10de823ca35c5e26beb825bf0e4521aff",
+  "type": "self",
+  "name": "Person, Former",
+  "id": "formerpsn",
+  "description": "Former Staff - University IT",
+  "status": "inactive",
+  "url": "http://example.com/accounts/formerpsn",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+"""
 
-account_affilite = TestAccount(
-    id='affilite',
-    name='Affiliate Smith',
-    description='Affiliate - Genetics',
-    type='self',
-    status='active',
-    statusDateStr='2020-01-03T15:14:13.00Z',
-    services=[
-        TestKerberos(
-            status='active',
-            principal='affilite',
-            uid=12344,
-        ),
-        TestSEAS(
-            status='active',
-            local='affilite@zm88.example.com',
-            sunetid=['affilite'],
-            sunetidpreferred='affilite',
-        ),
-        TestEmail(
-            status='active',
-            accounttype='personal',
-        ),
-        TestLeland(
-            status='active',
-            shell='/bin/bash', # nosec B604
-        ),
-        TestPTS(
-            status='active',
-            uid=12344,
-        ),
-        TestAFS(
-            status='active',
-            homedirectory='/afs/te/users/a/f/affilite',
-        ),
-    ],
-)
+json_affilite = '''
+{
+  "services": [
+    {
+      "settings": [
+        {
+          "name": "local",
+          "value": "affilite@zm88.example.com"
+        },
+        {
+          "name": "sunetidpreferred",
+          "value": "affilite"
+        },
+        {
+          "name": "sunetid",
+          "value": "affilite"
+        }
+      ],
+      "name": "seas",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "principal",
+          "value": "affilite"
+        },
+        {
+          "name": "uid",
+          "value": "12344"
+        }
+      ],
+      "name": "kerberos",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "accounttype",
+          "value": "personal"
+        }
+      ],
+      "name": "email",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "shell",
+          "value": "/bin/bash"
+        }
+      ],
+      "name": "leland",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "homedirectory",
+          "value": "/afs/te/users/a/f/affilite"
+        }
+      ],
+      "name": "afs",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "uid",
+          "value": "12344"
+        }
+      ],
+      "name": "pts",
+      "status": "active"
+    }
+  ],
+  "owner": "person/6239304b8ed646e811737031c9187ce46",
+  "type": "self",
+  "name": "Smith, Affiliate",
+  "id": "affilite",
+  "description": "Affiliate - Genetics",
+  "status": "active",
+  "url": "http://example.com/accounts/affilite",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
 
-account_afilbase = TestAccount(
-    id='afilbase',
-    name='Base Affiliate Jones',
-    description='Affiliate - Anesthesia',
-    type='self',
-    status='active',
-    statusDateStr='2020-01-03T15:14:13.00Z',
-    services=[
-        TestKerberos(
-            status='active',
-            principal='afilbase',
-            uid=12333,
-        )
-    ],
-)
+json_afilbase = '''
+{
+  "services": [
+    {
+      "settings": [
+        {
+          "name": "principal",
+          "value": "afilbase"
+        },
+        {
+          "name": "uid",
+          "value": "12333"
+        }
+      ],
+      "name": "kerberos",
+      "status": "active"
+    }
+  ],
+  "owner": "person/b21b790eafc6531bdd85f505dc31bef1e",
+  "type": "self",
+  "name": "Jones, Base Affiliate",
+  "id": "afilbase",
+  "description": "Affiliate - Anesthesia",
+  "status": "active",
+  "url": "http://example.com/accounts/afilbase",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
 
-account_functional = TestAccount(
-    id='functional',
-    name='Functional Account',
-    description='Functional Account',
-    type='functional',
-    status='active',
-    statusDateStr='2020-01-03T15:14:13.00Z',
-    services=[
-        TestKerberos(
-            status='active',
-            principal='functional',
-            uid=12332,
-        ),
-        TestPTS(
-            status='active',
-            uid=12332,
-        ),
-    ],
-)
+json_functional = '''
+{
+  "services": [
+    {
+      "settings": [
+        {
+          "name": "principal",
+          "value": "functional"
+        },
+        {
+          "name": "uid",
+          "value": "12332"
+        }
+      ],
+      "name": "kerberos",
+      "status": "active"
+    },
+    {
+      "settings": [
+        {
+          "name": "uid",
+          "value": "12332"
+        }
+      ],
+      "name": "pts",
+      "status": "active"
+    }
+  ],
+  "owner": "organization/54ec803d070816db5f093db9faaf05fce",
+  "type": "functional",
+  "name": "Functional Account",
+  "id": "functional",
+  "description": "Functional Account",
+  "status": "active",
+  "url": "http://example.com/accounts/functional",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
 
-account_oldfunctional = TestAccount(
-    id='oldfunctional',
-    name='Old Functional Account',
-    description='Functional Account',
-    type='functional',
-    status='inactive',
-    statusDateStr='2020-01-03T15:14:13.00Z',
-    services=[
-    ],
-)
+json_oldfunctional = '''
+{
+  "services": [
+    {
+      "settings": [
+        {
+          "name": "principal",
+          "value": "oldfunctional"
+        }
+      ],
+      "name": "kerberos",
+      "status": "inactive"
+    }
+  ],
+  "owner": "organization/9bf85dea9188297fdd394fc758bf5908f",
+  "type": "functional",
+  "name": "Old Functional Account",
+  "id": "oldfunctional",
+  "description": "Functional Account",
+  "status": "inactive",
+  "url": "http://example.com/accounts/oldfunctional",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
 
-account_sharedmailbox = TestAccount(
-    id='sharedmailbox',
-    name='Some Group Mailbox',
-    description='Shared Email Account',
-    type='functional',
-    status='active',
-    statusDateStr='2020-01-03T15:14:13.00Z',
-    services=[
-        TestSEAS(
-            status='active',
-            sunetid=['sharedmailbox'],
-            sunetidpreferred='sharedmailbox',
-            forward=['sharedmailbox@onmicrosoft.example.com'],
-        ),
-        TestAutoreply(
-            status='active',
-            forward='sharedmailbox@forward.example.com',
-            subj='Request received: $SUBJECT',
-            msg=r'Thank you for emailing us!\r\nYour email "$SUBJECT" will be responded to during business hours.\r\nThank you.',
-        ),
-    ],
-)
+json_sharedmailbox = '''
+{
+  "services": [
+    {
+      "settings": [
+        {
+          "name": "forward",
+          "value": "sharedmailbox@onmicrosoft.example.com"
+        },
+        {
+          "name": "sunetidpreferred",
+          "value": "sharedmailbox"
+        },
+        {
+          "name": "sunetid",
+          "value": "sharedmailbox"
+        }
+      ],
+      "name": "seas",
+      "status": "active"
+    }
+  ],
+  "owner": "organization/c3f6e1fc214a001f6714fccec0958dcab",
+  "type": "functional",
+  "name": "Some Group Mailbox - shared email",
+  "id": "sharedmailbox",
+  "description": "Shared mailbox for some group",
+  "status": "active",
+  "url": "http://example.com/accounts/sharedmailbox",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
 
 # Add Accounts responses to the Responses mock session
 def add_account_responses() -> None:
@@ -368,7 +520,7 @@ def add_account_responses() -> None:
         'http://example.com/accounts/fullprsn',
         status=200,
         content_type='application/json',
-        json=account_fullprsn.as_json(),
+        body=json_fullprsn,
     )
 
     responses.add(
@@ -376,7 +528,7 @@ def add_account_responses() -> None:
         'http://example.com/accounts/frozprsn',
         status=200,
         content_type='application/json',
-        json=account_frozprsn.as_json(),
+        body=json_frozprsn,
     )
 
     responses.add(
@@ -384,7 +536,7 @@ def add_account_responses() -> None:
         'http://example.com/accounts/formerpsn',
         status=200,
         content_type='application/json',
-        json=account_formerpsn.as_json(),
+        body=json_formerpsn,
     )
 
     responses.add(
@@ -392,7 +544,7 @@ def add_account_responses() -> None:
         'http://example.com/accounts/affilite',
         status=200,
         content_type='application/json',
-        json=account_affilite.as_json(),
+        body=json_affilite,
     )
 
     responses.add(
@@ -400,7 +552,7 @@ def add_account_responses() -> None:
         'http://example.com/accounts/afilbase',
         status=200,
         content_type='application/json',
-        json=account_afilbase.as_json(),
+        body=json_afilbase,
     )
 
     responses.add(
@@ -408,7 +560,7 @@ def add_account_responses() -> None:
         'http://example.com/accounts/functional',
         status=200,
         content_type='application/json',
-        json=account_functional.as_json(),
+        body=json_functional,
     )
 
     responses.add(
@@ -416,7 +568,7 @@ def add_account_responses() -> None:
         'http://example.com/accounts/oldfunctional',
         status=200,
         content_type='application/json',
-        json=account_oldfunctional.as_json(),
+        body=json_oldfunctional,
     )
 
     responses.add(
@@ -424,7 +576,7 @@ def add_account_responses() -> None:
         'http://example.com/accounts/sharedmailbox',
         status=200,
         content_type='application/json',
-        json=account_sharedmailbox.as_json(),
+        body=json_sharedmailbox,
     )
 
     # Simulate error conditions

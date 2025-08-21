@@ -41,30 +41,34 @@ def test_kerberos(account_client):
     sharedmailbox = account_client['sharedmailbox']
 
     # These folks should *not* have the kerberos service
-    assert formerpsn.services.kerberos is None
-    assert oldfunctional.services.kerberos is None
     assert sharedmailbox.services.kerberos is None
 
     # These folks should have the kerberos service
     assert fullprsn.services.kerberos is not None
     assert frozprsn.services.kerberos is not None
+    assert formerpsn.services.kerberos is not None
     assert affilite.services.kerberos is not None
     assert afilbase.services.kerberos is not None
     assert functional.services.kerberos is not None
+    assert oldfunctional.services.kerberos is not None
 
     # Check active or frozen
     assert fullprsn.services.kerberos.status == ServiceStatus.ACTIVE
     assert frozprsn.services.kerberos.status == ServiceStatus.FROZEN
+    assert formerpsn.services.kerberos.status == ServiceStatus.INACTIVE
     assert affilite.services.kerberos.status == ServiceStatus.ACTIVE
     assert afilbase.services.kerberos.status == ServiceStatus.ACTIVE
     assert functional.services.kerberos.status == ServiceStatus.ACTIVE
+    assert oldfunctional.services.kerberos.status == ServiceStatus.INACTIVE
 
     # Check that principal matches SUNetID
     assert fullprsn.services.kerberos.principal == fullprsn.sunetid
     assert frozprsn.services.kerberos.principal == frozprsn.sunetid
+    assert formerpsn.services.kerberos.principal == formerpsn.sunetid
     assert affilite.services.kerberos.principal == affilite.sunetid
     assert afilbase.services.kerberos.principal == afilbase.sunetid
     assert functional.services.kerberos.principal == functional.sunetid
+    assert oldfunctional.services.kerberos.principal == oldfunctional.sunetid
 
     # Check that uid is what we expect
     assert fullprsn.services.kerberos.uid == 12345
@@ -219,26 +223,22 @@ def test_autoreply(account_client):
     assert functional.services.autoreply is None
     assert formerpsn.services.autoreply is None
     assert oldfunctional.services.autoreply is None
+    assert sharedmailbox.services.autoreply is None
 
     # These folks should have the autoreply service
     assert frozprsn.services.autoreply is not None
-    assert sharedmailbox.services.autoreply is not None
 
     # Confirm statuses are active
     assert frozprsn.services.autoreply.status == ServiceStatus.ACTIVE
-    assert sharedmailbox.services.autoreply.status == ServiceStatus.ACTIVE
 
     # Check forward
     assert frozprsn.services.autoreply.forward == 'frozprsn@forward.example.com'
-    assert sharedmailbox.services.autoreply.forward == 'sharedmailbox@forward.example.com'
 
     # Check subj
     assert frozprsn.services.autoreply.subj == 'Out of office'
-    assert sharedmailbox.services.autoreply.subj == 'Request received: $SUBJECT'
 
     # Check msg
     assert frozprsn.services.autoreply.msg == 'I am currently out of the office.\\r\\nI will respond when I return.'
-    assert sharedmailbox.services.autoreply.msg == 'Thank you for emailing us!\\r\\nYour email "$SUBJECT" will be responded to during business hours.\\r\\nThank you.'
 
 # All the folks with leland service have the same shell
 def test_leland(account_client):
@@ -255,23 +255,25 @@ def test_leland(account_client):
     # These folks should *not* have the leland service
     assert afilbase.services.leland is None
     assert functional.services.leland is None
-    assert formerpsn.services.leland is None
     assert oldfunctional.services.leland is None
     assert sharedmailbox.services.leland is None
 
     # These folks should have the leland service
     assert fullprsn.services.leland is not None
     assert frozprsn.services.leland is not None
+    assert formerpsn.services.leland is not None
     assert affilite.services.leland is not None
 
     # Confirm statuses are active
     assert fullprsn.services.leland.status == ServiceStatus.ACTIVE
     assert frozprsn.services.leland.status == ServiceStatus.ACTIVE
+    assert formerpsn.services.leland.status == ServiceStatus.INACTIVE
     assert affilite.services.leland.status == ServiceStatus.ACTIVE
 
     # Confirm shells are BASH (or not present, which is possible)
     assert fullprsn.services.leland.shell is None
     assert frozprsn.services.leland.shell == '/bin/bash'
+    assert formerpsn.services.leland.shell == '/bin/tcsh'
     assert affilite.services.leland.shell == '/bin/bash'
 
 # Full folks have PTS

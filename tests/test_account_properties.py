@@ -133,14 +133,14 @@ def test_name(account_client):
     sharedmailbox = account_client['sharedmailbox']
 
     # Check that names match what we expect
-    assert fullprsn.name == 'Full Person'
-    assert frozprsn.name == 'Frozen Person'
-    assert formerpsn.name == 'Former Person'
-    assert affilite.name == 'Affiliate Smith'
-    assert afilbase.name == 'Base Affiliate Jones'
+    assert fullprsn.name == 'Person, Full'
+    assert frozprsn.name == 'Person, Frozen'
+    assert formerpsn.name == 'Person, Former'
+    assert affilite.name == 'Smith, Affiliate'
+    assert afilbase.name == 'Jones, Base Affiliate'
     assert functional.name == 'Functional Account'
     assert oldfunctional.name == 'Old Functional Account'
-    assert sharedmailbox.name == 'Some Group Mailbox'
+    assert sharedmailbox.name == 'Some Group Mailbox - shared email'
 
 # Test that we get the expected descriptions
 def test_description(account_client):
@@ -162,7 +162,7 @@ def test_description(account_client):
     assert afilbase.description == 'Affiliate - Anesthesia'
     assert functional.description == 'Functional Account'
     assert oldfunctional.description == 'Functional Account'
-    assert sharedmailbox.description == 'Shared Email Account'
+    assert sharedmailbox.description == 'Shared mailbox for some group'
 
 def test_is_person(account_client):
     # Fetch our accounts
