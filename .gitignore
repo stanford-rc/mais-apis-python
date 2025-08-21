@@ -25,4 +25,5 @@ dist
 docs/_build
 
 # Ignore test stuff
+.coverage
 .tox
