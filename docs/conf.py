@@ -24,7 +24,7 @@ sys.path.insert(0, str(src_path))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Stanford MaIS APIs'
+project = 'Stanford MaIS Python SDK'
 copyright = '2021, The Board of Trustees of the Leland Stanford Junior University'
 author = 'Stanford Research Computing'
 
