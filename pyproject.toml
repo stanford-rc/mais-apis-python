@@ -59,6 +59,7 @@ test = [
 [project.urls]
 Source = "https://github.com/stanford-rc/mais-apis-python"
 Documentation = "https://mais-apis-python.readthedocs.io"
+Changelog = "https://github.com/stanford-rc/mais-apis-python/blob/main/CHANGELOG.rst"
 Issues = "https://github.com/stanford-rc/mais-apis-python/issues"
 
 [tool.mypy]
