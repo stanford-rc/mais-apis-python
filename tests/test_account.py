@@ -66,6 +66,15 @@ def test_get_vs_key(account_client):
     )
     assert key_result is get_result
 
+# Test that looking up a sunetid@stanford.edu works,
+# and that looking up an alias doesn't work
+def test_sunet_vs_email(account_client):
+    sunet_result = account_client['frozprsn']
+    email_result = account_client['frozprsn@stanford.edu']
+    assert sunet_result is email_result
+    with pytest.raises(KeyError):
+        result = account_client['frozen.person@stanford.edu']
+
 """
 The next set of tests checks that AccountViews work.  It uses our test users:
 

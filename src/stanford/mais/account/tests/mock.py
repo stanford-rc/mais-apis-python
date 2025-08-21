@@ -595,6 +595,18 @@ def add_account_responses() -> None:
 
     responses.add(
         responses.GET,
+        'http://example.com/accounts/frozen.person',
+        status=404,
+        content_type='application/json',
+        json={
+            'status': 404,
+            'message': 'Account "frozen.person" does not exist',
+            'url': 'http://example.com/accounts/frozen.person'
+        },
+    )
+
+    responses.add(
+        responses.GET,
         'http://example.com/accounts/hidden1',
         status=401,
         content_type='application/json',
