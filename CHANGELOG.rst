@@ -30,6 +30,8 @@ Other:
   ``MAISClient``'s constructor, using the ``session`` argument.
 
 * Bandit and CodeQL checks are being performed on all pushes and pull requests.
+  Coverage reports are also being generated for runs.  Nothing's being done
+  with it, though.
 
 * The docs on Read the Docs were not building properly.
 

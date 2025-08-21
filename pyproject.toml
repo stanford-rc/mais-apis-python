@@ -88,11 +88,12 @@ deps = [
     "mypy >=0.910, <1.0",
     "types-requests",
     "pytest >=8.4.1, <8.5.0",
+    "pytest-cov >=4.0.0",
     "pytest-responses",
     "responses",
 ]
 commands = [
-    ["pytest", "--strict-config", "--strict-markers", "-W", "error"],
+    ["pytest", "--cov=src", "--cov-append", "--strict-config", "--strict-markers", "-W", "error"],
 ]
 set_env = { PYTHONTRACEMALLOC = "20" }
 
