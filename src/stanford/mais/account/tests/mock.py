@@ -519,6 +519,68 @@ json_sharedmailbox = '''
 }
 '''
 
+# These are accounts that are weird (to us), in some way
+
+json_newservice = '''
+{
+  "services": [
+    {
+      "settings": [
+        {
+          "name": "something",
+          "value": "a"
+        },
+        {
+          "name": "else",
+          "value": "2"
+        }
+      ],
+      "name": "zzzz",
+      "status": "active"
+    }
+  ],
+  "owner": "organization/54ec803d070816db5f093db9faaf05fce",
+  "type": "functional",
+  "name": "New Service Test Account",
+  "id": "newservice",
+  "description": "New Service Test Account",
+  "status": "active",
+  "url": "http://example.com/accounts/newservice",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
+
+json_newtype = '''
+{
+  "services": [
+    {
+      "settings": [
+        {
+          "name": "something",
+          "value": "a"
+        },
+        {
+          "name": "else",
+          "value": "2"
+        }
+      ],
+      "name": "zzzz",
+      "status": "active"
+    }
+  ],
+  "owner": "organization/54ec803d070816db5f093db9faaf05fce",
+  "type": "service",
+  "name": "New Type of Account",
+  "id": "newtype",
+  "description": "New Type of Account",
+  "status": "active",
+  "url": "http://example.com/accounts/newtype",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
+
 # Add Accounts responses to the Responses mock session
 def add_account_responses() -> None:
     # GET ACCOUNTS
@@ -587,6 +649,24 @@ def add_account_responses() -> None:
         status=200,
         content_type='application/json',
         body=json_sharedmailbox,
+    )
+
+    # Account with an unknown service
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/newservice',
+        status=200,
+        content_type='application/json',
+        body=json_newservice,
+    )
+
+    # Account with an unknown type
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/newtype',
+        status=200,
+        content_type='application/json',
+        body=json_newtype,
     )
 
     # Simulate error conditions

@@ -28,6 +28,27 @@ See test_account_properties.py for a list of accounts, and what we expect from
 them.
 """
 
+# Test that we can still load an account which has an unknown (to us) service
+def test_newservice(account_client):
+    # Test we can fetch our account
+    newservice = account_client['newservice']
+
+    # It should not have any known service
+    assert newservice.services.kerberos is None
+    assert newservice.services.seas is None
+    assert newservice.services.email is None
+    assert newservice.services.leland is None
+    assert newservice.services.pts is None
+    assert newservice.services.afs is None
+    assert newservice.services.library is None
+    assert newservice.services.dialin is None
+    assert newservice.services.autoreply is None
+
+# Test that accounts of an unknown (to us) type will raise an exception
+def test_newtype(account_client):
+    with pytest.raises(NotImplementedError):
+        newtype = account_client['newtype']
+
 # Test the aspects of the kerberos service
 def test_kerberos(account_client):
     # Fetch our accounts
