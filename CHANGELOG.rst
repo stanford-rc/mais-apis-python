@@ -16,7 +16,8 @@ Fixed:
 
 * Although the project is fully typed, the PEP 561 marker file was missing (`#2`_).
 
-* A number of Account services properties had incorrect types.
+* A number of Account services properties had incorrect types.  Indeed, types
+  have been cleaned up *a lot* in this release.
 
 * Setting timeouts works properly!  Before now, not all operations honored the
   ``default_timeout`` that you might have set when you created your MAISClient.
