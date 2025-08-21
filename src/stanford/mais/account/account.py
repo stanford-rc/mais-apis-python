@@ -355,6 +355,3 @@ class Account():
         )
         client._cache[sunetid] = result
         return result
-
-    def __repr__(self) -> str:
-        return f"Account.get({self.sunetid})"
