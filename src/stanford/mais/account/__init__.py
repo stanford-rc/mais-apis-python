@@ -221,7 +221,7 @@ class AccountClient():
         return AccountView(
             client=self.client,
             _cache=self._cache,
-            account_filter=lambda candidate: (True if candidate.is_active else False)
+            account_filter=lambda candidate: (False if candidate.is_active else True)
         )
 
     def only_people(
