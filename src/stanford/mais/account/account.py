@@ -100,8 +100,8 @@ class Account():
     name: str
     """
     For people, this is ther name (last name first).  For functional accounts,
-    this is a name set at the time of account creation.  This is the `name` key
-    from the API.
+    this is a name set at the time of account creation, followed possibly by a
+    descriptor like `` - shared email``.  This is the `name` key from the API.
     """
 
     description: str
