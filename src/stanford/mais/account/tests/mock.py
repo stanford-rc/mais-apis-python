@@ -51,6 +51,11 @@ json_fullprsn = '''
       "status": "active"
     },
     {
+      "settings": [],
+      "name": "dialin",
+      "status": "active"
+    },
+    {
       "settings": [
         {
           "name": "principal",
@@ -294,6 +299,11 @@ json_formerpsn = """
 json_affilite = '''
 {
   "services": [
+    {
+      "settings": [],
+      "name": "dialin",
+      "status": "active"
+    },
     {
       "settings": [
         {

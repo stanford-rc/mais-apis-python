@@ -361,11 +361,13 @@ def test_dialin(account_client):
     sharedmailbox = account_client['sharedmailbox']
 
     # These folks should *not* have the dialin service
-    assert fullprsn.services.dialin is None
     assert frozprsn.services.dialin is None
-    assert affilite.services.dialin is None
     assert afilbase.services.dialin is None
     assert formerpsn.services.dialin is None
     assert functional.services.dialin is None
     assert oldfunctional.services.dialin is None
     assert sharedmailbox.services.dialin is None
+
+    # These folks should have the afs service
+    assert fullprsn.services.dialin is not None
+    assert affilite.services.dialin is not None
