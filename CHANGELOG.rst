@@ -3,13 +3,14 @@ Unreleased
 
 Enhancements:
 
-* Add support for the Workgroup API.
-
 * Account services (kerberos, seas, et al) all have a status.  Previously,
   the only visibility into status was via ``is_active``.  Now, the ``status``
   property gives you the exact status (it's an Enum), with possible statuses
   "active", "inactive", and "frozen".  ``is_active`` is still a property, and
   returns ``True`` iff the status is "active" (else it returns ``False``).
+
+* Add support for the Workgroup API.  This doesn't have tests yet, and may
+  still change, so it's not a top-line enhancement.
 
 Fixed:
 
