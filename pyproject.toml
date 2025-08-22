@@ -93,6 +93,9 @@ deps = [
     "pytest-responses",
     "responses",
 ]
+commands = [
+    ["pytest", "--cov", "--cov-append", "--cov-report=", "--strict-config", "--strict-markers", "-W", "error"],
+]
 set_env = { PYTHONTRACEMALLOC = "20" }
 
 [tool.tox.env.minimal]
@@ -100,17 +103,11 @@ deps = [
     "requests==2.30.0",
     "setuptools==66.1.1",
 ]
-commands = [
-    ["pytest", "--cov", "--cov-append", "--cov-report=", "--strict-config", "--strict-markers", "-W", "error"],
-]
 
 [tool.tox.env.latest]
 deps = [
     "requests >2.32.4, <3.0",
     "setuptools >=80.9.0",
-]
-commands = [
-    ["pytest", "--cov", "--cov-append", "--cov-report=", "--strict-config", "--strict-markers", "-W", "error"],
 ]
 
 [tool.tox.env.report]
