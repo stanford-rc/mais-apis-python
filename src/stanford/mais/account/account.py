@@ -90,10 +90,10 @@ class Account():
 
     sunetid: str
     """
-    The SUNetID, for people; for functional accounts, the ID.  This is the `id`
-    key from the API.
+    For people, their SUNetID is also their username.  For functional accounts,
+    this is their username.  This is the ``id`` key from the API.
 
-    .. note::
+    .. tip::
        This is used as the account's ``uid`` in LDAP.
     """
 
@@ -101,85 +101,119 @@ class Account():
     """
     For people, this is ther name (last name first).  For functional accounts,
     this is a name set at the time of account creation, followed possibly by a
-    descriptor like `` - shared email``.  This is the `name` key from the API.
+    descriptor like " - shared email".  This is the ``name`` key from the API.
     """
 
     description: str
     """
     For people, this is a combination of their Org name and their position
     title.  This may be set to "Former …" or the like for inactive accounts
-    For functional accounts, this is a description set at the time of account
-    creation.  This is the `description` key from the API.
+    For functional accounts, this is a description set at the time of account's
+    creation.  This is the ``description`` key from the API.
 
-    .. note::
+    .. tip::
        This is used as the account's ``description`` in LDAP.
     """
 
     is_person: bool
     """
     If `True`, this account is for a person.  If `False`, this account is for a
-    "functional account".  This is the `type` key from the API.
+    "functional account".  This is the ``type`` key from the API.
     """
 
     is_active: bool
     """
-    If `True`, this SUNetID is active.  In other words, someone could
-    authenticate to Stanford Login using this SUNetID.  This does not imply
-    anything else.  This is computed from the `status` key from the API.
+    If `True`, this account is active.  If the account is for a person, then
+    assuming the person's kerberos service is not frozen or otherwise blocked,
+    they are able to use Stanford Login.  If the account is a functional
+    account, then the associated services are active.  This does not imply
+    anything else.  This is computed from the ``status`` key from the API.
     """
 
     is_full: bool
     """
-    If `True`, this is a full SUNetID.  That means the SUNetID has services
-    like email enabled.  A SUNetID can be "full" either by being associated
-    with an active student, faculty, or staff member; or via sponsorship.
-    We check for full status by seeing if the SUNetID has the `leland` service
-    associated with it.
-    *NOTE*: Some services (such as Library e-resources) are not available to
-    all Full SUNetIDs, so this property does not imply access to *all*
-    services.
+    If `True`, this is a person with a a full SUNetID.  See `SUNet IDs in
+    Detail`_ to learn what it means to have a full SUNetID.  We check for full
+    status by seeing if the SUNetID has the ``leland`` service associated with
+    it.
+
+    If :data:`is_full` is `False` but :data:`is_person` is `True`, then this
+    is a person with a base SUNetID.
+
+    .. warning::
+       At this time, is it not possible to tell if the account is sponsored.
+
+    .. _SUNet IDs in Detail: https://uit.stanford.edu/service/accounts/sunetids
     """
 
     services: AccountServiceTypes
     """
     This contains the services currently associated with the account.  Each
-    service has a service name, and the value is a dataclass which contains
-    status and service-specific information.
+    service exists as a property, mapping to a subclass of
+    :class:`~stanford.mais.account.service.AccountService`.  If an account does
+    not have a service defined, then the property maps to ``None``.
 
-    It is a :class:`~collections.abc.Mapping` of :class:`str` (the service
-    name) to subclasses of
-    :class:`~stanford.mais.account.service.AccountService`.  To learn the key
-    name for each service, refer to the documentation for that subclass.
+    You can use this technique to see if an account has a service:
+
+    .. code-block:: python
+
+       def has_kerberos(sunetid: Account) -> bool:
+         if sunetid.services.kerberos is None:
+           return False
+         else:
+           return sunetid.services.kerberos.is_active
 
     .. note::
        From time to time, new services are defined.  Those services will
        **not** appear in this mapping until a software update is released,
        defining a new subclass for that service.  If you need to access the
-       service's data before that time, refer to the `services` key in the
-       parsed JSON.
+       service's data before that time, use :data:`raw`, and look in the
+       ``services`` key for the new service.
+
+    The following services are recognized, and have the following
+    :class:`~stanford.mais.account.service.AccountService` subclasses:
+
+    * ``kerberos``: :class:`~stanford.mais.account.service.AccountServiceKerberos`
+
+    * ``library``: :class:`~stanford.mais.account.service.AccountServiceLibrary`
+
+    * ``seas``: :class:`~stanford.mais.account.service.AccountServiceSEAS`
+
+    * ``email``: :class:`~stanford.mais.account.service.AccountServiceEmail`
+
+    * ``autoreply``: :class:`~stanford.mais.account.service.AccountServiceAutoreply`
+
+    * ``leland``: :class:`~stanford.mais.account.service.AccountServiceLeland`
+
+    * ``pts``: :class:`~stanford.mais.account.service.AccountServicePTS`
+
+    * ``afs``: :class:`~stanford.mais.account.service.AccountServiceAFS`
+
+    * ``dialin``: :class:`~stanford.mais.account.service.AccountServiceDialin`
     """
 
     last_update: datetime.datetime
     """
-    The datetime when the account was last updated.  It is timezone-aware, and
-    is already set to the UTC timezone.
+    The timezone-aware datetime when the account was last updated.  is already
+    set to the UTC timezone.  This is computed from the ``statusDateStr`` key
+    from the API.
     """
 
     raw: dict[str, Any]
     """
-    This is the parsed JSON returned from the MaIS Accounts API.  Most keys
+    This is the parsed JSON returned from the MaIS Account API.  Most keys
     have already been parsed, and are available as properties.  Here are some
     additional keys you can find:
 
     * **owner**: This is a string with two parts, with a forward-slash used as a
       separator.
 
-      * If the account is for a person (that is, `type` is "self"), then this
-        string will be ``person/`` followed by the RegID of the person.
+      * If the account is for a person, then this string will be ``person/``
+        followed by the RegID of the person.
 
-      * If the account is for a functional account (`type` is "functional"),
-        then this string will be ``organization/`` followed by the RegID of the
-        Org which owns the functional account.
+      * If the account is for a functional account, then this string will be
+        ``organization/`` followed by the RegID of the Org which owns the
+        functional account.
 
     * **statusDate**: The date when this account was last changed, in the
       US/Pacific time zone, in the form of a POSIX timestamp tht has been
@@ -199,7 +233,10 @@ class Account():
             pytz.utc
          )
 
-      You really should just use :meth:`last_update` instead.
+      .. tip::
+         You really should just use :meth:`last_update` instead.
+
+    * **url**: The MaIS Account API URL to look up this account.
     """
 
     @classmethod
@@ -211,7 +248,7 @@ class Account():
         """Given a string, return an Account.
 
         This uses the MaIS Workgroup API to look up information for an account,
-        using the SUNetID as input.
+        using the SUNetID (or functional account username/uid) as input.
 
         This function is memoized; once a lookup is performed, subsequent calls
         for the same input will return the same result instance, thanks to the
@@ -219,18 +256,20 @@ class Account():
 
         .. warning::
            This will looks up accounts of all types, both accounts for
-           people and also functional accounts.  Check :meth:`is_person` before
-           assuming you are working with a SUNetID.
+           people and also functional accounts.  Check :data:`is_person` before
+           assuming you are working with a SUNetID.  Also consider using
+           :meth:`AccountClient.only_people`.
 
         .. warning::
            This memoization means that, should an account change status
            after lookup, that status change will not be noticed until after the
            module is reloaded.  That means this code should *not* be used by
-           long-running client code.
+           long-running client code.  Use :meth:`AccountClient.clear_cache` if
+           necessary.
 
         :param client: An :class:`AccountClient` representing our API endpoint.
 
-        :param sunetid: The ID to look up.  This must be an actual id, not an alias.
+        :param sunetid: The ID to look up.  This must be an actual ID, not an alias.
 
         :raises ChildProcessError: Something went wrong on the server side (a 400 or 500 error was returned).
 

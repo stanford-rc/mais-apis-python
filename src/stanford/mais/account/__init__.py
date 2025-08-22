@@ -51,15 +51,18 @@ __all__ = (
 @dataclasses.dataclass(frozen=True)
 class AccountClient():
     """
-    The :class:`AccountClient` is the first thing you will instantiate when you
-    want to interact with the MaIS Account API.  One parameter is required to
-    instantiate a client.
+
+    The :class:`AccountClient` is the second thing you will instantiate when you
+    want to interact with the MaIS Account API.  (The first thing you
+    instantiate is a :class:`MAISClient`).  Once you have a
+    :class:`MAISClient`, you pass it to the :class:`AccountClient` constructor
+    with this parameter:
 
     :param stanford.mais.client.MAISClient client: The MAIS client to use.
 
-    Once you have a client instantiated, you can use :meth:`get` to fetch an
-    account.   For your convenience, instances of this class also implement
-    ``__getitem__``, so instead of doing…
+    Once you have an :class:`AccountClient` instantiated, you can use
+    :meth:`get` to fetch an account.   For your convenience, instances of this
+    class also implement ``__getitem__``, so instead of doing…
 
     .. code-block:: default
 
@@ -86,7 +89,6 @@ class AccountClient():
     instead of making a fresh API request.
 
     .. warning::
-
        The existence of an account does not mean it is active!
     """
 
@@ -198,8 +200,6 @@ class AccountClient():
     ) -> None:
         """Clear cache of accounts.
 
-        This clears the cache of accounts.
-
         As mentioned in the class docs, visited accounts are cached locally,
         for speed and to reduce load on the Account API.  Although accounts
         rarely change, in long-running
@@ -242,6 +242,12 @@ class AccountClient():
            api_client = stanford.mais.client.MAISClient(...)
            active_accounts = AccountClient(api_client).only_active()
 
+        .. tip::
+           You can stack these filters.  For example,
+           ``AccountClient(api_client).only_active().only_people()`` will only
+           be able to "see" active people accounts (ignoring active functional
+           accounts).
+
         .. warning::
            The 'client' returned by this method uses the same caches as this
            client.  Therefore, it must not be used across threads/processes.
@@ -264,9 +270,8 @@ class AccountClient():
         try to look up an active account, :meth:`~AccountClient.get` will
         act as if the account does not exist.
 
-        .. warning::
-           The 'client' returned by this method uses the same caches as this
-           client.  Therefore, it must not be used across threads/processes.
+        See :meth:`~AccountClient.only_active` for examples, tips, and
+        warnings.
         """
         new_filter = lambda candidate: (False if candidate.is_active else True) 
         return AccountClient(
@@ -331,9 +336,8 @@ class AccountClient():
         try to look up a person's account (a SUNetID),
         :meth:`~AccountClient.get` will act as if the account does not exist.
 
-        .. warning::
-           The 'client' returned by this method uses the same caches as this
-           client.  Therefore, it must not be used across threads/processes.
+        See :meth:`~AccountClient.only_people` for examples, tips, and
+        warnings.
         """
         new_filter = lambda candidate: (False if candidate.is_person else True) 
         return AccountClient(

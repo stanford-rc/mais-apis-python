@@ -56,9 +56,15 @@ class _URLs(TypedDict, total=False):
 
 # Define a Named Tuple for the most detailed form of timeout
 class Timeout(NamedTuple):
-    """A custom timeout for use with Requests.
+    """Allows providing granular timeouts when making web requests.
 
-    See `the Requests documentation`_ for more information on timeouts.
+    This library uses Requests to make HTTPS calls.  Requests has a peculiar
+    way for dealing with timeouts.  See `the Requests documentation`_ for more
+    information on timeouts.
+
+    If you want to configure granular timeouts, you may do so using this class.
+    The instance of this class is then passed to the :class:`MAISClient`
+    constructor.
 
     .. _the Requests documentation: https://requests.readthedocs.io/en/latest/user/advanced/#timeouts
     """
@@ -66,7 +72,8 @@ class Timeout(NamedTuple):
     connect: float
     """The connection timeout.
 
-    This should be larger than a multiple of 3.0, due to TCP mechanics.
+    How long to wait for the TCP connection to open.  This should be larger
+    than a multiple of 3.0, due to TCP mechanics.
 
     .. warning::
        If connecting to a DNS name which has multiple IPs, each IP will be
@@ -90,15 +97,14 @@ class MAISClient():
     The :class:`MAISClient` is the first thing you will instantiate when you
     want to interact with a MaIS API.
 
-    To instantiate a :class:`MAISClient`, you will need to provide two pieces
-    of configuration as parameters to the class constructor.  The configuration
-    items are documented below.
+    **You probably do not want to call this directly.** For convenience, you
+    should one of the ready-made constructors, :meth:`MAISClient.prod` and
+    :meth:`MAISClient.uat`.  :meth:`MAISClient.uat1` is also available for the
+    temporary UAT1 environment.
 
-    For convenience, you may wish to use one of the ready-made constructors,
-    :meth:`MAISClient.prod` and :meth:`MAISClient.uat`.
-    :meth:`MAISClient.uat1` is also available for the temporary UAT1
-    environment.  If you use one of those, then you do not need to provide the
-    ``urls``.
+    This class is documented here only to be a reference for the
+    parameters you will need to provide when using a convenience constructor
+    (in particular, ``cert``, ``key``, and ``timeout``).
     """
 
     urls: _URLs
@@ -107,13 +113,9 @@ class MAISClient():
     This mapping uses API names (like ``account``) as keys, and the base URL as
     the value.
 
-    If you are setting up your own client instance, you will need to provide
-    entries for each API you plan on using.  If you are using the UAT or PROD
-    (production) environments, you can call :meth:`uat` or :meth:`prod`.  If
-    you are using a different environment, or developing a MaIS API locally,
-    you won't be able to use those methods, but you can study the code (more
-    specifically, the URLs they embed) to get an idea of which URL is needed
-    for which service.
+    If you decided to not use the convenience constructors
+    (:meth:`MAISClient.prod`, etc.), then you will need to provide entries for
+    each API you plan on using.
 
     :raises TypeError: You did not provide a mapping.
     """
@@ -122,13 +124,12 @@ class MAISClient():
     """The path to a TLS client certificate.
 
     This may contain *either* a single TLS client certificate, *or* a TLS
-    private key followed by a certificate.  The latter format (combined key and
-    cert) was common in the old days; the former format (separate key and cert)
-    is preferred today.
+    private key followed by a certificate.  The combined format (key and
+    cert in one file) was common in the old days; the former format (key and
+    cert in separate files) is often preferred today.
 
     The certificate (and key, if included) must be in PEM format (the text
-    format).  If a key is included, and it is an EC key, then any necessary EC
-    parameters may be included before the private key.
+    format that has "BEGIN" and "END" lines).
 
     A test load will be made before the constructor completes.
 
@@ -138,9 +139,10 @@ class MAISClient():
 
     :raises FileNotFoundError: The file does not exist.
 
-    :raises PermissionError: We do not have read permission on the file.
+    :raises PermissionError: You do not have read permission on the file.
 
-    :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
+    :raises ssl.SSLError: The private key and certificate do not match, or
+        there was some other problem loading the certificate.
     """
 
     key: pathlib.Path | None = None
@@ -149,16 +151,14 @@ class MAISClient():
     This must be the private key associated with the provided certificate, any
     must only be set if the private key is in a separate file from the
     certificate.  If the private key and certificate are in the same file, then
-    this must be set to `None`.
+    this must be set to ``None``.
 
-    The file must be in PEM format (the text format), and must contain a single
-    key.  If the key is an EC key, then any necessary EC parameters may be
-    included, before the private key.  This is the same format that most
-    programs (particularly web servers) use.
+    The file must be in PEM format (the text format that has "BEGIN" and "END"
+    lines), and must contain a single key.
 
     .. warning::
        The private key must **not** be password-protected.  Enabling support
-       for this is covered in `<https://github.com/psf/requests/issues/1573>`_.
+       for this is covered in `<https://github.com/psf/requests/issues/2519>`_.
 
     A test load of the key and certificate will be made before the constructor
     completes.
@@ -171,7 +171,8 @@ class MAISClient():
 
     :raises PermissionError: We do not have read permission on the file.
 
-    :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
+    :raises ssl.SSLError: The private key and certificate do not match, or
+        there was some other problem loading the certificate.
     """
 
     session: requests.Session = dataclasses.field(repr=False, init=False)
@@ -194,15 +195,11 @@ class MAISClient():
     internally subclass :class:`requests.Session` to implement a default
     timeout.  This is the timeout that will be used.
 
-    In addition, to match what Requests supports, we accept `None` (to not set
+    In addition, to match what Requests supports, we accept ``None`` (to not set
     a specific timeout) and a single float (covering both timeouts).
 
     There are two separate timeouts, a connect timeout and a read timeout.
     See the documentation of :class:`Timeout` for more information.
-
-    You may either provide a single float (used for both timeouts), a
-    :class:`Timeout` tuple (to specify different connect and read timeouts), or
-    ``None`` (to not specify a timeout).
 
     .. _does: https://github.com/psf/requests/issues/1130
 
@@ -271,15 +268,14 @@ class MAISClient():
         key: pathlib.Path | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
-        """Return a client configured to connect to connect to production
-        (PROD) APIs.
+        """Return a client configured to connect to production (PROD) APIs.
 
         The returned client has all of the URLs pre-configured.
 
         .. note::
            A new client instance is created every time you call this.  If
            you want to take advantage of caching, call this only once per
-           thread/process.
+           thread.
 
         :param cert: See :class:`MAISClient` for more information.
 
@@ -291,7 +287,8 @@ class MAISClient():
 
         :raises PermissionError: We do not have read permission on the file.
 
-        :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
+        :raises ssl.SSLError: The private key and certificate do not match, or
+            there was some other problem loading the certificate.
         """
         return cls(
             urls={
@@ -314,14 +311,15 @@ class MAISClient():
         key: pathlib.Path | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
-        """Return a client configured to connect to connect to UAT APIs.
+        """Return a client configured to connect to production-track test (UAT)
+        APIs.
 
         The returned client has all of the URLs pre-configured.
 
         .. note::
            A new client instance is created every time you call this.  If
            you want to take advantage of caching, call this only once per
-           thread/process.
+           thread.
 
         :param cert: See :class:`MAISClient` for more information.
 
@@ -333,7 +331,8 @@ class MAISClient():
 
         :raises PermissionError: We do not have read permission on the file.
 
-        :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
+        :raises ssl.SSLError: The private key and certificate do not match, or
+            there was some other problem loading the certificate.
         """
         return cls(
             urls={
@@ -356,13 +355,14 @@ class MAISClient():
         key: pathlib.Path | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
-        """Return a client configured to connect to connect to UAT1 APIs, used for Sequoia testing.
+        """Return a client configured to connect to connect to UAT1 APIs, used
+        for Sequoia testing.
 
         UAT1 is available for the Account, Authority (also known as
         "Privilege") APIs, since those are the APIs that directly depend on
         data from HR.
 
-        The returned client has all of the URLs pre-configured.
+        If you have credentials that work for UAT, they will work for UAT1.
 
         .. note::
            UAT1 does have a Workgroup API, but it uses the XML-based 1.0 API.
@@ -372,7 +372,7 @@ class MAISClient():
         .. note::
            A new client instance is created every time you call this.  If
            you want to take advantage of caching, call this only once per
-           thread/process.
+           thread.
 
         :param cert: See :class:`MAISClient` for more information.
 
@@ -384,7 +384,8 @@ class MAISClient():
 
         :raises PermissionError: We do not have read permission on the file.
 
-        :raises ssl.SSLError: The private key and certificate do not match, or there was some other problem loading the certificate.
+        :raises ssl.SSLError: The private key and certificate do not match, or
+            there was some other problem loading the certificate.
         """
         return cls(
             urls={

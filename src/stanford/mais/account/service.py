@@ -34,6 +34,7 @@ debug = logger.debug
 info = logger.info
 
 __all__ = (
+    'ServiceStatus',
     'AccountService',
     'AccountServiceKerberos',
     'AccountServiceLibrary',
@@ -44,13 +45,12 @@ __all__ = (
     'AccountServicePTS',
     'AccountServiceAFS',
     'AccountServiceDialin',
-    'ServiceStatus',
 )
 
 # A service can have one of three different statuses
 @enum.unique
 class ServiceStatus(enum.Enum):
-    """The possible status of a service
+    """The possible statuses of a service.
     """
 
     ACTIVE = 'active'
@@ -59,12 +59,18 @@ class ServiceStatus(enum.Enum):
 
     FROZEN = 'frozen'
     """The account has this service, but it is inaccessible right now.
+
+    .. note::
+       Not every service uses this status.
     """
 
     INACTIVE = 'inactive'
     """The account does not have this service.
 
-    The account may have had the service in the past, but does not now.
+    .. note::
+       The account may have had the service in the past, but does not now.  For
+       example, full SUNetIDs have access to the autoreply service, but when
+       autoreply is not enabled, the service is inactive.
     """
 
 # Each account service has a different class.  Combine that with the base
@@ -74,10 +80,11 @@ class ServiceStatus(enum.Enum):
 
 @dataclasses.dataclass(frozen=True)
 class AccountService(abc.ABC):
-    """Represents an account service.
+    """The base class for all account services.
 
-    This is a base container representing a service, and stores the
-    common properties that a service can have.  For service-specific
+    This is a base class representing a service, and stores the common
+    properties that a service can have (the :data:`~AccountService.name` of the
+    service, and its :data:`~AccountService.status`).  For service-specific
     properties, check out the documentation for the appropriate subclasses.
     """
 
@@ -258,14 +265,18 @@ class AccountService(abc.ABC):
 class AccountServiceKerberos(AccountService):
     """``kerberos`` service for an Account.
 
-    This represents an account's entry in Kerberos.  If active, then the
-    account is at least a base (or base-sponsored) account.
+    This represents an account's entry in Kerberos.  If an account has this
+    service, then the account is at least a base (or base-sponsored) account.
     """
 
     principal: str
     """
     The name of the Kerberos principal.  This is normally the same as the
     SUNetID.
+
+    .. note::
+       This is an un-scoped principal.  In other words, it does not contain a
+       Kerberos realm (because Stanford has multiple Kerberos realms!).
     """
 
     uid: int
@@ -350,25 +361,29 @@ class AccountServiceSEAS(AccountService):
     """
     This is a setting which may appear multiple times.  Each entry represents
     an `@stanford.edu` email address.  There will always be one entry matching
-    the account's ID (so that `id@stanford.edu` works).  If the user has any
+    the account's ID (so that ``id@stanford.edu`` works).  If the user has any
     email alises, each alias will appear as an additional entry.
+
+    .. danger::
+       Do not use this to look up an account's SUNetID/uid!
     """
 
     sunetidpreferred: str
     """
-    This is the alias that the user prefers to use as their ID in their
-    Stanford email address.  If the user does not have any aliases,
-    then this will be their account ID.
+    One of the entries from :data:`~AccountServiceSEAS.sunetid`, this is the
+    alias the the person prefers others use for email comunication.
 
     .. note::
-       This setting, along with the tier-specific suffix (``@stanford.edu`` on
-       PROD), is used for the user's ``mail`` attribute in LDAP (in the
-       ``people`` tree).
+       This setting, along with the tier-specific suffix (``@stanford.edu`` in
+       PROD), is used for the user's ``mail`` attribute in LDAP (which you can
+       find in the `people tree`_).
+
+    .. _people tree: https://uit.stanford.edu/service/directory/datadefs/people
     """
 
-    forward: list[str] | None
+    forward: str | None
     """
-    This is an optional setting.  If present, emails received by this address
+    This is an optional setting.  If present, emails received by this account
     will be forwarded to the emails listed in this setting.  Multiple emails
     are separated by a comma.
 
@@ -378,9 +393,9 @@ class AccountServiceSEAS(AccountService):
 
     urirouteto: str
     """
-    When a client browses to `<https://stanford.edu/~id>`_, this is the URI
-    where the client will be redirected.  If it is just a path (and not a full
-    URL), it is relative to `<https://web.stanford.edu/>`_.
+    When a user points their web browser to to `<https://stanford.edu/~id>`_,
+    this is the URI where the client will be redirected.  If it is just a path
+    (not a full URL), it is relative to `<https://web.stanford.edu/>`_.
     """
 
     @classmethod
@@ -407,9 +422,8 @@ class AccountServiceSEAS(AccountService):
 class AccountServiceEmail(AccountService):
     """``email`` service for an Account.
 
-    This represents a Stanford mailbox.  If active, the account has a Stanford
-    electronic mailbox.  The ``seas`` service should also be present and
-    active.
+    If active, the account has a Stanford electronic mailbox.  The ``seas``
+    service should also be present and active.
 
     .. note::
        The specific email backend (Zimbra, Office 365, Google, …) is not
@@ -596,7 +610,19 @@ class AccountServicePTS(AccountService):
 class AccountServiceAFS(AccountService):
     """``afs`` service for an Account.
 
-    This represents an account's AFS home directory.
+    This represents an account's AFS home volume.
+
+    .. note::
+       Just because someone has active AFS service, does not mean they actually
+       have a home volume.  New Faculty and Staff members must `request an AFS
+       home volume`_.
+
+    .. tip::
+       It is still possible to use AFS without a home volume, as long as you
+       use a service (like FarmShare) that does not use AFS for home
+       directories.
+
+    .. _request an AFS home volume: https://uit.stanford.edu/service/afs/intro
     """
 
     homedirectory: str
@@ -608,7 +634,7 @@ class AccountServiceAFS(AccountService):
        will probably want to override it.
 
     .. note::
-       This setting assumes that AFS is mounted at path ``/afs`` on a ssytem.
+       This setting assumes that AFS is mounted at path ``/afs`` on a system.
        This is normally, but not always, the case.  This setting also assumes
        that your system has an up-to-date copy of the
        `CellServDB <https://docs.openafs.org/Reference/5/CellServDB.html>`_

@@ -56,7 +56,7 @@ Here is an example of how you can use the Accounts API through this SDK:
    lelandjr = accounts['lelandjr']  # … you can do this!
 
    # Look at account information
-   lelandjr.name  # "Stanford Jr., Leland
+   lelandjr.name  # "Stanford Jr., Leland"
    lelandjr.services.library.is_active  # `True`
 
    # Only interested in accounts of people?
@@ -189,7 +189,7 @@ Requirements
   the `Getting Started`_ guide for more information.
 
 * Testing requires `PyTest <https://docs.pytest.org/en/latest/>`_ and
-  `requests-mock <https://requests-mock.readthedocs.io/>`_.
+  `pytest-responses <https://pypi.org/project/pytest-responses/>`_.
 
 * Linting requires `MyPy <http://www.mypy-lang.org/>`_ and `types-requests
   <https://pypi.org/project/types-requests/>`_.

@@ -40,50 +40,45 @@ __all__ = (
 class AccountValidationResults:
     """Results of doing an account validation.
 
-    This class contains the results of an account validation, called via
-    :func:`validate`.
-
-    .. note::
-       Many of these properties are collections.  That means, if you want to
-       use things like subscripting, you will want to convert to a
-       more-specific type (such as :class:`list` before using it).
+    This class contains the result of calling :func:`validate`.
     """
 
     raw: str | None
     """
-    The raw input provided for validation.  This is only provided when
+    The raw input string provided for validation.  This is only provided when
     a string was provided to :func:`validate`.
     """
 
     raw_set: Collection[str]
     """
     The raw input provided for validation.  If a string was provided to
-    :func:`validate`, then this is the raw input after being split into a
-    collection.  Otherwise, this will be the original list/set/tuple that was
-    provided to :func:`validate`, but made into a set.
+    :func:`validate`, then this is the raw input after being split.  If the
+    input to :func:`validate` was a set, then this is that set.  Otherwise,
+    this is the input to :func:`validate`, but as a set.
 
-    The set union of `full`, `base`, `inactive`, and `unknown` is equal to
-    this list.
+    The set union of ``full``, ``base``, ``inactive``, and ``unknown`` is equal
+    to this.
     """
 
     full: Collection[str]
     """
-    The set of active, full (or full-sponsored) SUNetIDs found in `raw_set`.
+    The set of active full (or full-sponsored) SUNetIDs found in ``raw_set``.
     """
 
     base: Collection[str]
     """
-    The set of active, base (or base-sponsored) SUNetIDs found in `raw_set`.
+    The set of active base (or base-sponsored) SUNetIDs found in ``raw_set``.
     """
 
     inactive: Collection[str]
     """
-    The set of inactive SUNetIDs found in `raw_set`.
+    The set of inactive SUNetIDs found in ``raw_set``.
     """
 
     unknown: Collection[str]
     """
-    The set of entries from `raw_set` that are not SUNetIDs.
+    The set of entries from ``raw_set`` that are not SUNetIDs.  This includes
+    uids that are functional accounts.
     """
 
 # For validation, we will have three functions:
@@ -103,9 +98,11 @@ def validate(
     and check status.
 
     This takes a list of SUNetIDs, and returns a list of SUNetIDs which have
-    been checked against the Accounts API for both activity and service level.
-    The returned result shows which SUNetIDs are active full (or
-    full-sponsored), active base (or base-sponsored), or inactive.
+    been checked against the Accounts API for both activeness and service
+    level.  The returned result shows which SUNetIDs are active full (or
+    full-sponsored), active base (or base-sponsored), or inactive.  All other
+    entries (including those representing functional accounts) are rejected as
+    "unknown".
 
     If the input is a string, then the input string may be separated by commas,
     and/or whitespace, (where "whitespace" is a space, newline/linefeed, form
@@ -122,19 +119,24 @@ def validate(
 
     This is designed to catch most exceptions.  Exceptions related to
     validation (for example, attempting to validate an obviously-invalid
-    SUNetID like `ab$#`) will result in the 'SUNetID' being added to the
+    SUNetID like ``ab$#``) will result in the 'SUNetID' being added to the
     `unknown` list, instead of throwing an exception.  The only exceptions that
     should be expected from this function are ones related to API issues.
 
-    :param raw: The list of SUNetIDs.  If a `str`, then the list may be comma- and/or whitespace-separated.
+    :param raw: The list of SUNetIDs.  If a :class:`str`, then the list must be
+       either comma- and/or whitespace-separated.
 
-    :param client: An :class:`~stanford.mais.account.AccountClient` to connect to the Account API.
+    :param client: An :class:`~stanford.mais.account.AccountClient` to connect
+       to the Account API.
 
-    :return: The results of the validation.  See the definition of :class:`~nero_wgcreator.account.validate.AccountValidationResults` for details.  If the input to this function is a string; that string will be in `raw`, and the parsed list will be in `raw_set`.  If the input to this function is not a string, then `raw` will be `None` and `raw_set` will be a copy of the input.
+    :return: The results of the validation.  See
+       :class:`AccountValidationResults` for details.
 
-    :raises ChildProcessError: Something went wrong on the server side (a 400 or 500 error was returned).
+    :raises ChildProcessError: Something went wrong on the server side (a 400
+       or 500 error was returned).
 
-    :raises PermissionError: You did not use a valid certificate, or do not have permissions to perform the operation.
+    :raises PermissionError: You did not use a valid certificate, or do not
+       have permissions to perform the operation.
 
     :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
     """
