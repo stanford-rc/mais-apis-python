@@ -93,9 +93,6 @@ deps = [
     "pytest-responses",
     "responses",
 ]
-commands = [
-    ["pytest", "--cov", "--cov-append", "--strict-config", "--strict-markers", "-W", "error"],
-]
 set_env = { PYTHONTRACEMALLOC = "20" }
 
 [tool.tox.env.minimal]
@@ -103,17 +100,28 @@ deps = [
     "requests==2.30.0",
     "setuptools==66.1.1",
 ]
+commands = [
+    ["pytest", "--cov", "--cov-append", "--cov-report=", "--strict-config", "--strict-markers", "-W", "error"],
+]
 
 [tool.tox.env.latest]
 deps = [
     "requests >2.32.4, <3.0",
     "setuptools >=80.9.0",
 ]
+commands = [
+    ["pytest", "--cov", "--cov-append", "--cov-report=", "--strict-config", "--strict-markers", "-W", "error"],
+]
+
+[tool.tox.env.report]
+commands = [
+    ["coverage", "report"],
+]
 
 [tool.tox.gh.python]
-"3.11" = ["py311-minimal", "py311-latest"]
-"3.12" = ["py312-minimal", "py312-latest"]
-"3.13" = ["py313-minimal", "py313-latest"]
+"3.11" = ["py311-minimal", "py311-latest", "report"]
+"3.12" = ["py312-minimal", "py312-latest", "report"]
+"3.13" = ["py313-minimal", "py313-latest", "report"]
 
 [tool.bandit.assert_used]
 skips = [ "tests/*.py" ]
