@@ -80,6 +80,13 @@ def test_in(account_client):
     assert 'fullprsn' in account_client
     assert 'nobody' not in account_client
 
+# Test clearing the cache works
+def test_clear(account_client):
+    fullprsn_result1 = account_client['fullprsn']
+    account_client.clear_cache()
+    fullprsn_result2 = account_client['fullprsn']
+    assert fullprsn_result1 is not fullprsn_result2
+
 """
 The next set of tests checks that AccountViews work.  It uses our test users:
 

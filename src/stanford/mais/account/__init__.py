@@ -193,6 +193,30 @@ class AccountClient():
         except KeyError:
             return False
 
+    def clear_cache(
+        self,
+    ) -> None:
+        """Clear cache of accounts.
+
+        This clears the cache of accounts.
+
+        As mentioned in the class docs, visited accounts are cached locally,
+        for speed and to reduce load on the Account API.  Although accounts
+        rarely change, in long-running
+        programs, this can be a problem.  To assist, this method clears the
+        cache of this specific Account client.
+
+        .. danger::
+            If you are holding a reference to an existing :class:`Account`,
+            or to one of the the Account's services, clearing the cache does
+            not invalidate those references!
+
+            This method should not be called unless you know what you are
+            doing.
+        """
+        debug('in clear_cache')
+        self._cache.clear()
+
     # Now, let's create some AccountViews!!!
 
     def only_active(
