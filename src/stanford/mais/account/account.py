@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
-warn = logger.warn
+warn = logger.warning
 
 # NOTE: It's expected that this module will be *-imported, so not only does this
 # define what gets included in Sphinx docs, this also determines what gets

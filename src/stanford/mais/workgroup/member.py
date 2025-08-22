@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
-warning = logger.warn
+warning = logger.warning
 error = logger.error
 
 __all__ = (

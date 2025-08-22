@@ -32,7 +32,7 @@ from stanford.mais.workgroup.workgroup import Workgroup
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
-warning = logger.warn
+warning = logger.warning
 error = logger.error
 
 # We are the root for this module, so do library-wide logging configuration.

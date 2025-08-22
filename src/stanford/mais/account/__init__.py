@@ -35,7 +35,7 @@ import stanford.mais.client
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
-warn = logger.warn
+warn = logger.warning
 
 # We are the root for this module, so do library-wide logging configuration.
 # See https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
