@@ -94,7 +94,7 @@ deps = [
     "responses",
 ]
 commands = [
-    ["pytest", "--cov=src", "--cov-append", "--strict-config", "--strict-markers", "-W", "error"],
+    ["pytest", "--cov", "--cov-append", "--strict-config", "--strict-markers", "-W", "error"],
 ]
 set_env = { PYTHONTRACEMALLOC = "20" }
 
