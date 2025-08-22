@@ -460,9 +460,14 @@ class AccountServiceEmail(AccountService):
 class AccountServiceAutoreply(AccountService):
     """``autoreply`` service for an Account.
 
-    This represents the email autoresponder service.  If active, incoming
-    emails will be forwarded to the autoresponder service, which will send an
+    This **used to** represent the email autoresponder service.  If active, incoming
+    emails would have been forwarded to the autoresponder service, which would send an
     appropriate reply.
+
+    In May 2025, the central autoresponder service `was turned off
+    <https://uit.stanford.edu/news/stanford-accounts-getting-new-look>`_.
+    Autoreply is now managed within the user's email system (Office 365, GMail,
+    etc.).  This service may disappear in the future.
     """
 
     forward: str

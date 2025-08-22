@@ -33,6 +33,9 @@ Other:
 
 * In the Account class, the property ``last_updated`` is now ``last_update``.
 
+* As of May 2025, the `autoreply service is no longer in use`_.  You should
+  stop using the ``Account.service.autoreply`` property.
+
 * Custom session support has gone through major changes!  Instead of providing
   a custom Requests Session to each service's constructor (AccountClient,
   WorkgroupClient, etc.), you now provide the custom Session to the
@@ -60,3 +63,5 @@ First alpha version!
 Includes support for the base client (MAISClient), and the Accounts API.
 
 .. _#2: https://github.com/stanford-rc/mais-apis-python/issues/2
+
+.. _autoreply service is no longer in use: https://uit.stanford.edu/news/stanford-accounts-getting-new-look
