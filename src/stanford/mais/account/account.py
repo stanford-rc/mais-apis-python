@@ -50,7 +50,7 @@ __all__ = (
 # The Account class is big!  So it's in its own file.
 # (AccountServiceTypes is here as required support.)
 
-@dataclasses.dataclass(frozen=True, slots=True, weakref_slot=True)
+@dataclasses.dataclass(frozen=True, slots=True, weakref_slot=False)
 class AccountServiceTypes():
     """The different types of services which may be attached to an Account.
 
