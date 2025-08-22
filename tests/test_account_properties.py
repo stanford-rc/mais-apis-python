@@ -30,7 +30,7 @@ All test accounts (that aren't intentionally broken) have:
     - sunetid
     - name
     - description
-    - last_updated
+    - last_update
 
 These are our test users:
     fullprsn:
@@ -227,7 +227,7 @@ def test_is_full(account_client):
     assert oldfunctional.is_full is False
     assert sharedmailbox.is_full is False
 
-# Test last_updated
+# Test last_update
 def test_last_updated(account_client):
     # Fetch our accounts
     fullprsn = account_client['fullprsn']
@@ -252,11 +252,11 @@ def test_last_updated(account_client):
     )
 
     # Test last-updated is decoded correctly
-    assert fullprsn.last_updated == expected_dt
-    assert frozprsn.last_updated == expected_dt
-    assert formerpsn.last_updated == expected_dt
-    assert affilite.last_updated == expected_dt
-    assert afilbase.last_updated == expected_dt
-    assert functional.last_updated == expected_dt
-    assert oldfunctional.last_updated == expected_dt
-    assert sharedmailbox.last_updated == expected_dt
+    assert fullprsn.last_update == expected_dt
+    assert frozprsn.last_update == expected_dt
+    assert formerpsn.last_update == expected_dt
+    assert affilite.last_update == expected_dt
+    assert afilbase.last_update == expected_dt
+    assert functional.last_update == expected_dt
+    assert oldfunctional.last_update == expected_dt
+    assert sharedmailbox.last_update == expected_dt

@@ -159,7 +159,7 @@ class Account():
        parsed JSON.
     """
 
-    last_updated: datetime.datetime
+    last_update: datetime.datetime
     """
     The datetime when the account was last updated.  It is timezone-aware, and
     is already set to the UTC timezone.
@@ -199,7 +199,7 @@ class Account():
             pytz.utc
          )
 
-      You really should just use :meth:`last_updated` instead.
+      You really should just use :meth:`last_update` instead.
     """
 
     @classmethod
@@ -335,7 +335,7 @@ class Account():
             raise NotImplementedError(f"Unexpected account type '{account_type}'")
 
         # Compute last_updated
-        last_updated=datetime.datetime.strptime(
+        last_update=datetime.datetime.strptime(
             response_json['statusDateStr'],
             '%Y-%m-%dT%H:%M:%S.%fZ'
         ).replace(tzinfo=datetime.timezone.utc)
@@ -350,7 +350,7 @@ class Account():
             is_active=(True if response_json['status'] == 'active' else False),
             is_full=is_full,
             services=AccountServiceTypes(**services),
-            last_updated=last_updated,
+            last_update=last_update,
             raw=response_json,
         )
         client._cache[sunetid] = result

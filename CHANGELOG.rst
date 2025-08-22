@@ -26,6 +26,8 @@ Fixed:
 
 Other:
 
+* In the Account class, the property ``last_updated`` is now ``last_update``.
+
 * Custom session support has gone through major changes!  Instead of providing
   a custom Requests Session to each service's constructor (AccountClient,
   WorkgroupClient, etc.), you now provide the custom Session to the
