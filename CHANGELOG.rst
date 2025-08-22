@@ -9,6 +9,9 @@ Enhancements:
   "active", "inactive", and "frozen".  ``is_active`` is still a property, and
   returns ``True`` iff the status is "active" (else it returns ``False``).
 
+* All of the Account code is now fully tested.  From this point on, changes to
+  the existing account SDK's structure is unlikely.
+
 * Add support for the Workgroup API.  This doesn't have tests yet, and may
   still change, so it's not a top-line enhancement.
 
