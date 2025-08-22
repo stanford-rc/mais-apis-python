@@ -103,10 +103,24 @@ def test_is_active(account_client):
     # Fetch our accounts
     fullprsn = account_client['fullprsn']
     frozprsn = account_client['frozprsn']
+    formerpsn = account_client['formerpsn']
 
     # Check is_active
     assert fullprsn.services.kerberos.is_active is True
     assert frozprsn.services.kerberos.is_active is False
+    assert formerpsn.services.kerberos.is_active is False
+
+# Test if not_inactive property works correctly, using the Kerberos service
+def test_not_inactive(account_client):
+    # Fetch our accounts
+    fullprsn = account_client['fullprsn']
+    frozprsn = account_client['frozprsn']
+    formerpsn = account_client['formerpsn']
+
+    # Check not_inactive
+    assert fullprsn.services.kerberos.not_inactive is True
+    assert frozprsn.services.kerberos.not_inactive is True
+    assert formerpsn.services.kerberos.not_inactive is False
 
 # The library service doesn't really have much to test
 def test_library(account_client):

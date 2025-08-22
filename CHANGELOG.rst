@@ -9,6 +9,8 @@ Enhancements:
   "active", "inactive", and "frozen".  ``is_active`` is still a property, and
   returns ``True`` iff the status is "active" (else it returns ``False``).
 
+* In addition to ``is_active``, account services now has ``not_inactive``.
+
 * All of the Account code is now fully tested.  From this point on, changes to
   the existing account SDK's structure is unlikely.
 

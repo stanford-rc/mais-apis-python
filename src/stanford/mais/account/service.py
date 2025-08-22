@@ -94,9 +94,28 @@ class AccountService(abc.ABC):
     @property
     def is_active(self) -> bool:
         """
-        ``True`` if the service is active for the associated account.
+        ``True`` if the service is active.
+
+        .. danger::
+           This will return `True` only when the service is active, *not when
+           the service is frozen*.
+
+           For some services, you might not care if the service is frozen.  For
+           example, if an account's kerberos service is frozen, you might want
+           to keep them in the directory, even if you don't want to allow
+           logins.
         """
         return (True if self.status == ServiceStatus.ACTIVE else False)
+
+    @property
+    def not_inactive(self) -> bool:
+        """
+        ``True`` if the service is not inactive.
+
+        This will return `True` when the service is active or frozen.  If the
+        service is inactive, it will return `False`.
+        """
+        return (True if self.status != ServiceStatus.INACTIVE else False)
 
     @classmethod
     @abc.abstractmethod
