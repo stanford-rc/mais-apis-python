@@ -14,4 +14,3 @@
    changes
 
    genindex
-   modindex
