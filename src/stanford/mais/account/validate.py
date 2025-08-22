@@ -98,7 +98,8 @@ def validate(
     raw: str,
     client: stanford.mais.account.AccountClient,
 ) -> AccountValidationResults:
-    """Given a list of SUNetIDs; as a string or a list, tuple, or set; validate
+    """Given a list of SUNetIDs—as a :class:`str`, :class:`list`,
+    :class:`tuple`, :class:`set`, or :class:`frozenset`—validate
     and check status.
 
     This takes a list of SUNetIDs, and returns a list of SUNetIDs which have
@@ -113,8 +114,9 @@ def validate(
     whitespace etc. have been removed.
 
     .. note::
-       "List, tuple, or set" is used instead of the generic "collection"
-       because a :class:`str` is also a collection (of other :class:`str`).
+       "List, tuple, set, or frozenset" is used instead of the generic
+       :class:`~collections.abc.Collection` because a :class:`str` is also a
+       collection (of one-character :class:`str`).
        See `typing issue #256 <https://github.com/python/typing/issues/256>`_
        for the discussion around this issue.
 
@@ -169,8 +171,9 @@ def validate(
 @validate.register(list)
 @validate.register(tuple)
 @validate.register(set)
+@validate.register(frozenset)
 def _( # type: ignore[misc]
-    raw: list[str] | tuple[str] | set[str],
+    raw: list[str] | tuple[str] | set[str] | frozenset[str],
     client: stanford.mais.account.AccountClient,
 ) -> AccountValidationResults:
     """

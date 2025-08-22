@@ -42,10 +42,12 @@ def test_validate_collections(account_client):
         'nobody',
     )
     input_good_set = set(input_good_tuple)
+    input_good_frozenset = frozenset(input_good_tuple)
     input_good_list = list(input_good_tuple)
 
     # Run validation on each input   
     validated_set = validate(input_good_set, account_client)
+    validated_frozenset = validate(input_good_frozenset, account_client)
     validated_tuple = validate(input_good_tuple, account_client)
     validated_list = validate(input_good_list, account_client)
 
