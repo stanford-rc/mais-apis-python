@@ -64,6 +64,30 @@ Documentation = "https://mais-apis-python.readthedocs.io"
 Changelog = "https://github.com/stanford-rc/mais-apis-python/blob/main/CHANGELOG.rst"
 Issues = "https://github.com/stanford-rc/mais-apis-python/issues"
 
+[tool.coverage.paths]
+account = [
+    "src/stanford/mais/account",
+    "**/site-packages/stanford/mais/account",
+]
+client = [
+    "src/stanford/mais/client",
+    "**/site-packages/stanford/mais/client",
+]
+workgroup = [
+    "src/stanford/mais/workgroup",
+    "**/site-packages/stanford/mais/workgroup",
+]
+
+[tool.coverage.run]
+source = [
+    "./tests",
+]
+source_pkgs = [
+    "stanford.mais.account",
+    "stanford.mais.client",
+    "stanford.mais.workgroup",
+]
+
 [tool.mypy]
 explicit_package_bases = true
 namespace_packages = true
