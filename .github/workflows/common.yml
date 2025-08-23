@@ -22,6 +22,17 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      - name: Get pip cache dir
+        id: pip-cache-dir
+        run: |
+          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Pip environment
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
+        with:
+          key: pip-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}
+          path: ${{ steps.pip-cache-dir.outputs.dir }}
+
       - name: Cache Tox environment
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
         with:
