@@ -50,6 +50,7 @@ test = [
     "mypy >= 1.0.0",
     "types-requests",
     "pytest >=8.4.1, <8.5.0",
+    "pytest-cov",
     "pytest-responses",
     "requests >=2.30.0, <3.0",
     "responses",
