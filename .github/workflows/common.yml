@@ -22,6 +22,12 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      - name: Cache Tox environment
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
+        with:
+          key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}
+          path: .tox
+
       - name: Prepare pip
         run: |
           python -m pip install --upgrade pip
