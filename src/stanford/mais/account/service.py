@@ -245,18 +245,18 @@ class AccountService(abc.ABC):
             required_keys_single + required_keys_multiple +
             optional_keys_single + optional_keys_multiple
         ):
-            result[k] = AccountService._get_setting(settings, k)
+            result[k.lower()] = AccountService._get_setting(settings, k)
 
         # Error out if a required key is missing
         for k in (required_keys_single + required_keys_multiple):
-            if result[k] is None:
+            if result[k.lower()] is None:
                 raise KeyError(f"Service {service} missing required setting {k}")
 
         # Ensure multi-value keys are in sets
         for k in (required_keys_multiple + optional_keys_multiple):
-            should_be_set = result[k]
+            should_be_set = result[k.lower()]
             if isinstance(should_be_set, str):
-                result[k] = set([should_be_set])
+                result[k.lower()] = set([should_be_set])
 
         # All done!
         return result
