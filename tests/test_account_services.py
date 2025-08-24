@@ -204,6 +204,11 @@ def test_seas(account_client):
     assert affilite.services.seas.sunetidpreferred in affilite.services.seas.sunetid
     assert sharedmailbox.services.seas.sunetidpreferred in sharedmailbox.services.seas.sunetid
 
+    # Check emailservice
+    assert fullprsn.services.seas.emailsystem == 'office365'
+    assert frozprsn.services.seas.emailsystem == 'office365'
+    assert affilite.services.seas.emailsystem == 'gmail'
+
     # Check URIs - Only one person has a URI
     assert fullprsn.services.seas.urirouteto is None
     assert frozprsn.services.seas.urirouteto == 'http://geocities.com/neworleans/12/11/'

@@ -381,6 +381,17 @@ class AccountServiceSEAS(AccountService):
     .. _people tree: https://uit.stanford.edu/service/directory/datadefs/people
     """
 
+    emailsystem: str | None
+    """
+    For accounts which have a Stanford electronic mailbox (the ``email``
+    service, this specifies which service hosts said mailbox.  Known values
+    include ``office365`` and ``gmail``.
+
+    .. warning::
+       Functional accounts (including those for Shared Email) do not have the
+       ``email`` service, and so they will not have this setting.
+    """
+
     forward: str | None
     """
     This is an optional setting.  If present, emails received by this account
@@ -412,7 +423,7 @@ class AccountServiceSEAS(AccountService):
             service = 'seas',
             required_keys_single = ('sunetidpreferred',),
             required_keys_multiple = ('sunetid',),
-            optional_keys_single = ('local', 'forward', 'urirouteto'),
+            optional_keys_single = ('local', 'emailSystem', 'forward', 'urirouteto'),
         ))
 
         # Call the constructor and return!

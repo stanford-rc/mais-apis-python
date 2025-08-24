@@ -3,7 +3,7 @@ Unreleased
 
 Enhancements:
 
-
+* The Account service 'seas' has a new setting, ``emailservice``.
 
 Fixes:
 

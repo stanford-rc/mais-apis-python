@@ -45,6 +45,10 @@ json_fullprsn = '''
         {
           "name": "sunetid",
           "value": "fullprsn"
+        },
+        {
+          "name": "emailSystem",
+          "value": "office365"
         }
       ],
       "name": "seas",
@@ -317,6 +321,10 @@ json_affilite = '''
         {
           "name": "sunetid",
           "value": "affilite"
+        },
+        {
+          "name": "emailSystem",
+          "value": "gmail"
         }
       ],
       "name": "seas",
