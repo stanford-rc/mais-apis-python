@@ -1,6 +1,14 @@
 Unreleased
 ----------
 
+Enhancements:
+
+
+
+Fixes:
+
+
+
 Other:
 
 * Fix a GitHub Actions problem preventing a single Git operation from releasing
