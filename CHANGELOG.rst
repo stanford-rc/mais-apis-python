@@ -1,7 +1,10 @@
 0.51.1
 ------
 
+Other:
 
+* Fix a GitHub Actions problem preventing a single Git operation from releasing
+  on both PyPi and Test PyPi in a single action (that is, in a single tag).
 
 0.51.0
 ------
