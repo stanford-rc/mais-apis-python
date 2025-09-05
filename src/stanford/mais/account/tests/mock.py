@@ -129,6 +129,17 @@ json_fullprsn = '''
 }
 '''
 
+json_fullprsn_partial = '''
+{
+  "type": "self",
+  "id": "fullprsn",
+  "status": "active",
+  "url": "http://example.com/accounts/fullprsn",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
+
 json_frozprsn = '''
 {
   "services": [
@@ -264,6 +275,17 @@ json_frozprsn = '''
 }
 '''
 
+json_frozprsn_partial = '''
+{
+  "type": "self",
+  "id": "frozprsn",
+  "status": "active",
+  "url": "http://example.com/accounts/frozprsn",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
+
 json_formerpsn = """
 {
   "services": [
@@ -293,6 +315,17 @@ json_formerpsn = """
   "name": "Person, Former",
   "id": "formerpsn",
   "description": "Former Staff - University IT",
+  "status": "inactive",
+  "url": "http://example.com/accounts/formerpsn",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+"""
+
+json_formerpsn_partial = """
+{
+  "type": "self",
+  "id": "formerpsn",
   "status": "inactive",
   "url": "http://example.com/accounts/formerpsn",
   "statusDate": 1578036073000,
@@ -397,6 +430,17 @@ json_affilite = '''
 }
 '''
 
+json_affilite_partial = '''
+{
+  "type": "self",
+  "id": "affilite",
+  "status": "active",
+  "url": "http://example.com/accounts/affilite",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
+
 json_afilbase = '''
 {
   "services": [
@@ -420,6 +464,17 @@ json_afilbase = '''
   "name": "Jones, Base Affiliate",
   "id": "afilbase",
   "description": "Affiliate - Anesthesia",
+  "status": "active",
+  "url": "http://example.com/accounts/afilbase",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
+
+json_afilbase_partial = '''
+{
+  "type": "self",
+  "id": "afilbase",
   "status": "active",
   "url": "http://example.com/accounts/afilbase",
   "statusDate": 1578036073000,
@@ -467,6 +522,17 @@ json_functional = '''
 }
 '''
 
+json_functional_partial = '''
+{
+  "type": "functional",
+  "id": "functional",
+  "status": "active",
+  "url": "http://example.com/accounts/functional",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
+
 json_oldfunctional = '''
 {
   "services": [
@@ -486,6 +552,17 @@ json_oldfunctional = '''
   "name": "Old Functional Account",
   "id": "oldfunctional",
   "description": "Functional Account",
+  "status": "inactive",
+  "url": "http://example.com/accounts/oldfunctional",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
+
+json_oldfunctional_partial = '''
+{
+  "type": "functional",
+  "id": "oldfunctional",
   "status": "inactive",
   "url": "http://example.com/accounts/oldfunctional",
   "statusDate": 1578036073000,
@@ -520,6 +597,17 @@ json_sharedmailbox = '''
   "name": "Some Group Mailbox - shared email",
   "id": "sharedmailbox",
   "description": "Shared mailbox for some group",
+  "status": "active",
+  "url": "http://example.com/accounts/sharedmailbox",
+  "statusDate": 1578036073000,
+  "statusDateStr": "2020-01-03T15:14:13.00Z"
+}
+'''
+
+json_sharedmailbox_partial = '''
+{
+  "type": "functional",
+  "id": "sharedmailbox",
   "status": "active",
   "url": "http://example.com/accounts/sharedmailbox",
   "statusDate": 1578036073000,
@@ -749,6 +837,78 @@ def add_account_responses() -> None:
             'message': 'Internal server error',
             'url': 'http://example.com/accounts/broken5'
         },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/?type=functional&status=pending&statusdays=2',
+        status=403,
+        content_type='application/json',
+        json={
+            'status': 403,
+            'message': 'Forbidden',
+            'url': 'http://example.com/accounts/hidden3'
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/?type=self&status=pending&statusdays=2',
+        status=500,
+        content_type='application/json',
+        json={
+            'status': 500,
+            'message': 'Internal server error',
+            'url': 'http://example.com/accounts/broken5'
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/?type=self&status=pending&statusdays=30',
+        status=200,
+        content_type='application/json',
+        json=[],
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/?type=self&status=active&statusdays=30',
+        status=200,
+        content_type='application/json',
+        body=('[' +
+            json_fullprsn_partial + ',' +
+            json_frozprsn_partial + ',' +
+            json_affilite_partial + ',' +
+            json_afilbase_partial + ']'
+        ),
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/?type=self&status=inactive&statusdays=30',
+        status=200,
+        content_type='application/json',
+        body=('[' + json_formerpsn_partial + ']'),
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/?type=functional&status=active&statusdays=30',
+        status=200,
+        content_type='application/json',
+        body=('[' +
+            json_functional_partial + ',' +
+            json_sharedmailbox_partial + ']'
+        ),
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/?type=functional&status=inactive&statusdays=30',
+        status=200,
+        content_type='application/json',
+        body=('[' + json_oldfunctional_partial + ']'),
     )
 
     # All done!
