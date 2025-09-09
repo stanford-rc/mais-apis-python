@@ -29,6 +29,7 @@ import logging
 import pathlib
 import re
 from typing import Any, TYPE_CHECKING
+import weakref
 import zoneinfo
 
 # Finally, do local imports
@@ -269,10 +270,14 @@ class Workgroup:
         # Decode the JSON, and send to make the instance
         debug(f"Got back a response!")
         response_json = response.json()
-        return cls(
+        result = cls(
             client=client,
             from_json=response_json,
         )
+
+        # Put our new workgroup into the cache, and return
+        client._cache[name] = weakref.ref(result)
+        return result
 
     @classmethod
     def get(
@@ -316,7 +321,18 @@ class Workgroup:
 
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
+        # Lowercase the name before we continue
+        name = name.lower()
         debug(f"In get for Workgroup name {name}")
+
+        # Check if the Workgroup is in the cache
+        if name in client._cache:
+            result = client._cache[name]()
+            if result is not None:
+                debug(f"Returning Workgroup {name} from cache")
+                return result
+            else:
+                debug(f"{name} expired in cache.  Re-fetching…")
 
         # Make the request for the Workgroup.
         get_url = client._url(
@@ -341,10 +357,14 @@ class Workgroup:
         # Decode the JSON, and send to make the instance
         debug('Got a response!')
         response_json = response.json()
-        return cls(
+        result = cls(
             client=client,
             from_json=response_json,
         )
+
+        # Put into the cache and return!
+        client._cache[name] = weakref.ref(result)
+        return result
 
     def refresh(self) -> None:
         """Refresh an existing Workgroup instance.
