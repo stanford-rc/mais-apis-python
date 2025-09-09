@@ -88,6 +88,17 @@ workgroup_test1 = TestWorkgroup(
     ],
 )
 
+workgroup_test1_lite = (
+    '{' +
+    '"memberCount": "1",' +
+    '"lastUpdate": "1-Jan-2025",' +
+    '"name": "test:1",' +
+    '"description": "Test 1",' +
+    '"integrations": [],' +
+    '"lastUpdateBy": "workgroup_maint"' +
+    '}'
+)
+
 
 # Add Workgroup responses to the Responses mock session
 def add_workgroup_responses() -> None:
