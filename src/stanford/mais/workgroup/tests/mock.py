@@ -22,71 +22,36 @@ from typing import List, Literal
 # PyPi imports
 import responses
 
-# Define the classes that our test data will use
 
-WorkgroupFilterLiteral = Literal[
-    'NONE',
-    'ACADEMIC_ADMINISTRATIVE',
-    'STUDENT',
-    'FACULTY',
-    'STAFF',
-    'FACULTY_STAFF',
-    'FACULTY_STUDENT',
-    'STAFF_STUDENT',
-    'FACULTY_STAFF_STUDENT',
-]
-
-@dataclasses.dataclass(frozen=True)
-class TestMember:
-    type: Literal['PERSON', 'WORKGROUP', 'CERTIFICATE']
-    id: str
-    name: str
-
-@dataclasses.dataclass(frozen=True)
-class TestWorkgroup:
-    name: str
-    description: str
-    filter: WorkgroupFilterLiteral
-    visibility: Literal['STANFORD', 'PRIVATE']
-    reusable: bool
-    privgroup: bool
-    # integrations is not implemented
-    integrations: List[None]
-    lastUpdate: str
-    lastUpdateBy: str
-    members: List['TestMember']
-    administrators: List['TestMember']
-
-# Make some test data!
-
-person_akkornel = TestMember(
-    type='PERSON',
-    id='akkornel',
-    name='Kornel, Karl'
-)
-person_leland = TestMember(
-    type='PERSON',
-    id='stanford',
-    name='Stanford, Leland Jr.',
-)
-
-workgroup_test1 = TestWorkgroup(
-    name='test:1',
-    description='Test 1',
-    filter='NONE',
-    visibility='STANFORD',
-    reusable=True,
-    privgroup=True,
-    integrations=list(),
-    lastUpdate='1-Jan-2025',
-    lastUpdateBy='pytest',
-    members=[
-        person_akkornel,
-    ],
-    administrators=[
-        person_leland,
-    ],
-)
+workgroup_test1_json = """
+{
+"filter": "NONE",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "Kornel, Karl",
+        "id": "akkornel",
+        "type": "PERSON"
+    }
+],
+"name": "test:1",
+"description": "Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "Stanford, Leland Jr.",
+        "id": "stanford",
+        "type": "PERSON"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
 
 workgroup_test1_lite = (
     '{' +
@@ -205,7 +170,7 @@ def add_workgroup_responses() -> None:
         'http://example.com/wg/v2/test:1',
         status=200,
         content_type='application/json',
-        json=dataclasses.asdict(workgroup_test1),
+        body=workgroup_test1_json,
     )
 
     # test:missing is a 404
