@@ -22,7 +22,7 @@ from typing import List, Literal
 # PyPi imports
 import responses
 
-
+# Provide some raw workgroups, in full and lite form
 workgroup_test1_json = """
 {
 "filter": "NONE",
@@ -53,16 +53,16 @@ workgroup_test1_json = """
 }
 """
 
-workgroup_test1_lite = (
-    '{' +
-    '"memberCount": "1",' +
-    '"lastUpdate": "1-Jan-2025",' +
-    '"name": "test:1",' +
-    '"description": "Test 1",' +
-    '"integrations": [],' +
-    '"lastUpdateBy": "workgroup_maint"' +
-    '}'
-)
+workgroup_test1_lite = """
+{
+"memberCount": "1",
+"lastUpdate": "1-Jan-2025",
+"name": "test:1",
+"description": "Test 1",
+"integrations": [],
+"lastUpdateBy": "workgroup_maint"
+}
+"""
 
 
 # Add Workgroup responses to the Responses mock session
