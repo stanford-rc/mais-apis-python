@@ -91,6 +91,72 @@ workgroup_test1 = TestWorkgroup(
 
 # Add Workgroup responses to the Responses mock session
 def add_workgroup_responses() -> None:
+    # The bad: stem is used for triggering error statuses
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w1',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w2',
+        status=500,
+        content_type='application/json',
+        json={
+            'notification': 'Internal Server Error',
+            'code': 500,
+            'message': 'Internal Server Error',
+            'status': 500,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w3',
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w4',
+        status=403,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 403',
+            'code': 403,
+            'message': 'Forbidden',
+            'status': 403,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w5',
+        status=404,
+        content_type='application/json',
+        json={
+            'notification': 'Not found',
+            'code': 404,
+            'message': 'Not found',
+            'status': 404,
+        },
+    )
+
     # GET WORKGROUP
 
     # test:1 works
