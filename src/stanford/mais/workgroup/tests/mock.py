@@ -168,6 +168,35 @@ def add_workgroup_responses() -> None:
         },
     )
 
+    # Add some search results
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/search/noresults:*',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"search": "noresults:*",' +
+            '"results": []' +
+            '}'
+        )
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/search/test:*',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"search": "research-computing:*",' +
+            '"results": [' +
+            workgroup_test1_lite +
+            ']' +
+            '}'
+        )
+    )
+
     # GET WORKGROUP
 
     # test:1 works
