@@ -248,23 +248,10 @@ class WorkgroupClient():
         Refer to :meth:`Workgroup.get` for details on exceptions, etc..
         """
         debug(f"In get for workgroup '{name}'")
-
-        # Is the Workgroup in the cache?
-        if name in self._cache:
-            possible_workgroup = self._cache[name]()
-            if possible_workgroup is not None:
-                debug(f"Returning workgroup {name} from cache")
-                return possible_workgroup
-            else:
-                del self._cache[name]
-
-        # Get the Workgroup, store in cache, and return
-        actual_workgroup = Workgroup.get(
+        return Workgroup.get(
             client=self,
             name=name,
         )
-        self._cache[name] = weakref.ref(actual_workgroup)
-        return actual_workgroup
 
     def __getitem__(
         self,
