@@ -211,6 +211,32 @@ def add_workgroup_responses() -> None:
 
     responses.add(
         responses.GET,
+        'http://example.com/wg/v2/search/bad:w1',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/search/bad:w3',
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
+
+    responses.add(
+        responses.GET,
         'http://example.com/wg/v2?type=WORKGROUP&id=workgroup:test-owners',
         status=200,
         content_type='application/json',
@@ -274,6 +300,32 @@ def add_workgroup_responses() -> None:
             ']' +
             '}'
         )
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2?type=CERTIFICATE&id=bad400',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2?type=CERTIFICATE&id=bad401',
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
     )
 
     responses.add(
