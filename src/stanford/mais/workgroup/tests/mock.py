@@ -46,6 +46,12 @@ workgroup_test1_json = """
         "name": "Stanford, Leland Jr.",
         "id": "stanford",
         "type": "PERSON"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:test-owners",
+        "id": "workgroup:test-owners",
+        "type": "WORKGROUP"
     }
 ],
 "reusable": "TRUE",
@@ -61,6 +67,47 @@ workgroup_test1_lite = """
 "description": "Test 1",
 "integrations": [],
 "lastUpdateBy": "workgroup_maint"
+}
+"""
+
+workgroup_testowners_json = """
+{
+"filter": "ACADEMIC_ADMINISTRATIVE",
+"privgroup": "FALSE",
+"visibility": "PRIVATE",
+"lastUpdate": "1-Jan-2025",
+"members": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    }
+],
+"name": "workgroup:test-owners",
+"description": "Workgroup stem for testing",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:workgroup-owners",
+        "id": "workgroup:workgroup-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "FALSE",
+"lastUpdateBy": "pytest"
+}
+"""
+
+workgroup_testowners_lite = """
+{
+"memberCount": "1",
+"lastUpdate": "1-Jan-2025",
+"name": "workgroup:test-owners",
+"description": "Workgroup stem for testing",
+"integrations": [],
+"lastUpdateBy": "pytest"
 }
 """
 
