@@ -209,7 +209,107 @@ def add_workgroup_responses() -> None:
         )
     )
 
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2?type=WORKGROUP&id=workgroup:test-owners',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"administrators_count": 1,' +
+            '"members": [' +
+            '],' +
+            '"members_count": 0,' +
+            '"id": "workgroup:test-owners",' +
+            '"type": "workgroup",' +
+            '"results": [' +
+            workgroup_test1_lite +
+            '],' +
+            '"administrators": [' +
+            workgroup_test1_lite +
+            ']' +
+            '}'
+        )
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2?type=CERTIFICATE&id=client-cert-1',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"administrators_count": 1,' +
+            '"members": [' +
+            '],' +
+            '"members_count": 1,' +
+            '"id": "client-cert-1",' +
+            '"type": "certificate",' +
+            '"results": [' +
+            workgroup_testowners_lite +
+            '],' +
+            '"administrators": [' +
+            workgroup_testowners_lite +
+            ']' +
+            '}'
+        )
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2?type=CERTIFICATE&id=nonexistant',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"administrators_count": 0,' +
+            '"members": [' +
+            '],' +
+            '"members_count": 0,' +
+            '"id": "nonexistant",' +
+            '"type": "certificate",' +
+            '"results": [' +
+            '],' +
+            '"administrators": [' +
+            ']' +
+            '}'
+        )
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2?type=USER&id=akkornel',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"administrators_count": 0,' +
+            '"members": [' +
+            workgroup_test1_lite +
+            '],' +
+            '"members_count": 1,' +
+            '"id": "akkornel",' +
+            '"type": "user",' +
+            '"results": [' +
+            workgroup_test1_lite +
+            '],' +
+            '"administrators": [' +
+            ']' +
+            '}'
+        )
+
+    )
+
     # GET WORKGROUP
+
+    # test:1 works
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/workgroup:test-owners',
+        status=200,
+        content_type='application/json',
+        body=workgroup_testowners_json,
+    )
 
     # test:1 works
     responses.add(
