@@ -112,6 +112,61 @@ workgroup_testowners_lite = """
 }
 """
 
+# A rare workgroup that has no description
+workgroup_test2_json = """
+{
+"filter": "NONE",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "Kornel, Karl",
+        "id": "akkornel",
+        "type": "PERSON"
+    }
+],
+"name": "test:2",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "Stanford, Leland Jr.",
+        "id": "stanford",
+        "type": "PERSON"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:test-owners",
+        "id": "workgroup:test-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+
+# A private workgroup
+workgroup_private1_json = """
+{
+"filter": "NONE",
+"privgroup": "TRUE",
+"visibility": "PRIVATE",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "private:1",
+"description": "Private Test 1",
+"integrations": [],
+"administrators": [
+],
+"reusable": "FALSE",
+"lastUpdateBy": "pytest"
+}
+"""
+
 # The `create:` stem is used to test workgroup creation and property change.
 # The create:1 workgroup is our starting point, as if we created a workgroup
 # with nothing (other than name & description) specified.
