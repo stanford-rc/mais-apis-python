@@ -165,8 +165,8 @@ class Workgroup:
             which may contain only lowercase letters, numbers, hyphens, and
             underscores.  The name portion must start with a letter or number.
 
-        :param description: The workgroup description.  Required, but it can be
-            an empty string.  Limited to 255 characters from the ISO 8859-1
+        :param description: The workgroup description.  It must contain at
+            least one character.  Limited to 255 characters from the ISO 8859-1
             ("Latin 1") character set.
 
         :param filter: Optional.  See :meth:`filter`.  Defaults to `NONE`.
@@ -189,7 +189,8 @@ class Workgroup:
         :raises ChildProcessError: Something went wrong on the server side (a
             400 or 500 error was returned).
 
-        :raise IndexError: The proposed workgroup name or description is too long.
+        :raise IndexError: The proposed workgroup name or description is too
+            short or too long.
 
         :raise ValueError: The proposed workgroup name or description has
             invalid characters.
@@ -224,6 +225,9 @@ class Workgroup:
             raise ValueError('name')
 
         # Check the length of the description.
+        if len(description) == 0:
+            error('Proposed description is too short')
+            raise IndexError('description')
         if len(description) > 255:
             error(f"Proposed description is too long")
             raise IndexError('description')
@@ -1076,7 +1080,7 @@ class Workgroup:
         See :py:property:`description` for information on this property.
         You must be a workgroup administrator to use this property setter.
 
-        :raise IndexError: The proposed description is too long.
+        :raise IndexError: The proposed description is too short or too long.
 
         :raise ValueError: The proposed description has invalid characters.
 
@@ -1090,6 +1094,9 @@ class Workgroup:
         """
         if self.deleted:
             raise EOFError('Workgroup has been deleted')
+        if len(description) == 0:
+            error('Proposed description is too short')
+            raise IndexError('description')
         if len(value) > 255:
             raise IndexError(self.name)
 
