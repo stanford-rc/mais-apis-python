@@ -26,7 +26,7 @@ from typing import Literal
 import urllib.parse
 import weakref
 import stanford.mais.client
-from stanford.mais.workgroup.workgroup import Workgroup
+from stanford.mais.workgroup.workgroup import *
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -42,6 +42,10 @@ logging.getLogger('stanford.mais.workgroup').addHandler(logging.NullHandler())
 __all__ = (
     'WorkgroupClient',
     'Workgroup',
+    'WorkgroupFilter',
+    'WorkgroupVisibility',
+    'PrivgroupContents',
+    'PrivgroupEntry',
 )
 
 # Define the type for search results
