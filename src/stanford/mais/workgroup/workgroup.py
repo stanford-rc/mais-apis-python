@@ -256,6 +256,8 @@ class Workgroup:
             json={
                 'description': description,
                 'filter': str(filter),
+                'privgroup': ('TRUE' if privgroup is True else 'FALSE'),
+                'reusable': ('TRUE' if reusable is True else 'FALSE'),
                 'visibility': str(visibility),
             },
         )
