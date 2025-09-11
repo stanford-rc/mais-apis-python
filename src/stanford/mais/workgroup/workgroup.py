@@ -598,6 +598,10 @@ class Workgroup:
         call to :meth:`refresh`.  Otherwise, this will be the date & time when
         either :meth:`create` or :meth:`get` was called.
 
+        .. note::
+           If :meth:`delete` is called to delete the workgroup, this will
+           return the datetime when the workgroup was deleted.
+
         .. warning::
             Changes to workgroup properties (including workgroup membership)
             does **not** change this value.
@@ -1275,7 +1279,8 @@ class Workgroup:
         if response.status_code in (401, 403):
             raise PermissionError(self.name)
 
-        # Mark the instance as deleted
+        # Update last-refresh & mark the instance as deleted
+        self._last_refresh = datetime.datetime.now(tz=datetime.timezone.utc)
         self._deleted = True
         
     #
