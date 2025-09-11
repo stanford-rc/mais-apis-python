@@ -710,6 +710,272 @@ def add_workgroup_responses() -> None:
 
     )
 
+    # CREATE WORKGROUP
+
+    # Basic case
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create1_json,
+    )
+
+    # Basic case, but with different filters
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'ACADEMIC_ADMINISTRATIVE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_filter_academic_administrative_json,
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'STUDENT',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_filter_student_json,
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'FACULTY',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_filter_faculty_json,
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'STAFF',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_filter_staff_json,
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'FACULTY_STAFF',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_filter_faculty_staff_json,
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'FACULTY_STUDENT',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_filter_faculty_student_json,
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'STAFF_STUDENT',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_filter_staff_student_json,
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'FACULTY_STAFF_STUDENT',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_filter_faculty_staff_student_json,
+    )
+
+    # Basic case, but with privgroup off
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'FALSE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_privgroup_json,
+    )
+
+    # Basic case, but with reusable off
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'FALSE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_reusable_json,
+    )
+
+    # Basic case, but with visibility private
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'PRIVATE',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create_visibility_json,
+    )
+
+    # Duplicate workgroup
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:dupe',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=409,
+        content_type='application/json',
+        json={
+            'notification': 'create:dupe workgroup already exist.',
+            'code': 409,
+            'message': 'Conflict',
+            'status': 409,
+        },
+    )
+
     # GET WORKGROUP
 
     # test:1 works
