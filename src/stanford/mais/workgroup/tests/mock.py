@@ -1029,7 +1029,7 @@ def add_workgroup_responses() -> None:
 
     # GET WORKGROUP
 
-    # test:1 works
+    # workgroup:test-owners works
     responses.add(
         responses.GET,
         'http://example.com/wg/v2/workgroup:test-owners',
