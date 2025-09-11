@@ -21,6 +21,7 @@ from typing import List, Literal
 
 # PyPi imports
 import responses
+from responses import matchers
 
 # Provide some raw workgroups, in full and lite form
 workgroup_test1_json = """
