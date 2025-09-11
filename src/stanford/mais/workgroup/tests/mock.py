@@ -112,6 +112,363 @@ workgroup_testowners_lite = """
 }
 """
 
+# The `create:` stem is used to test workgroup creation and property change.
+# The create:1 workgroup is our starting point, as if we created a workgroup
+# with nothing (other than name & description) specified.
+
+workgroup_create1_json = """
+{
+"filter": "NONE",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+
+# These 'create' workgroups change different filters
+workgroup_create_filter_academic_administrative_json = """
+{
+"filter": "ACADEMIC_ADMINISTRATIVE",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+workgroup_create_filter_student_json = """
+{
+"filter": "STUDENT",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+workgroup_create_filter_faculty_json = """
+{
+"filter": "FACULTY",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+workgroup_create_filter_staff_json = """
+{
+"filter": "STAFF",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+workgroup_create_filter_faculty_staff_json = """
+{
+"filter": "FACULTY_STAFF",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+workgroup_create_filter_faculty_student_json = """
+{
+"filter": "FACULTY_STUDENT",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+workgroup_create_filter_staff_student_json = """
+{
+"filter": "STAFF_STUDENT",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+workgroup_create_filter_faculty_staff_student_json = """
+{
+"filter": "FACULTY_STAFF_STUDENT",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+
+# These 'create' workgroups change privgroup, reusable, or visibility
+workgroup_create_privgroup_json = """
+{
+"filter": "NONE",
+"privgroup": "FALSE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+workgroup_create_reusable_json = """
+{
+"filter": "NONE",
+"privgroup": "TRUE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "FALSE",
+"lastUpdateBy": "pytest"
+}
+"""
+workgroup_create_visibility_json = """
+{
+"filter": "NONE",
+"privgroup": "TRUE",
+"visibility": "PRIVATE",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "create:1",
+"description": "Create Test 1",
+"integrations": [],
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "client-cert-1",
+        "id": "client-cert-1",
+        "type": "CERTIFICATE"
+    },
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "workgroup:create-owners",
+        "id": "workgroup:create-owners",
+        "type": "WORKGROUP"
+    }
+],
+"reusable": "TRUE",
+"lastUpdateBy": "pytest"
+}
+"""
+
 
 # Add Workgroup responses to the Responses mock session
 def add_workgroup_responses() -> None:
