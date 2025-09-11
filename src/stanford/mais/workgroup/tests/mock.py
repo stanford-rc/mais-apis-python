@@ -1093,6 +1093,15 @@ def add_workgroup_responses() -> None:
         body=workgroup_testowners_json,
     )
 
+    # private:1 works
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/private:1',
+        status=200,
+        content_type='application/json',
+        body=workgroup_private1_json,
+    )
+
     # test:1 works
     responses.add(
         responses.GET,
@@ -1100,6 +1109,15 @@ def add_workgroup_responses() -> None:
         status=200,
         content_type='application/json',
         body=workgroup_test1_json,
+    )
+
+    # test:2 works
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/test:2',
+        status=200,
+        content_type='application/json',
+        body=workgroup_test2_json,
     )
 
     # test:missing is a 404
