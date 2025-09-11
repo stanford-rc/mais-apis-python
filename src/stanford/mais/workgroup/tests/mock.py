@@ -1138,6 +1138,48 @@ def add_workgroup_responses() -> None:
 
     # DELETE WORKGROUP
 
+    # Delete test:1
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:1',
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup: test:1 has been deleted and all members and administrators removed',
+            'code': 200,
+            'message': 'Deleted',
+            'status': 200,
+        }
+    )
+
+    # Deleting workgroup:test-owners returns a 400
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/workgroup:test-owners',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+
+    # Deleting private:1 returns a 401
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/private:1',
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
 
     # GET PRIVILEGE GROUP
 
