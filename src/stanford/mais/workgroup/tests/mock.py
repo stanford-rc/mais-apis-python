@@ -976,6 +976,57 @@ def add_workgroup_responses() -> None:
         },
     )
 
+    # Upstream failures
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:bad400',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:bad401',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
+
     # GET WORKGROUP
 
     # test:1 works
