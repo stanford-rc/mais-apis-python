@@ -168,7 +168,9 @@ class WorkgroupMembership:
         :raises EOFError: The related Workgroup instance no longer exists.
         """
         # For logging, grab the workgroup name & collection type from people
-        # Fail if the upstream workgroup no longer exists
+        # Fail if the upstream workgroup instance no longer exists
+        # NOTE: We skip the workgroup.deleted check here, because we might be
+        # called to clear out a workgroup membership.
         workgroup = self.people.workgroup
         if workgroup is None:
             error('Attempting to update members/administrators for a deleted instance')
