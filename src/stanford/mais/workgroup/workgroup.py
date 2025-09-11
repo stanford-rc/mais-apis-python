@@ -129,7 +129,7 @@ class Workgroup:
         name: str,
         description: str,
         filter: WorkgroupFilter = WorkgroupFilter.NONE,
-        privgroup: bool = False,
+        privgroup: bool = True,
         reusable: bool = True,
         visibility: WorkgroupVisibility = WorkgroupVisibility.STANFORD,
     ) -> Workgroup:
@@ -172,12 +172,7 @@ class Workgroup:
         :param filter: Optional.  See :meth:`filter`.  Defaults to `NONE`.
 
         :param privgroup: Optional.  See :meth:`privgroup`.  Defaults to
-            `False`.
-
-            .. danger::
-                This default is probably not what you want!  You almost
-                certainly want to set this to ``True``.  See See
-                :meth:`privgroup` for more information.
+            `True`.
 
         :param reusable: Optional.  See :meth:`reusable`.  Defaults to `True`.
 
@@ -718,19 +713,17 @@ class Workgroup:
         may only be used within Workgroup Manager (for example, it can be
         nested in other workgroups).
 
-        If you only want a workgroup to be nested in other workgroups, and
-        never used directly, set this to ``False``.  Otherwise, set this
-        to ``True``.
-
-        .. danger::
-            Workgroups created by the API have `privgroup` set to
-            ``False`` by default.  Workgroups created through Workgroup
-            Manager have `privgroup` set to ``True`` by default.
-
-            You almost always want to set this to ``True``.
+        .. warning::
+            If you disable privgroup on a workgroup and then nest it into
+            another workgroup, this workgroup's members will **not** appear in
+            the privgroup of the nested workgroup.
 
         Use as a property to get the current privgroup setting; call with
         parameters to change the current privgroup setting.
+
+        .. note::
+            This property cannot be changed through the Workgroup Manager web
+            site, only through the API.
 
         :param bool value: The new privgroup setting.
 
