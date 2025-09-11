@@ -74,12 +74,6 @@ def test_in(workgroup_client):
     assert 'test:1' in workgroup_client
     assert 'bad:w5' not in workgroup_client
 
-# Test creating a workgroup (which can be done via WorkgroupClient)
-@pytest.mark.skip(reason="Not implemented yet")
-def test_create(workgroup_client):
-    # TODO
-    result = workgroup_client.create()
-
 # Test we can access ourselves through the workgroup
 def test_client(workgroup_client):
     result = workgroup_client['test:1']
