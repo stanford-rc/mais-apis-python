@@ -80,6 +80,11 @@ def test_create(workgroup_client):
     # TODO
     result = workgroup_client.create()
 
+# Test we can access ourselves through the workgroup
+def test_client(workgroup_client):
+    result = workgroup_client['test:1']
+    assert result.client is workgroup_client
+
 # Test a search that returns no results
 def test_search_empty(workgroup_client):
     results = workgroup_client.search_by_name('noresults:*')
