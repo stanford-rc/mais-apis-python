@@ -5,6 +5,9 @@ Enhancements:
 
 * The Account service 'seas' has a new setting, ``emailservice``.
 
+* When creating a new Workgroup, the ``privgroup`` setting now defaults to
+  True, in line with the Workgroup API.
+
 Fixes:
 
 * When creating a new Workgroup, the ``Workgroup.create()`` call was not
