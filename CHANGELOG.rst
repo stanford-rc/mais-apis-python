@@ -7,7 +7,10 @@ Enhancements:
 
 Fixes:
 
-
+* When creating a new Workgroup, the ``Workgroup.create()`` call was not
+  including the ``privgroup`` and ``reusable`` properties in the API call.  All
+  workgroups created by the ``create()`` call had the ``privgroup`` and
+  ``reusable`` properties set to True.
 
 * The WorkgroupClient's caching functionality was not fully-implemented.  Only
   calls to ``WorkgroupClient.get()`` were being cached.
