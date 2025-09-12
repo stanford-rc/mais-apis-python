@@ -9,6 +9,9 @@ Fixes:
 
 
 
+* The WorkgroupClient's caching functionality was not fully-implemented.  Only
+  calls to ``WorkgroupClient.get()`` were being cached.
+
 Other:
 
 * Fix a GitHub Actions problem preventing a single Git operation from releasing
