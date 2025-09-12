@@ -1093,7 +1093,7 @@ class Workgroup:
         """
         if self.deleted:
             raise EOFError('Workgroup has been deleted')
-        if len(description) == 0:
+        if len(value) == 0:
             error('Proposed description is too short')
             raise IndexError('description')
         if len(value) > 255:
