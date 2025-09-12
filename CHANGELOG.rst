@@ -3,6 +3,9 @@ Unreleased
 
 Enhancements:
 
+* The Account "List of accounts that changed status in past x days" API
+  operation is now supported.
+
 * The Account service 'seas' has a new setting, ``emailservice``.
 
 * When creating a new Workgroup, the ``privgroup`` setting now defaults to
