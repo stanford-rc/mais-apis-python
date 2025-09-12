@@ -12,10 +12,6 @@ recursive-exclude docs/_build *
 # one built in to the tests.
 include test_cert_create.sh
 
-# This script updates the version number to a datetime-specific version, so you
-# can push to Test PyPI without causion version conflicts.
-include update-version-for-test-push.py
-
 # Exclude macOS files
 # (This must be at the end, to override any prior includes)
 global-exclude .DS_Store
