@@ -25,6 +25,9 @@ Account API Client
 .. autoclass:: stanford.mais.account.AccountClient
    :members:
 
+.. autoclass:: stanford.mais.account.PartialAccount
+   :members:
+
 .. _Account:
 
 Account

@@ -23,6 +23,7 @@ from __future__ import annotations
 
 # Start with stdlib imports
 from collections.abc import Callable, MutableMapping
+import datetime
 import dataclasses
 import logging
 import requests
@@ -46,7 +47,132 @@ __all__ = (
     'Account',
 )
 
-# First, define the client class.  Then, define the actual account.
+
+# Define a type for search results
+@dataclasses.dataclass(frozen=True, slots=True)
+class PartialAccount:
+    """Part of a Stanford Account.
+
+    This is a "lite" account record.  Lite accounts are returned by the
+    Workgroup API in two cases:
+
+    * When you fetch a lite account, instead of a full account (we never do
+      this).
+
+    * When you request a list of accounts that have changed status recently.
+
+    The entire contents are read-only.
+
+    To get the full account, call the :meth:`~PartialAccount.account` method to
+    getch a full account record.
+    """
+
+    sunetid: str
+    """
+    For people, their SUNetID is also their username.  For functional accounts,
+    this is their username.  This is the ``id`` key from the API.
+
+    .. tip::
+       This is used as the account's ``uid`` in LDAP.
+    """
+
+    is_person: bool
+    """
+    If `True`, this account is for a person.  If `False`, this account is for a
+    "functional account".  This is the ``type`` key from the API.
+    """
+
+    is_active: bool
+    """
+    If `True`, this account is active.  If the account is for a person, then
+    assuming the person's kerberos service is not frozen or otherwise blocked,
+    they are able to use Stanford Login.  If the account is a functional
+    account, then the associated services are active.  This does not imply
+    anything else.  This is computed from the ``status`` key from the API.
+    """
+
+    last_update: datetime.datetime
+    """
+    The timezone-aware datetime when the account was last updated.  This is
+    computed from the ``statusDateStr`` key from the API.
+    """
+
+    @classmethod
+    def from_json(
+        cls,
+        source: dict[str, str | int],
+    ) -> PartialAccount:
+        debug(f"Creating PartialAccount for source['type'] {source['id']} ")
+
+        # Check sunetid type
+        if not isinstance(source['id'], str):
+            raise TypeError('Unexpected type for "id"')
+
+        # Is the account for a person, or functional?
+        account_type = source['type']
+        if not isinstance(account_type, str):
+            raise TypeError('Unexpected type for "type"')
+        if account_type == 'self':
+            is_person = True
+        elif account_type == 'functional':
+            is_person = False
+        else:
+            raise NotImplementedError(f"Unexpected account type '{account_type}'")
+
+        # Compute last_updated
+        if not isinstance(source['statusDateStr'], str):
+            raise TypeError('Unexpected type for "statusDateStr"')
+        last_update=datetime.datetime.strptime(
+            source['statusDateStr'],
+            '%Y-%m-%dT%H:%M:%S.%fZ'
+        ).replace(tzinfo=datetime.timezone.utc)
+
+        return cls(
+            sunetid=source['id'],
+            is_person=is_person,
+            is_active=(True if source['status'] == 'active' else False),
+            last_update=last_update,
+        )
+
+    def account(
+        self,
+        client: AccountClient,
+    ) -> Account:
+        """Fetch the full :class:`Account` for this search result.
+
+        This is a convenience method, performing a normal account lookup and
+        returning the result.
+
+        .. warning::
+           The returned Account may have a different `is_active` or
+           `last_update` value.  Once you call this method, you should stop
+           using this PartialAccount.
+
+        .. note::
+           The returned Account will have the same `is_person` value as this
+           partial account.
+
+        :param client: The AccountClient to use for the lookup.
+
+        :returns: The full :class:`Account` for this PartialAccount's SUNetID.
+
+        :raises ChildProcessError: Something went wrong on the server side (a
+            400 or 500 error was returned).
+
+        :raises KeyError: The SUNetID changed between now and when this
+            PartialAccount was returned in search results.  This is extremely
+            rare.
+
+        :raises PermissionError: You did not use a valid certificate, or do not
+            have permissions to perform the operation.  This is also rare, and
+            means you either changed certificates, or your certificate has been
+            disabled or expired.
+
+        :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
+        """
+        return client.get(self.sunetid)
+
+# Next, define the client class.  Then, define the actual account.
 
 @dataclasses.dataclass(frozen=True)
 class AccountClient():
