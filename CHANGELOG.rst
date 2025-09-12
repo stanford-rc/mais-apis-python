@@ -17,6 +17,12 @@ Fixes:
 
 Other:
 
+* When doing ``from stanford.mais.workgroup import *``, you now get all of the
+  names that come from running ``from stanford.mais.workgroup.workgroup import
+  *`` That is, running ``from stanford.mais.workgroup import *`` now gets you
+  ``WorkgroupFilter``, ``WorkgroupVisibility``, ``PrivgroupContents``, and
+  ``PrivgroupEntry``.
+
 * Fix a GitHub Actions problem preventing a single Git operation from releasing
   on both PyPi and Test PyPi in a single action (that is, in a single tag).
 
