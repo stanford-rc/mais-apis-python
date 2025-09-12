@@ -133,12 +133,10 @@ The following APIs are supported:
 * `Account`_: Full support for *Full Data* records for individual accounts,
   for both people (SUNetIDs) and functional accounts.  All of the information
   provided by the API is exposed, including service-specific settings.
-  Support for 'views' that can act as if functional or inactive
+  Support for fetching a list of accounts that changed status in the last X
+  days.  Support for 'views' that can act as if functional or inactive
   accounts don't exist (so you don't have to filter them out).  Also provided
   is code for quickly validating a collection of SUNetIDs.
-
-  *Not implemented*: Retrieving a list of accounts that changed status in
-  the past X days.
 
 Work is in progress on the following APIs:
 
