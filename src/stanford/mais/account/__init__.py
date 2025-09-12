@@ -27,6 +27,8 @@ import datetime
 import dataclasses
 import logging
 import requests
+from typing import Literal
+import urllib.parse
 
 # Finally, do local imports
 from stanford.mais.account.account import Account
@@ -471,3 +473,110 @@ class AccountClient():
             _cache=self._cache,
             _filters=self._filters | frozenset((new_filter,))
         )
+
+    # Accounts changed status in the last X days
+
+    def get_changed_status(
+        self,
+        days: int,
+        current_status: Literal['active', 'inactive', 'pending'],
+        get_people: bool = True,
+    ) -> frozenset[PartialAccount]:
+        """Search for accounts which have recently changed status.
+
+        Search for all accounts that have changed status within the specified number
+        of days.  This is commonly used to get a list of accounts that have
+        changed status
+
+        .. warning::
+           This call **only** includes accounts which have changed status.
+           Changes to other attributes—like a person's name, or a service
+           setting like email aliases—will not cause an account to be included
+           in these results.
+
+        .. warning::
+           The search results will tell you which accounts changed status, but
+           they will not tell you the old status.
+
+        .. note::
+           This method is not affected by the modified AccountClient instances
+           returned by :meth:`only_active`, :meth:`only_inactive`,
+           :meth:`only_people`, and :meth:`only_functional`.
+
+        :param days: Include accounts that changed status within this many days.
+            Must be at least 1, and at most 30.
+
+        :param current_status: Only accounts with this current status will be
+            included in the results.
+
+            The status `pending` refers to an account which has just been
+            created and is not yet active.  It is only used at the very
+            beginning of an account's life cycle.
+
+            .. note::
+               Only one `current_status` value may be provided.  If you want a
+               list of *all* accounts which have changed status, run this search
+               multiple times (once for each status), and perform a set union
+               on the results.
+
+            .. warning::
+               It is possible for an account to change status multiple times
+               during your search period.  For example, if you search for
+               `current_status` ``active``, your search results might include
+               accounts which were already active, went inactive, and then
+               became active again.
+
+        :param get_people: If True (which is the defaut), only accounts for
+            people will be included in the results.  If you instead want
+            results for functional accounts, change this to ``False``.
+
+            .. note::
+               The search can return either people accounts or functional
+               accounts, not both.  If you want both, then make two searches
+               and perform a set union on the results.
+
+        :raises ValueError: You provided an invalid `days`.
+
+        :raises PermissionError: You did not use a valid certificate, or do not have permissions to perform the operation.
+
+        :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
+        """
+
+        # Check days
+        if days < 1:
+            raise ValueError('days must be at least 1')
+        if days > 30:
+            raise ValueError('days must be at most 30')
+
+        # Get the Requests session
+        session = self.client.session
+
+        # Do the search.
+        query = {
+            'type': ('self' if get_people is True else 'functional'),
+            'status': current_status,
+            'statusdays': str(days),
+        }
+        info(f"Fetching all {query['type']} changed to {current_status} in the last {days} days…")
+        response = session.get(
+            urllib.parse.urljoin(
+                self.client.urls['account'],
+                '?' + urllib.parse.urlencode(query),
+            ),
+        )
+
+        # Catch a number of bad errors.
+        debug(f"Status code is {response.status_code}")
+        if response.status_code in (400, 500):
+            raise ChildProcessError(response.text)
+        if response.status_code in (401, 403):
+            raise PermissionError()
+
+        # Decode the JSON
+        info('Parsing response JSON')
+        response_json = response.json()
+
+        # Make our results
+        return frozenset(list(
+            (PartialAccount.from_json(result) for result in response_json)
+        ))
