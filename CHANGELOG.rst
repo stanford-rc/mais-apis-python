@@ -8,6 +8,9 @@ Enhancements:
 * When creating a new Workgroup, the ``privgroup`` setting now defaults to
   True, in line with the Workgroup API.
 
+* When deleting a workgroup, the ``last_refreshed`` field now shows the
+  datetime when the workgroup was deleted.
+
 Fixes:
 
 * When creating a new Workgroup, the ``Workgroup.create()`` call was not
