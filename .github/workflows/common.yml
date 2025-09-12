@@ -49,13 +49,13 @@ jobs:
 
       - name: Prepare Tox
         run: |
-          tox run -v --notest --skip-missing-interpreters false
+          tox --conf pyproject.toml run -v --notest --skip-missing-interpreters false
         env:
           TOX_GH_MAJOR_MINOR: ${{ matrix.python }}
 
       - name: Run Tox
         run: |
-          tox run --skip-pkg-install
+          tox --conf pyproject.toml run --skip-pkg-install
         env:
           TOX_GH_MAJOR_MINOR: ${{ matrix.python }}
 
