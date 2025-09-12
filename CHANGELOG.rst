@@ -14,6 +14,8 @@ Enhancements:
 * When deleting a workgroup, the ``last_refreshed`` field now shows the
   datetime when the workgroup was deleted.
 
+* More of the Workgroup code is tested.  Work is ongoing in this area.
+
 Fixes:
 
 * When creating a new Workgroup, the ``Workgroup.create()`` call was not
