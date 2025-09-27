@@ -3,6 +3,15 @@ Unreleased
 
 Enhancements:
 
+* When changing a workgroup's property (such as its description), the Workgroup
+  API returns a full workgroup record, as if we had also called ``refresh()``.
+  We used to ignore that, but now we use it to update the Workgroup instance.
+  This essentially means that every workgroup property change includes an
+  implicit call to ``refresh()``.
+
+  .. note::
+      Changes to a workgroup's members or administrators will *not*
+      trigger an implicit refresh.
 
 Fixes:
 
