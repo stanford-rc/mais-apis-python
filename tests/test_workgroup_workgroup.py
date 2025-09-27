@@ -242,9 +242,7 @@ def test_delete(workgroup_client):
 
     # Trying to update anything should raise an exception
     with pytest.raises(EOFError):
-        result._update(changes={
-            'description': 'x',
-        })
+        result._update('description', 'x')
     with pytest.raises(EOFError):
         result.description = 'x'
     with pytest.raises(EOFError):

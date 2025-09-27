@@ -29,7 +29,7 @@ import logging
 import pathlib
 import re
 import requests
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 import weakref
 import zoneinfo
 
@@ -615,18 +615,18 @@ class Workgroup:
         """When the instance was last refreshed.
 
         This is set to the (aware) datetime when the instance was last
-        refreshed from the Workgroup API.  If :meth:`refresh` was ever called
-        on this instance, this will have the date & time of the most-recent
-        call to :meth:`refresh`.  Otherwise, this will be the date & time when
-        either :meth:`create` or :meth:`get` was called.
+        refreshed from the Workgroup API.  The following actions can trigger a
+        refresh:
+
+        * Calling :meth:`create` or :meth:`get`.
+
+        * Calling :meth:`refresh`.
+
+        * Changing any property of the workgroup.
 
         .. note::
            If :meth:`delete` is called to delete the workgroup, this will
            return the datetime when the workgroup was deleted.
-
-        .. warning::
-            Changes to workgroup properties (including workgroup membership)
-            does **not** change this value.
         """
         return self._last_refresh
 
@@ -634,8 +634,13 @@ class Workgroup:
     def description(self) -> str:
         """The workgroup description.
 
-        Use as a property to get the current description; call with
-        parameters to update the current description.
+        This is a property: Use as a value to get the current description; call
+        with a string to change the current setting.
+
+        .. warning::
+            Changing a workgroup property triggers a refresh of the entire
+            workgroup.  See the documentation for :meth:`refresh`; all of those
+            warnings apply here.
 
         :param str value: The new description.  The maximum length is 255
             characters.
@@ -693,15 +698,20 @@ class Workgroup:
         you see through this API) and filter it to provude an effective
         membership (which others see).
 
-        Use as a property to get the current filter setting; call with
-        parameters to change the current filter setting.
+        This is a property: Use as a value to get the current description; call
+        with a :class:`~stanford.mais.workgroup.properties.WorkgroupFilter` (or
+        equivalent string) to change the current setting.
+
+        .. warning::
+            Changing a workgroup property triggers a refresh of the entire
+            workgroup.  See the documentation for :meth:`refresh`; all of those
+            warnings apply here.
 
         :param value:
             The new filter.  This may either be a
             :class:`~stanford.mais.workgroup.properties.WorkgroupFilter`,
             or a string that parses cleanly into a
             :class:`~stanford.mais.workgroup.properties.WorkgroupFilter`.
-
 
         :raises ChildProcessError: Something went wrong on the server side (a
             400 or 500 error was returned).
@@ -744,12 +754,17 @@ class Workgroup:
             another workgroup, this workgroup's members will **not** appear in
             the privgroup of the nested workgroup.
 
-        Use as a property to get the current privgroup setting; call with
-        parameters to change the current privgroup setting.
-
         .. note::
             This property cannot be changed through the Workgroup Manager web
             site, only through the API.
+
+        This is a property: Use as a value to get the current description; call
+        with a :class:`bool` to change the current setting.
+
+        .. warning::
+            Changing a workgroup property triggers a refresh of the entire
+            workgroup.  See the documentation for :meth:`refresh`; all of those
+            warnings apply here.
 
         :param bool value: The new privgroup setting.
 
@@ -789,6 +804,14 @@ class Workgroup:
             relationships.  You can view existing nesting relationships in
             Workgroup Manager.
 
+        This is a property: Use as a value to get the current description; call
+        with a :class:`bool` to change the current setting.
+
+        .. warning::
+            Changing a workgroup property triggers a refresh of the entire
+            workgroup.  See the documentation for :meth:`refresh`; all of those
+            warnings apply here.
+
         :param bool value: The new reusable setting.
 
         :raises ChildProcessError: Something went wrong on the server side (a
@@ -820,6 +843,15 @@ class Workgroup:
         .. danger::
             Setting this to ``PRIVATE`` can cause unexpected and unusual issues
             in downstream applications.
+
+        This is a property: Use as a value to get the current description; call
+        with a :class:`~stanford.mais.workgroup.properties.WorkgroupVisibility`
+        (or equivalent string) to change the current setting.
+
+        .. warning::
+            Changing a workgroup property triggers a refresh of the entire
+            workgroup.  See the documentation for :meth:`refresh`; all of those
+            warnings apply here.
 
         :param value:
             The new visibility.  This may either be a
@@ -1045,15 +1077,30 @@ class Workgroup:
 
     def _update(
         self,
-        changes: Mapping[str, str]
+        name: Literal[
+            'description',
+            'filter',
+            'privgroup',
+            'reusable',
+            'visibility',
+        ],
+        value: str,
     ) -> None:
         """Update a workgroup's property.
 
-        This is used by the property setters in this class.  In addition to
-        sending the change to the Workgroups API, it also updates the
-        instance's last_updated date.
+        This is used by the property setters in this class.  It sends the
+        requested change to the Workgroup API.
 
-        :param changes: A dict of changes.
+        The change might fail, due to a permission error or due to the
+        workgroup being deleted from under us.  Or the change might succeed,
+        and the response from the Workgroup API will be the full workgroup
+        record (which includes our just-made change).  Either way, that sounds
+        a lot like a refresh, so send the response to the refresh-handling
+        code!
+
+        :param name: The name of the property to change.
+
+        :param value: The new value for the property.
 
         :raises ChildProcessError: Something went wrong on the server side (a
             400 or 500 error was returned).
@@ -1071,18 +1118,14 @@ class Workgroup:
             self.client._url(
                 fragment=self.name
             ),
-            json=changes,
+            json={
+                name: value,
+            },
         )
 
-        # Catch a number of bad errors.
-        if response.status_code in (400, 500):
-            raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
-            raise PermissionError(self.name)
-
-        # Reset the last-updated date, and we're done!
-        self._reset_last_update()
-        return None
+        # At this point, it's as if we did a refresh, so send off to the
+        # refresh-handling code.
+        return self._handle_refresh(response)
 
     # Setters for properties defined in the "R" section.
 
@@ -1131,11 +1174,8 @@ class Workgroup:
             error(f"Proposed description has non-printable characters")
             raise ValueError('description')
 
-        # Make the change in the API, then update the instance.
-        self._update(changes={
-            'description': value
-        })
-        self._description = value
+        # Make the change in the API, which triggers a refresh.
+        self._update('description', value)
 
     @filter.setter  # type: ignore[no-redef,attr-defined]
     def filter(
@@ -1162,11 +1202,8 @@ class Workgroup:
         else:
             value_as_enum = WorkgroupFilter.from_str(value)
         value_as_str = str(value_as_enum)
-        # Make the change in the API, then update the instance.
-        self._update(changes={
-            'filter': value_as_str,
-        })
-        self._filter = value_as_enum
+        # Make the change in the API, which triggers a refresh.
+        self._update('filter', value_as_str)
 
     @privgroup.setter  # type: ignore[no-redef,attr-defined]
     def privgroup(
@@ -1194,11 +1231,8 @@ class Workgroup:
             value_as_str = 'TRUE'
         else:
             value_as_str = 'FALSE'
-        # Make the change in the API, then update the instance.
-        self._update(changes={
-            'privgroup': value_as_str,
-        })
-        self._privgroup = value
+        # Make the change in the API, which triggers a refresh.
+        self._update('privgroup', value_as_str)
 
     @reusable.setter  # type: ignore[no-redef,attr-defined]
     def reusable(
@@ -1226,11 +1260,8 @@ class Workgroup:
             value_as_str = 'TRUE'
         else:
             value_as_str = 'FALSE'
-        # Make the change in the API, then update the instance.
-        self._update(changes={
-            'reusable': value_as_str,
-        })
-        self._privgroup = value
+        # Make the change in the API, which triggers a refresh.
+        self._update('reusable', value_as_str)
 
     @visibility.setter  # type: ignore[no-redef,attr-defined]
     def visibility(
@@ -1257,11 +1288,8 @@ class Workgroup:
         else:
             value_as_enum = WorkgroupVisibility.from_str(value)
         value_as_str = str(value_as_enum)
-        # Make the change in the API, then update the instance.
-        self._update(changes={
-            'visibility': value_as_str,
-        })
-        self._visibility = value_as_enum
+        # Make the change in the API, which triggers a refresh.
+        self._update('visibility', value_as_str)
 
     #
     # "D" Methods.
