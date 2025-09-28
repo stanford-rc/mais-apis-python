@@ -503,11 +503,11 @@ class Workgroup:
         self._name = response_json['name']
 
         # Make empty containers for members and administrators
-        self._members = WorkgroupMembership(
+        self._members: WorkgroupMembership = WorkgroupMembership(
             workgroup=self,
             collection_type='members',
         )
-        self._administrators = WorkgroupMembership(
+        self._administrators: WorkgroupMembership = WorkgroupMembership(
             workgroup=self,
             collection_type='administrators',
         )
