@@ -1081,6 +1081,30 @@ def add_workgroup_responses() -> None:
             'status': 401,
         },
     )
+    responses.add(
+        responses.POST,
+        'http://example.com/wg/v2/create:inactive',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
 
     # GET WORKGROUP
 
@@ -1132,8 +1156,44 @@ def add_workgroup_responses() -> None:
         },
     )
 
+    # test:deleted is a workgroup which has been deleted
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/test:inactive',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
 
     # UPDATE WORKGROUP
+
+    # Changing test:1 description to 'deleted' gives a special 400
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'delete',
+                },
+                strict_match=True,
+            )
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
 
 
     # DELETE WORKGROUP
@@ -1178,6 +1238,20 @@ def add_workgroup_responses() -> None:
             'code': 401,
             'message': 'Unauthorized',
             'status': 401,
+        },
+    )
+
+    # test:deleted is a workgroup which has been deleted
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:inactive',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
         },
     )
 
