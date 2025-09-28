@@ -1166,9 +1166,9 @@ class Workgroup:
 
         # Check if the description has nonprintable characters or is non-ASCII
         try:
-            value.encode('ASCII')
+            value.encode('latin1')
         except UnicodeError:
-            error('Proposed description is not ASCII')
+            error('Proposed description is not encodable in ISO 8859-1')
             raise ValueError('description')
         if not value.isprintable():
             error(f"Proposed description has non-printable characters")
