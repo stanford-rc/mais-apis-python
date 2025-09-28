@@ -407,7 +407,7 @@ class WorkgroupMembershipContainer(
         # Do a PUT call to make the add.
         # In addition to the path, we need to provide the identifier type.
         response = session.put(
-            workgroup._client._url(
+            workgroup.client._url(
                 fragment=url_path,
             ),
             json={'type': self.container_type},
@@ -472,7 +472,7 @@ class WorkgroupMembershipContainer(
         # Do a DELETE call to do the removal.
         # In addition to the path, we need to provide the identifier type.
         response = session.delete(
-            workgroup._client._url(
+            workgroup.client._url(
                 fragment=url_path,
             ),
             json={'type': self.container_type},
