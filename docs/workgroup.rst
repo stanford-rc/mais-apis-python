@@ -62,6 +62,10 @@ name and description, which might be enough for you:
 .. autoclass:: stanford.mais.workgroup.PartialWorkgroup
    :members:
 
+.. autoclass:: stanford.mais.workgroup.workgroup.WorkgroupDeleted
+   :show-inheritance:
+   :members:
+
 Workgroup
 =========
 

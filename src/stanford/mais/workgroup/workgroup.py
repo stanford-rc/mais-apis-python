@@ -52,6 +52,7 @@ error = logger.error
 
 __all__ = (
     'Workgroup',
+    'WorkgroupDeleted',
     'WorkgroupFilter',
     'WorkgroupVisibility',
     'PrivgroupContents',
@@ -104,6 +105,23 @@ class PrivgroupEntry:
 class PrivgroupContents:
     members: set[PrivgroupEntry]
     administrators: set[PrivgroupEntry]
+
+
+# Next, Workgroup-related exceptions:
+
+
+class WorkgroupDeleted(KeyError):
+    """Workgroup used to exist, but has been deleted.
+
+    This exception is raised whenever a workgroup is "inactive", which means
+    that it used to exist, but has been deleted.  Constrast that with a
+    workgroup never having existed, which triggers the raise of a KeyError.
+
+    This exception exists for folks who care if a workgroup used to exist:
+    Folks who don't care can simply catch KeyError, which will work because
+    this is a subclass of KeyError.
+    """
+    pass
 
 
 # Now, on to the Workgroup!

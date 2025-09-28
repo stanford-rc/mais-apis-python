@@ -42,6 +42,7 @@ logging.getLogger('stanford.mais.workgroup').addHandler(logging.NullHandler())
 __all__ = (
     'WorkgroupClient',
     'Workgroup',
+    'WorkgroupDeleted',
     'WorkgroupFilter',
     'WorkgroupVisibility',
     'PrivgroupContents',
