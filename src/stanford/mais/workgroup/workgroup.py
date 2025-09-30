@@ -210,8 +210,11 @@ class Workgroup:
             invalid characters.
 
         :raise KeyError:
-            The proposed workgroup name is already used for a
-            workgroup, or has been previously used for a workgroup.
+            A workgroup with this name already exists.
+
+        :raises WorkgroupDeleted:
+            The proposed workgroup name was already used for a
+            workgroup, and that workgroup has since been deleted.
 
             .. note::
                 Deleted workgroups are not really deleted, just hidden.
@@ -276,6 +279,23 @@ class Workgroup:
             },
         )
 
+        # Catch an inactive workgroup.
+        if (response.status_code == 400):
+            response_json = None
+            try:
+                response_json = response.json()
+            except requests.exceptions.JSONDecodeError:
+                pass
+            if (
+                response_json is not None and
+                response_json['notification'] == 'Workgroup is inactive'
+            ):
+                warning(f"Workgroup {name} used to exist but has been deleted")
+                raise WorkgroupDeleted(name)
+        # Catch an already-existing workgroup
+        if response.status_code == 409:
+            warning(f"Workgroup {name} already exists")
+            raise KeyError(name)
         # Catch a number of bad errors.
         if response.status_code in (400, 500):
             error(f"Upstream API error: {response.text}")
@@ -283,9 +303,6 @@ class Workgroup:
         if response.status_code in (401, 403):
             warning(f"Permission error on create for {name}")
             raise PermissionError(name)
-        if response.status_code == 409:
-            warning(f"Workgroup {name} already exists (or once existed)")
-            raise KeyError(name)
 
         # Decode the JSON, and send to make the instance
         debug(f"Got back a response!")
@@ -335,7 +352,9 @@ class Workgroup:
             400 or 500 error was returned), or you did not provide a workgroup
             name.
 
-        :raises KeyError: The workgroup does not exist.
+        :raises KeyError: The workgroup does not exist, and has never existed.
+
+        :raises WorkgroupDeleted: The workgroup used to exist, but was deleted.
 
         :raises PermissionError: You did not use a valid certificate.
 
@@ -363,6 +382,23 @@ class Workgroup:
             get_url,
         )
 
+        # Catch an inactive workgroup.
+        if (response.status_code == 400):
+            response_json = None
+            try:
+                response_json = response.json()
+            except requests.exceptions.JSONDecodeError:
+                pass
+            if (
+                response_json is not None and
+                response_json['notification'] == 'Workgroup is inactive'
+            ):
+                warning(f"Workgroup {name} has been deleted")
+                raise WorkgroupDeleted(name)
+        # Catch a never-existed workgroup
+        if response.status_code == 404:
+            warning(f"Workgroup {name} not found")
+            raise KeyError(name)
         # Catch a number of bad errors.
         if response.status_code in (400, 500):
             error(f"Upstream API error: {response.text}")
@@ -370,9 +406,6 @@ class Workgroup:
         if response.status_code in (401, 403):
             warning(f"Permission error on create for {name}")
             raise PermissionError(name)
-        if response.status_code == 404:
-            warning(f"Workgroup {name} not found")
-            raise KeyError(name)
 
         # Decode the JSON, and send to make the instance
         debug('Got a response!')
@@ -400,8 +433,8 @@ class Workgroup:
 
         .. danger::
             It is also possible that someone else has deleted the workgroup.
-            After this call, you must re-check the :attr:`deleted` property
-            before doing anything else.
+            If that happens, the :attr:`deleted` property will be set and a
+            :class:`WorkgroupDeleted` exception will be raised.
 
         .. warning::
             If your client certificate is not an administrator of the
@@ -420,8 +453,9 @@ class Workgroup:
         :raises PermissionError: You did not use a valid certificate, or do not
             have permissions to perform the operation.
 
-        :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
+        :raises WorkgroupDeleted: The workgroup has been deleted.
 
+        :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
         debug(f"In refresh for Workgroup name {self.name}")
         if self.deleted:
@@ -438,6 +472,26 @@ class Workgroup:
 
         # Hand off the change for processing
         return self._handle_refresh(response)
+
+    def _mark_deleted(self) -> None:
+        """Mark an instance as deleted
+
+        When a workgroup is deleted, this updates various fields in the
+        Workgroup instance.  This could happen because we intentionally deleted
+        the workgroup, or the workgroup could have been deleted by someone
+        else, after the instance was created.
+        """
+
+        # We will leave all existing properties alone, but we will force
+        # the members and administrators sets to become empty.
+        self._members.update_from_upstream(list())
+        self._administrators.update_from_upstream(list())
+
+        # Update last-refresh & mark the instance as deleted
+        self._last_refresh = datetime.datetime.now(tz=datetime.timezone.utc)
+        self._deleted = True
+
+        # All done!
 
     def _handle_refresh(
         self,
@@ -457,31 +511,50 @@ class Workgroup:
 
         :raises PermissionError: You did not use a valid certificate, or do not
             have permissions to perform the operation.
+
+        :raises WorkgroupDeleted: The workgroup has been deleted.
         """
 
-        # Check for a number of bad errors.
-        if response.status_code in (400, 500):
-            error(f"Upstream API error: {response.text}")
-            raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
-            warning(f"Permission error on create for {self.name}")
-            raise PermissionError(self.name)
-
-        # Check if the workgroup has been deleted
-        if response.status_code == 404:
-            warning(f"Already-instanced workgroup {self.name} has been deleted")
-            self._deleted = True
-
-            # We will leave all existing properties alone, but we will force
-            # the members and administrators sets to become empty.
-            self._members.update_from_upstream(list())
-            self._administrators.update_from_upstream(list())
-        else:
-            # If we still have a workgroup, send it through for normal
-            # processing.
+        # Did our change go through?
+        if response.status_code == 200:
+            # It worked!  Send it through for normal processing.
             debug('Got a response!')
             response_json = response.json()
             self._from_json(response_json)
+
+        # Catch 400 errors.
+        elif (response.status_code == 400):
+            response_json = None
+            try:
+                response_json = response.json()
+            except requests.exceptions.JSONDecodeError:
+                pass
+
+            # Did our workgroup go inactive out from under us?
+            if (
+                response_json is not None and
+                response_json['notification'] == 'Workgroup is inactive'
+            ):
+                error(f"Already-instanced workgroup {self.name} has been deleted")
+                self._mark_deleted()
+                raise WorkgroupDeleted(self.name)
+            else:
+                # Other 400 errors are an actual error
+                error(f"Upstream API error: {response.text}")
+                raise ChildProcessError(response.text)
+
+        # Catch 500 errors
+        elif response.status_code == 500:
+            error(f"Upstream API error: {response.text}")
+            raise ChildProcessError(response.text)
+
+        # Catch 401 & 403 errors
+        elif response.status_code in (401, 403):
+            warning(f"Permission error on create for {self.name}")
+            raise PermissionError(self.name)
+
+        # All done!
+        return None
 
     # Actually set up a new instance.
     def __init__(
@@ -1030,6 +1103,8 @@ class Workgroup:
         :raises PermissionError: You did not use a valid certificate, or do not
             have permissions to perform the operation.
 
+        :raises WorkgroupDeleted: The workgroup has been deleted.
+
         :raises EOFError: The workgroup has been deleted.
 
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
@@ -1049,28 +1124,62 @@ class Workgroup:
             ),
         )
 
-        # Catch a number of bad errors.
-        if response.status_code in (400, 500):
+        # Did we get a response?
+        if response.status_code == 200:
+            debug('Got a response!')
+
+            # Get results, and make containers for holding results
+            results = response.json()
+            administrators: set[PrivgroupEntry] = set()
+            members: set[PrivgroupEntry] = set()
+
+            # Process the results and return
+            for administrator in results['administrators']:
+                administrators.add(PrivgroupEntry.from_json(administrator))
+            for member in results['members']:
+                members.add(PrivgroupEntry.from_json(member))
+
+            debug(f"Returning {len(administrators)} admins and {len(members)} members")
+            return PrivgroupContents(
+                members=members,
+                administrators=administrators,
+            )
+
+        # Catch 400 errors.
+        elif (response.status_code == 400):
+            response_json = None
+            try:
+                response_json = response.json()
+            except requests.exceptions.JSONDecodeError:
+                pass
+
+            # Did our workgroup go inactive out from under us?
+            if (
+                response_json is not None and
+                response_json['notification'] == 'Workgroup is inactive'
+            ):
+                error(f"Already-instanced workgroup {self.name} has been deleted")
+                self._mark_deleted()
+                raise WorkgroupDeleted(self.name)
+            else:
+                # Other 400 errors are an actual error
+                error(f"Upstream API error: {response.text}")
+                raise ChildProcessError(response.text)
+
+        # Catch 500 errors
+        elif response.status_code == 500:
+            error(f"Upstream API error: {response.text}")
             raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
+
+        # Catch 401 & 403 errors
+        elif response.status_code in (401, 403):
+            warning(f"Permission error on create for {self.name}")
             raise PermissionError(self.name)
 
-        # Get results, and make containers for holding results
-        results = response.json()
-        administrators: set[PrivgroupEntry] = set()
-        members: set[PrivgroupEntry] = set()
-
-        # Process the results and return
-        for administrator in results['administrators']:
-            administrators.add(PrivgroupEntry.from_json(administrator))
-        for member in results['members']:
-            members.add(PrivgroupEntry.from_json(member))
-
-        debug(f"Returning {len(administrators)} admins and {len(members)} members")
-        return PrivgroupContents(
-            members=members,
-            administrators=administrators,
-        )
+        # We got a code we didn't expect!
+        else:
+            error(f"Received unexpected {response.status_code}: {response.text}")
+            raise NotImplementedError(f"{response.status_code}: {response.text}")
 
     #
     # "U" methods.
@@ -1323,11 +1432,20 @@ class Workgroup:
             workgroup with the same name.  Stem owners may restore deleted
             workgroups through the Workgroup Manager web site.
 
+        .. note::
+            It is possible that the workgroup was already deleted by someone
+            else.  If that happens, we will update the instance accordingly,
+            and then raise a :class:`WorkgroupDeleted` exception.  If you don't
+            care about this case, catch the exception and then continue as
+            normal.
+
         :raises ChildProcessError: Something went wrong on the server side (a
             400 or 500 error was returned).
 
         :raises PermissionError: You did not use a valid certificate, or do not
             have permissions to perform the operation.
+
+        :raises WorkgroupDeleted: The workgroup has been deleted unexpectedly.
 
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
@@ -1341,16 +1459,46 @@ class Workgroup:
             ),
         )
 
-        # Catch a number of bad errors.
-        if response.status_code in (400, 500):
+        # Did our change go through?
+        if response.status_code == 200:
+            # It worked!  Send it through for normal processing.
+            debug('Got a response!')
+            self._mark_deleted()
+
+        # Catch 400 errors.
+        elif (response.status_code == 400):
+            response_json = None
+            try:
+                response_json = response.json()
+            except requests.exceptions.JSONDecodeError:
+                pass
+
+            # Did our workgroup go inactive out from under us?
+            if (
+                response_json is not None and
+                response_json['notification'] == 'Workgroup is inactive'
+            ):
+                error(f"Already-instanced workgroup {self.name} has been deleted")
+                self._mark_deleted()
+                raise WorkgroupDeleted(self.name)
+            else:
+                # Other 400 errors are an actual error
+                error(f"Upstream API error: {response.text}")
+                raise ChildProcessError(response.text)
+
+        # Catch 500 errors
+        elif response.status_code == 500:
+            error(f"Upstream API error: {response.text}")
             raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
+
+        # Catch 401 & 403 errors
+        elif response.status_code in (401, 403):
+            warning(f"Permission error on create for {self.name}")
             raise PermissionError(self.name)
 
-        # Update last-refresh & mark the instance as deleted
-        self._last_refresh = datetime.datetime.now(tz=datetime.timezone.utc)
-        self._deleted = True
-        
+        # All done!
+        return None
+
     #
     # Support Methods
     #

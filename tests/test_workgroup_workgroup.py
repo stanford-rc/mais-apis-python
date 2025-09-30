@@ -21,7 +21,7 @@ import pytest
 import sys
 import time
 from stanford.mais.client import MAISClient
-from stanford.mais.workgroup import WorkgroupClient, Workgroup, WorkgroupFilter, WorkgroupVisibility
+from stanford.mais.workgroup import Workgroup, WorkgroupClient, WorkgroupDeleted, WorkgroupFilter, WorkgroupVisibility
 
 
 """
@@ -156,8 +156,11 @@ def test_refresh(workgroup_client):
 def test_refresh_deleted(workgroup_client):
     # Fetch test:1, then change its name and refresh
     result2 = workgroup_client['test:1']
-    result2._name = 'test:missing'
-    result2.refresh()
+    result2._name = 'test:inactive'
+
+    # Refreshing should raise an exception
+    with pytest.raises(WorkgroupDeleted):
+        result2.refresh()
 
     # The refreshed workgroup should be deleted
     assert result2.deleted is True
@@ -263,9 +266,15 @@ def test_delete_error(workgroup_client):
     result_owners = workgroup_client['workgroup:test-owners']
     with pytest.raises(ChildProcessError):
         result_owners.delete()
+
     result_private = workgroup_client['private:1']
     with pytest.raises(PermissionError):
         result_private.delete()
+
+    result_deleted = workgroup_client['test:1']
+    result_deleted._name = 'test:inactive'
+    with pytest.raises(WorkgroupDeleted):
+        result_deleted.delete()
 
 # Test if our "can we see membership?" test works
 def test_can_see_membership(workgroup_client):

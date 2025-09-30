@@ -28,6 +28,7 @@ import datetime
 import enum
 import logging
 import pathlib
+import requests
 from typing import Any, Literal, TYPE_CHECKING
 import weakref
 
@@ -362,6 +363,16 @@ class WorkgroupMembershipContainer(
 
         This triggers an API call to add the identifier to the workgroup.
 
+        .. note::
+            It is possible that your client certificate gained administrator
+            access between this instance's creation, and now.  It is also
+            possible that your client certificate *lost* administrator access.
+
+        .. danger::
+            It is also possible that someone else has deleted the workgroup.
+            If that happens, the :attr:`deleted` property will be set and a
+            :class:`WorkgroupDeleted` exception will be raised.
+
         :raises ChildProcessError:
             Something went wrong on the server side (a 400 or 500 error was
             returned).
@@ -369,6 +380,8 @@ class WorkgroupMembershipContainer(
         :raises EOFError: The related Workgroup instance no longer exists.
 
         :raises KeyErrror: The identifier was already added.
+
+        :raises WorkgroupDeleted: The workgroup has been deleted.
 
         :raises PermissionError:
             You did not use a valid certificate, or do not have permissions to
@@ -414,7 +427,25 @@ class WorkgroupMembershipContainer(
         )
 
         # Catch a number of bad errors.
-        if response.status_code in (400, 500):
+        if (response.status_code == 400):
+            response_json = None
+            try:
+                response_json = response.json()
+            except requests.exceptions.JSONDecodeError:
+                pass
+
+            # Did our workgroup go inactive out from under us?
+            if (
+                response_json is not None and
+                response_json['notification'] == 'Workgroup is inactive'
+            ):
+                # Hand off to the upstream's refresh handler, which will do the
+                # work of marking the workgroup deleted.
+                return workgroup._handle_refresh(response)
+            else:
+                # We have a generic 400 error
+                raise ChildProcessError(response.text)
+        if response.status_code == 500:
             raise ChildProcessError(response.text)
         if response.status_code in (401, 403):
             raise PermissionError('add')
@@ -436,11 +467,23 @@ class WorkgroupMembershipContainer(
 
         This triggers an API call to remove the identifier from the workgroup.
 
+        .. note::
+            It is possible that your client certificate gained administrator
+            access between this instance's creation, and now.  It is also
+            possible that your client certificate *lost* administrator access.
+
+        .. danger::
+            It is also possible that someone else has deleted the workgroup.
+            If that happens, the :attr:`deleted` property will be set and a
+            :class:`WorkgroupDeleted` exception will be raised.
+
         :raises ChildProcessError: Something went wrong on the server side (a 400 or 500 error was returned).
 
         :raises EOFError: The related Workgroup instance no longer exists.
 
         :raises KeyError: The identifier was already removed.
+
+        :raises WorkgroupDeleted: The workgroup has been deleted.
 
         :raises PermissionError: You did not use a valid certificate, or do not have permissions to perform the operation.
 
@@ -479,7 +522,25 @@ class WorkgroupMembershipContainer(
         )
 
         # Catch a number of bad errors.
-        if response.status_code in (400, 500):
+        if (response.status_code == 400):
+            response_json = None
+            try:
+                response_json = response.json()
+            except requests.exceptions.JSONDecodeError:
+                pass
+
+            # Did our workgroup go inactive out from under us?
+            if (
+                response_json is not None and
+                response_json['notification'] == 'Workgroup is inactive'
+            ):
+                # Hand off to the upstream's refresh handler, which will do the
+                # work of marking the workgroup deleted.
+                return workgroup._handle_refresh(response)
+            else:
+                # We have a generic 400 error
+                raise ChildProcessError(response.text)
+        if response.status_code == 500:
             raise ChildProcessError(response.text)
         if response.status_code in (401, 403):
             raise PermissionError('discard')

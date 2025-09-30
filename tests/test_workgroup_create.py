@@ -19,7 +19,7 @@ import datetime
 import itertools
 import pytest
 from stanford.mais.client import MAISClient
-from stanford.mais.workgroup import Workgroup, WorkgroupClient, WorkgroupFilter, WorkgroupVisibility
+from stanford.mais.workgroup import Workgroup, WorkgroupClient, WorkgroupDeleted, WorkgroupFilter, WorkgroupVisibility
 
 """
 This file tests workgroup creation, the different properties that can be set at
@@ -198,5 +198,10 @@ def test_workgroup_create_fail(workgroup_client):
     with pytest.raises(PermissionError):
         workgroup_client.create(
             name='create:bad401',
+            description='Create Test 1',
+        )
+    with pytest.raises(WorkgroupDeleted):
+        workgroup_client.create(
+            name='create:inactive',
             description='Create Test 1',
         )

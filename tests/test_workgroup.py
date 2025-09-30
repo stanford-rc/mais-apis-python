@@ -19,7 +19,7 @@ import datetime
 import itertools
 import pytest
 from stanford.mais.client import MAISClient
-from stanford.mais.workgroup import WorkgroupClient, Workgroup
+from stanford.mais.workgroup import WorkgroupClient, WorkgroupDeleted, Workgroup
 
 
 """
@@ -46,6 +46,7 @@ Workgroup `bad:w2` returns a 500
 Workgroup `bad:w3` returns a 401
 Workgroup `bad:w4` returns a 403
 Workgroup `bad:w5` returns a 404
+Workgroup `test:inactive` returns a special 400 for an inactive workgroup
 """
 def test_badqueries(workgroup_client):
     with pytest.raises(ChildProcessError):
@@ -58,6 +59,10 @@ def test_badqueries(workgroup_client):
         wc = workgroup_client['bad:w4']
     with pytest.raises(KeyError):
         wc = workgroup_client['bad:w5']
+    with pytest.raises(KeyError):
+        wc = workgroup_client['test:inactive']
+    with pytest.raises(WorkgroupDeleted):
+        wc = workgroup_client['test:inactive']
 
 # Test that the get method and the key-based methods work
 # Once we test this, we'll use the key-based methods from now on.
