@@ -13,11 +13,24 @@ Enhancements:
       Changes to a workgroup's members or administrators will *not*
       trigger an implicit refresh.
 
+* Calling ``Workgroup.refresh()`` on a deleted workgroup used to work silently,
+  and clients were told to manually check if the ``Workgroup.deleted`` property
+  changed.  Now, a ``WorkgroupDeleted`` exception is raised to make the
+  deletion obvious.
+
 Fixes:
 
+* Until now, doing any actions (including ``get()``) on an already-deleted
+  workgroup would have raised a ``ChildProcessError``.  This was because
+  actions on already-deleted workgroups returned a 400 error, which we did not
+  expect.  Now, we properly catch this situation, and return a new exception,
+  ``WorkgroupDeleted``.
 
 Other:
 
+* When we discover that a workgroup has been deleted 'behind our back', in
+  addition to raising a ``WorkgroupDeleted`` exception, the Workgroup instance
+  is marked as deleted.
 
 0.52.0
 ------
