@@ -841,6 +841,14 @@ def add_account_responses() -> None:
 
     responses.add(
         responses.GET,
+        'http://example.com/accounts/broken6',
+        status=552,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+
+    responses.add(
+        responses.GET,
         'http://example.com/accounts/?type=functional&status=pending&statusdays=2',
         status=403,
         content_type='application/json',
@@ -861,6 +869,14 @@ def add_account_responses() -> None:
             'message': 'Internal server error',
             'url': 'http://example.com/accounts/broken5'
         },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/accounts/?type=self&status=pending&statusdays=3',
+        status=552,
+        content_type='text/plain',
+        body='What even is this?',
     )
 
     responses.add(
