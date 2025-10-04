@@ -593,6 +593,14 @@ def add_workgroup_responses() -> None:
         },
     )
 
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w6',
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+
     # Add some search results
     responses.add(
         responses.GET,
@@ -646,6 +654,14 @@ def add_workgroup_responses() -> None:
             'message': 'Unauthorized',
             'status': 401,
         },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/search/bad:w6',
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
     )
 
     responses.add(
@@ -739,6 +755,14 @@ def add_workgroup_responses() -> None:
             'message': 'Unauthorized',
             'status': 401,
         },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2?type=CERTIFICATE&id=bad521',
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
     )
 
     responses.add(
@@ -1083,6 +1107,25 @@ def add_workgroup_responses() -> None:
     )
     responses.add(
         responses.POST,
+        'http://example.com/wg/v2/create:bad521',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+    responses.add(
+        responses.POST,
         'http://example.com/wg/v2/create:inactive',
         match=[
             matchers.json_params_matcher(
@@ -1194,7 +1237,23 @@ def add_workgroup_responses() -> None:
         },
     )
 
-
+    # Changing test:1 description to various special values gives upstream
+    # error response codes.
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'description': '521',
+                },
+                strict_match=True,
+            )
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
 
     # DELETE WORKGROUP
 
@@ -1226,7 +1285,6 @@ def add_workgroup_responses() -> None:
         },
     )
 
-
     # Deleting private:1 returns a 401
     responses.add(
         responses.DELETE,
@@ -1240,6 +1298,16 @@ def add_workgroup_responses() -> None:
             'status': 401,
         },
     )
+
+    # Deleting bad:521 returns a 521
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/bad:521',
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+    
 
     # test:deleted is a workgroup which has been deleted
     responses.add(
@@ -1257,12 +1325,53 @@ def add_workgroup_responses() -> None:
 
     # GET PRIVILEGE GROUP
 
+    # A number of special workgroup names return upstream errors
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w6/privgroup',
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
 
     # ADD MEMBER
 
+    # A few responses that raise bad status codes
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/bad521',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
 
     # REMOVE MEMBER
 
+    # A few responses that raise bad status codes
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:1/members/bad521',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
 
     # ADD ADMINISTRATOR
 
