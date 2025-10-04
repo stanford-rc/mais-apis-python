@@ -41,6 +41,7 @@ Account `hidden1` returns a 401
 Account `hidden3` returns a 403
 Account `broken4` returns a 400
 Account `broken5` returns a 500
+Account `broken6` returns a 522 (some random code we should never see)
 """
 def test_badqueries(account_client):
     with pytest.raises(ValueError):
@@ -55,6 +56,8 @@ def test_badqueries(account_client):
         ac = account_client['broken4']
     with pytest.raises(ChildProcessError):
         ac = account_client['broken5']
+    with pytest.raises(NotImplementedError):
+        ac = account_client['broken6']
 
 # Test that the get method and the key-based methods work
 # Once we test this, we'll use key-based methods from now on.

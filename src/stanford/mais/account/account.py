@@ -281,6 +281,8 @@ class Account():
 
         :raises ValueError: The input contains non-ASCII characters.
 
+        :raises NotImplementedError: An unexpected HTTP response was received.
+
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
         debug(f"In get with input '{sunetid}'")
@@ -316,12 +318,15 @@ class Account():
 
         # Catch a number of bad errors.
         debug(f"Status code is {response.status_code}")
-        if response.status_code in (400, 500):
-            raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
-            raise PermissionError(sunetid)
-        if response.status_code == 404:
-            raise KeyError(sunetid)
+        match response.status_code:
+            case 400 | 500:
+                raise ChildProcessError(response.text)
+            case 401 | 403:
+                raise PermissionError(response.text)
+            case 404:
+                raise KeyError(response.text)
+            case _ if response.status_code != 200:
+                raise NotImplementedError(response.text)
 
         # Decode the JSON
         info('Parsing response JSON')

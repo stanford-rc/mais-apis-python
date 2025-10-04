@@ -59,6 +59,8 @@ def test_badqueries(workgroup_client):
         wc = workgroup_client['bad:w4']
     with pytest.raises(KeyError):
         wc = workgroup_client['bad:w5']
+    with pytest.raises(NotImplementedError):
+        wc = workgroup_client['bad:w6']
     with pytest.raises(KeyError):
         wc = workgroup_client['test:inactive']
     with pytest.raises(WorkgroupDeleted):
@@ -115,6 +117,8 @@ def test_search_by_name_bad(workgroup_client):
         workgroup_client.search_by_name('bad:w1')
     with pytest.raises(PermissionError):
         workgroup_client.search_by_name('bad:w3')
+    with pytest.raises(NotImplementedError):
+        workgroup_client.search_by_name('bad:w6')
 
 # Search for member user
 def test_search_by_member_user(workgroup_client):
@@ -170,7 +174,8 @@ def test_search_by_bad(workgroup_client):
         workgroup_client.search_by_certificate('bad400')
     with pytest.raises(PermissionError):
         workgroup_client.search_by_certificate('bad401')
-
+    with pytest.raises(NotImplementedError):
+        workgroup_client.search_by_certificate('bad521')
 
 # Search for a certificate that does not exist
 def test_search_by_member_cert_empty(workgroup_client):

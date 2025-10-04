@@ -60,6 +60,12 @@ def test_account_changed_status_bad(account_client):
             current_status='pending',
             get_people=False,
         )
+    with pytest.raises(NotImplementedError):
+        account_client.get_changed_status(
+            days=3,
+            current_status='pending',
+            get_people=True,
+        )
 
 # Test a search that returns no results
 def test_account_changed_status_empty(account_client):

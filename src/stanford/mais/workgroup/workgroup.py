@@ -224,6 +224,8 @@ class Workgroup:
         :raises PermissionError: You did not use a valid certificate, or do not
             have permissions to perform the operation.
 
+        :raises NotImplementedError: Received an unexpected HTTP response code.
+
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
         debug(f"In create for name '{name}'")
@@ -280,29 +282,35 @@ class Workgroup:
         )
 
         # Catch an inactive workgroup.
-        if (response.status_code == 400):
-            response_json = None
-            try:
-                response_json = response.json()
-            except requests.exceptions.JSONDecodeError:
-                pass
-            if (
-                response_json is not None and
-                response_json['notification'] == 'Workgroup is inactive'
-            ):
-                warning(f"Workgroup {name} used to exist but has been deleted")
-                raise WorkgroupDeleted(name)
-        # Catch an already-existing workgroup
-        if response.status_code == 409:
-            warning(f"Workgroup {name} already exists")
-            raise KeyError(name)
-        # Catch a number of bad errors.
-        if response.status_code in (400, 500):
-            error(f"Upstream API error: {response.text}")
-            raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
-            warning(f"Permission error on create for {name}")
-            raise PermissionError(name)
+        match response.status_code:
+            case 400:
+                response_json = None
+                try:
+                    response_json = response.json()
+                except requests.exceptions.JSONDecodeError:
+                    pass
+
+                # Did our workgroup go inactive out from under us?
+                if (
+                    response_json is not None and
+                    response_json['notification'] == 'Workgroup is inactive'
+                ):
+                    warning(f"Workgroup {name} used to exist but has been deleted")
+                    raise WorkgroupDeleted(name)
+                else:
+                    # We have a generic 400 error
+                    raise ChildProcessError(response.text)
+            case 500:
+                error(f"Upstream API error: {response.text}")
+                raise ChildProcessError(response.text)
+            case 401 | 403:
+                warning(f"Permission error on create workgroup {name}")
+                raise PermissionError(response.text)
+            case 409: # Catch an already-existing workgroup
+                warning(f"Workgroup {name} already exists")
+                raise KeyError(name)
+            case _ if response.status_code != 201:
+                raise NotImplementedError(response.text)
 
         # Decode the JSON, and send to make the instance
         debug(f"Got back a response!")
@@ -358,6 +366,8 @@ class Workgroup:
 
         :raises PermissionError: You did not use a valid certificate.
 
+        :raises NotImplementedError: Received an unexpected HTTP response code.
+
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
         # Lowercase the name before we continue
@@ -383,29 +393,35 @@ class Workgroup:
         )
 
         # Catch an inactive workgroup.
-        if (response.status_code == 400):
-            response_json = None
-            try:
-                response_json = response.json()
-            except requests.exceptions.JSONDecodeError:
-                pass
-            if (
-                response_json is not None and
-                response_json['notification'] == 'Workgroup is inactive'
-            ):
-                warning(f"Workgroup {name} has been deleted")
-                raise WorkgroupDeleted(name)
-        # Catch a never-existed workgroup
-        if response.status_code == 404:
-            warning(f"Workgroup {name} not found")
-            raise KeyError(name)
-        # Catch a number of bad errors.
-        if response.status_code in (400, 500):
-            error(f"Upstream API error: {response.text}")
-            raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
-            warning(f"Permission error on create for {name}")
-            raise PermissionError(name)
+        match response.status_code:
+            case 400:
+                response_json = None
+                try:
+                    response_json = response.json()
+                except requests.exceptions.JSONDecodeError:
+                    pass
+
+                # Did our workgroup go inactive out from under us?
+                if (
+                    response_json is not None and
+                    response_json['notification'] == 'Workgroup is inactive'
+                ):
+                    warning(f"Workgroup {name} has been deleted")
+                    raise WorkgroupDeleted(name)
+                else:
+                    # We have a generic 400 error
+                    raise ChildProcessError(response.text)
+            case 500:
+                error(f"Upstream API error: {response.text}")
+                raise ChildProcessError(response.text)
+            case 401 | 403:
+                warning(f"Permission error on get {name}")
+                raise PermissionError(response.text)
+            case 404:
+                warning(f"Workgroup {name} not found")
+                raise KeyError(name)
+            case _ if response.status_code != 200:
+                raise NotImplementedError(response.text)
 
         # Decode the JSON, and send to make the instance
         debug('Got a response!')
@@ -454,6 +470,8 @@ class Workgroup:
             have permissions to perform the operation.
 
         :raises WorkgroupDeleted: The workgroup has been deleted.
+
+        :raises NotImplementedError: Received an unexpected HTTP response code.
 
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
@@ -513,6 +531,8 @@ class Workgroup:
             have permissions to perform the operation.
 
         :raises WorkgroupDeleted: The workgroup has been deleted.
+
+        :raises NotImplementedError: Received an unexpected HTTP response code.
         """
 
         # Did our change go through?
@@ -522,36 +542,37 @@ class Workgroup:
             response_json = response.json()
             self._from_json(response_json)
 
-        # Catch 400 errors.
-        elif (response.status_code == 400):
-            response_json = None
-            try:
-                response_json = response.json()
-            except requests.exceptions.JSONDecodeError:
-                pass
+        # Catch various errors
+        match response.status_code:
+            case 400:
+                response_json = None
+                try:
+                    response_json = response.json()
+                except requests.exceptions.JSONDecodeError:
+                    pass
 
-            # Did our workgroup go inactive out from under us?
-            if (
-                response_json is not None and
-                response_json['notification'] == 'Workgroup is inactive'
-            ):
-                error(f"Already-instanced workgroup {self.name} has been deleted")
-                self._mark_deleted()
-                raise WorkgroupDeleted(self.name)
-            else:
-                # Other 400 errors are an actual error
+                # Did our workgroup go inactive out from under us?
+                if (
+                    response_json is not None and
+                    response_json['notification'] == 'Workgroup is inactive'
+                ):
+                    error(f"Already-instanced workgroup {self.name} has been deleted")
+                    self._mark_deleted()
+                    raise WorkgroupDeleted(self.name)
+                else:
+                    # We have a generic 400 error
+                    raise ChildProcessError(response.text)
+            case 500:
                 error(f"Upstream API error: {response.text}")
                 raise ChildProcessError(response.text)
-
-        # Catch 500 errors
-        elif response.status_code == 500:
-            error(f"Upstream API error: {response.text}")
-            raise ChildProcessError(response.text)
-
-        # Catch 401 & 403 errors
-        elif response.status_code in (401, 403):
-            warning(f"Permission error on create for {self.name}")
-            raise PermissionError(self.name)
+            case 401 | 403:
+                warning(f"Permission error on get {self.name}")
+                raise PermissionError(response.text)
+            case 404:
+                warning(f"Workgroup {self.name} not found")
+                raise KeyError(self.name)
+            case _ if response.status_code != 200:
+                raise NotImplementedError(response.text)
 
         # All done!
         return None
@@ -1105,7 +1126,7 @@ class Workgroup:
 
         :raises WorkgroupDeleted: The workgroup has been deleted.
 
-        :raises EOFError: The workgroup has been deleted.
+        :raises NotImplementedError: Received an unexpected HTTP response code.
 
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
@@ -1124,62 +1145,57 @@ class Workgroup:
             ),
         )
 
-        # Did we get a response?
-        if response.status_code == 200:
-            debug('Got a response!')
+        # Catch various errors
+        match response.status_code:
+            case 400:
+                response_json = None
+                try:
+                    response_json = response.json()
+                except requests.exceptions.JSONDecodeError:
+                    pass
 
-            # Get results, and make containers for holding results
-            results = response.json()
-            administrators: set[PrivgroupEntry] = set()
-            members: set[PrivgroupEntry] = set()
-
-            # Process the results and return
-            for administrator in results['administrators']:
-                administrators.add(PrivgroupEntry.from_json(administrator))
-            for member in results['members']:
-                members.add(PrivgroupEntry.from_json(member))
-
-            debug(f"Returning {len(administrators)} admins and {len(members)} members")
-            return PrivgroupContents(
-                members=members,
-                administrators=administrators,
-            )
-
-        # Catch 400 errors.
-        elif (response.status_code == 400):
-            response_json = None
-            try:
-                response_json = response.json()
-            except requests.exceptions.JSONDecodeError:
-                pass
-
-            # Did our workgroup go inactive out from under us?
-            if (
-                response_json is not None and
-                response_json['notification'] == 'Workgroup is inactive'
-            ):
-                error(f"Already-instanced workgroup {self.name} has been deleted")
-                self._mark_deleted()
-                raise WorkgroupDeleted(self.name)
-            else:
-                # Other 400 errors are an actual error
+                # Did our workgroup go inactive out from under us?
+                if (
+                    response_json is not None and
+                    response_json['notification'] == 'Workgroup is inactive'
+                ):
+                    error(f"Already-instanced workgroup {self.name} has been deleted")
+                    self._mark_deleted()
+                    raise WorkgroupDeleted(self.name)
+                else:
+                    # We have a generic 400 error
+                    raise ChildProcessError(response.text)
+            case 500:
                 error(f"Upstream API error: {response.text}")
                 raise ChildProcessError(response.text)
+            case 401 | 403:
+                warning(f"Permission error on get {self.name}")
+                raise PermissionError(response.text)
+            case 404:
+                warning(f"Workgroup {self.name} not found")
+                raise KeyError(self.name)
+            case _ if response.status_code != 200:
+                raise NotImplementedError(response.text)
 
-        # Catch 500 errors
-        elif response.status_code == 500:
-            error(f"Upstream API error: {response.text}")
-            raise ChildProcessError(response.text)
+        # Did we get a response?
+        debug('Got a response!')
 
-        # Catch 401 & 403 errors
-        elif response.status_code in (401, 403):
-            warning(f"Permission error on create for {self.name}")
-            raise PermissionError(self.name)
+        # Get results, and make containers for holding results
+        results = response.json()
+        administrators: set[PrivgroupEntry] = set()
+        members: set[PrivgroupEntry] = set()
 
-        # We got a code we didn't expect!
-        else:
-            error(f"Received unexpected {response.status_code}: {response.text}")
-            raise NotImplementedError(f"{response.status_code}: {response.text}")
+        # Process the results and return
+        for administrator in results['administrators']:
+            administrators.add(PrivgroupEntry.from_json(administrator))
+        for member in results['members']:
+            members.add(PrivgroupEntry.from_json(member))
+
+        debug(f"Returning {len(administrators)} admins and {len(members)} members")
+        return PrivgroupContents(
+            members=members,
+            administrators=administrators,
+        )
 
     #
     # "U" methods.
@@ -1234,6 +1250,8 @@ class Workgroup:
 
         :raises PermissionError: You did not use a valid certificate, or do not
             have permissions to perform the operation.
+
+        :raises NotImplementedError: Received an unexpected HTTP response code.
 
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
@@ -1447,6 +1465,8 @@ class Workgroup:
 
         :raises WorkgroupDeleted: The workgroup has been deleted unexpectedly.
 
+        :raises NotImplementedError: Received an unexpected HTTP response code.
+
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
         if self.deleted:
@@ -1459,42 +1479,41 @@ class Workgroup:
             ),
         )
 
-        # Did our change go through?
-        if response.status_code == 200:
-            # It worked!  Send it through for normal processing.
-            debug('Got a response!')
-            self._mark_deleted()
-
-        # Catch 400 errors.
-        elif (response.status_code == 400):
-            response_json = None
-            try:
-                response_json = response.json()
-            except requests.exceptions.JSONDecodeError:
-                pass
-
-            # Did our workgroup go inactive out from under us?
-            if (
-                response_json is not None and
-                response_json['notification'] == 'Workgroup is inactive'
-            ):
-                error(f"Already-instanced workgroup {self.name} has been deleted")
+        # A success is easy to handle, so we can put everything into one big
+        # match.
+        match response.status_code:
+            case 200: # The deletion worked
+                debug('Got a response!')
                 self._mark_deleted()
-                raise WorkgroupDeleted(self.name)
-            else:
-                # Other 400 errors are an actual error
+            case 400:
+                response_json = None
+                try:
+                    response_json = response.json()
+                except requests.exceptions.JSONDecodeError:
+                    pass
+
+                # Did our workgroup go inactive out from under us?
+                if (
+                    response_json is not None and
+                    response_json['notification'] == 'Workgroup is inactive'
+                ):
+                    error(f"Already-instanced workgroup {self.name} has been deleted")
+                    self._mark_deleted()
+                    raise WorkgroupDeleted(self.name)
+                else:
+                    # We have a generic 400 error
+                    raise ChildProcessError(response.text)
+            case 500:
                 error(f"Upstream API error: {response.text}")
                 raise ChildProcessError(response.text)
-
-        # Catch 500 errors
-        elif response.status_code == 500:
-            error(f"Upstream API error: {response.text}")
-            raise ChildProcessError(response.text)
-
-        # Catch 401 & 403 errors
-        elif response.status_code in (401, 403):
-            warning(f"Permission error on create for {self.name}")
-            raise PermissionError(self.name)
+            case 401 | 403:
+                warning(f"Permission error on get {self.name}")
+                raise PermissionError(response.text)
+            case 404:
+                warning(f"Workgroup {self.name} not found")
+                raise KeyError(self.name)
+            case _:
+                raise NotImplementedError(response.text)
 
         # All done!
         return None

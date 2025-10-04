@@ -180,6 +180,13 @@ def test_refresh_errors(workgroup_client):
     with pytest.raises(PermissionError):
         result4.refresh()
 
+    # Test a weird response code on refresh
+    workgroup_client.clear_cache()
+    result5 = workgroup_client['test:1']
+    result5._name = 'bad:w6'
+    with pytest.raises(NotImplementedError):
+        result5.refresh()
+
 # Test the last_refresh time is valid
 def test_last_refresh(workgroup_client):
     # Fetch the workgroup & get the time
@@ -275,6 +282,14 @@ def test_delete_error(workgroup_client):
     result_deleted._name = 'test:inactive'
     with pytest.raises(WorkgroupDeleted):
         result_deleted.delete()
+
+    workgroup_client.clear_cache()
+    result_deleted = workgroup_client['test:1']
+    result_deleted._name = 'bad:521'
+    with pytest.raises(NotImplementedError):
+        result_deleted.delete()
+
+    # TODO: handle 500 error
 
 # Test if our "can we see membership?" test works
 def test_can_see_membership(workgroup_client):

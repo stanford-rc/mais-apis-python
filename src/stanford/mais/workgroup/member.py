@@ -391,6 +391,8 @@ class WorkgroupMembershipContainer(
             Workgroup Manager does not know about that identifier.  For
             example, you tried adding a SUNetID that does not exist.
 
+        :raises NotImplementedError: Received an unexpected HTTP response code.
+
         :raises requests.Timeout:
             The MaIS Workgroup API did not respond in time.
         """
@@ -427,30 +429,33 @@ class WorkgroupMembershipContainer(
         )
 
         # Catch a number of bad errors.
-        if (response.status_code == 400):
-            response_json = None
-            try:
-                response_json = response.json()
-            except requests.exceptions.JSONDecodeError:
-                pass
+        match response.status_code:
+            case 400:
+                response_json = None
+                try:
+                    response_json = response.json()
+                except requests.exceptions.JSONDecodeError:
+                    pass
 
-            # Did our workgroup go inactive out from under us?
-            if (
-                response_json is not None and
-                response_json['notification'] == 'Workgroup is inactive'
-            ):
-                # Hand off to the upstream's refresh handler, which will do the
-                # work of marking the workgroup deleted.
-                return workgroup._handle_refresh(response)
-            else:
-                # We have a generic 400 error
+                # Did our workgroup go inactive out from under us?
+                if (
+                    response_json is not None and
+                    response_json['notification'] == 'Workgroup is inactive'
+                ):
+                    # Hand off to the upstream's refresh handler, which will do the
+                    # work of marking the workgroup deleted.
+                    return workgroup._handle_refresh(response)
+                else:
+                    # We have a generic 400 error
+                    raise ChildProcessError(response.text)
+            case 500:
+                error(f"Upstream API error: {response.text}")
                 raise ChildProcessError(response.text)
-        if response.status_code == 500:
-            raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
-            raise PermissionError('add')
-        if response.status_code == 404:
-            raise ValueError(response.text)
+            case 401 | 403:
+                warning(f"Permission error on add {self.collection_type} {value} for {workgroup.name}")
+                raise PermissionError(response.text)
+            case _ if response.status_code != 200:
+                raise NotImplementedError(response.text)
 
         # Reset the workgroup's last_updated date
         workgroup._reset_last_update()
@@ -487,6 +492,8 @@ class WorkgroupMembershipContainer(
 
         :raises PermissionError: You did not use a valid certificate, or do not have permissions to perform the operation.
 
+        :raises NotImplementedError: Received an unexpected HTTP response code.
+
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
         debug(f"Workgroup TBD: Discarding {self.container_type} {value} from {self._collection_type}")
@@ -522,30 +529,35 @@ class WorkgroupMembershipContainer(
         )
 
         # Catch a number of bad errors.
-        if (response.status_code == 400):
-            response_json = None
-            try:
-                response_json = response.json()
-            except requests.exceptions.JSONDecodeError:
-                pass
+        match response.status_code:
+            case 400:
+                response_json = None
+                try:
+                    response_json = response.json()
+                except requests.exceptions.JSONDecodeError:
+                    pass
 
-            # Did our workgroup go inactive out from under us?
-            if (
-                response_json is not None and
-                response_json['notification'] == 'Workgroup is inactive'
-            ):
-                # Hand off to the upstream's refresh handler, which will do the
-                # work of marking the workgroup deleted.
-                return workgroup._handle_refresh(response)
-            else:
-                # We have a generic 400 error
+                # Did our workgroup go inactive out from under us?
+                if (
+                    response_json is not None and
+                    response_json['notification'] == 'Workgroup is inactive'
+                ):
+                    # Hand off to the upstream's refresh handler, which will do the
+                    # work of marking the workgroup deleted.
+                    return workgroup._handle_refresh(response)
+                else:
+                    # We have a generic 400 error
+                    raise ChildProcessError(response.text)
+            case 500:
+                error(f"Upstream API error: {response.text}")
                 raise ChildProcessError(response.text)
-        if response.status_code == 500:
-            raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
-            raise PermissionError('discard')
-        if response.status_code == 404: # Just in case
-            raise KeyError(response.text)
+            case 401 | 403:
+                warning(f"Permission error on remove {self.collection_type} {value} for {workgroup.name}")
+                raise PermissionError(response.text)
+            case 404: # Just in case
+                raise KeyError(response.text)
+            case _ if response.status_code != 200:
+                raise NotImplementedError(response.text)
 
         # Reset the workgroup's last_updated date
         workgroup._reset_last_update()

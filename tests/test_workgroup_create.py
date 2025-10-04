@@ -200,6 +200,11 @@ def test_workgroup_create_fail(workgroup_client):
             name='create:bad401',
             description='Create Test 1',
         )
+    with pytest.raises(NotImplementedError):
+        workgroup_client.create(
+            name='create:bad521',
+            description='Create Test 1',
+        )
     with pytest.raises(WorkgroupDeleted):
         workgroup_client.create(
             name='create:inactive',

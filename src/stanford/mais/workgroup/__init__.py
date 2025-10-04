@@ -322,7 +322,10 @@ class WorkgroupClient():
 
         :raises ValueError: The search string began with an asterisk, or
             was empty.
+
         :raises ValueError: The input contains non-ASCII characters.
+
+        :raises NotImplementedError: Received an unexpected HTTP response code.
 
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
@@ -350,12 +353,15 @@ class WorkgroupClient():
         )
 
         # Catch a number of bad errors.
-        if response.status_code in (400, 500):
-            error(f"Upstream API error: {response.text}")
-            raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
-            warning(f"Permission error on search for {search}")
-            raise PermissionError(search)
+        match response.status_code:
+            case 400 | 500:
+                error(f"Upstream API error: {response.text}")
+                raise ChildProcessError(response.text)
+            case 401 | 403:
+                warning(f"Permission error on search for {search}")
+                raise PermissionError(response.text)
+            case _ if response.status_code != 200:
+                raise NotImplementedError(response.text)
 
         # Decode the JSON, and send to make the instance
         debug('Got a response!')
@@ -400,6 +406,8 @@ class WorkgroupClient():
 
         :raises ValueError: The search string is empty.
 
+        :raises NotImplementedError: Received an unexpected HTTP response code.
+
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
         debug(f"In _search_by_target for {target_type} {target}")
@@ -422,12 +430,15 @@ class WorkgroupClient():
         )
 
         # Catch a number of bad errors.
-        if response.status_code in (400, 500):
-            error(f"Upstream API error: {response.text}")
-            raise ChildProcessError(response.text)
-        if response.status_code in (401, 403):
-            warning(f"Permission error on search for {target_type} {target}")
-            raise PermissionError(f"{target_type} {target}")
+        match response.status_code:
+            case 400 | 500:
+                error(f"Upstream API error: {response.text}")
+                raise ChildProcessError(response.text)
+            case 401 | 403:
+                warning(f"Permission error on search for {target_type} {target}")
+                raise PermissionError(response.text)
+            case _ if response.status_code != 200:
+                raise NotImplementedError(response.text)
 
         # Decode the JSON, and get our search results
         debug('Got a response!')
