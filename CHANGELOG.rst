@@ -18,6 +18,9 @@ Enhancements:
   changed.  Now, a ``WorkgroupDeleted`` exception is raised to make the
   deletion obvious.
 
+* Any operation that makes an API call may now raise a `NotImplementedError`.
+  This exception will be raised if the API returns an unexpected response code.
+
 Fixes:
 
 * Until now, doing any actions (including ``get()``) on an already-deleted
