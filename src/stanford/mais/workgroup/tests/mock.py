@@ -113,6 +113,35 @@ workgroup_testowners_lite = """
 }
 """
 
+workgroup_workgroupowners_json = """
+{
+"filter": "NONE",
+"privgroup": "FALSE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+],
+"name": "workgroup:workgroup-owners",
+"description": "Workgroup stem for testing",
+"integrations": [],
+"administrators": [
+],
+"reusable": "FALSE",
+"lastUpdateBy": "pytest"
+}
+"""
+
+workgroup_workgroupowners_lite = """
+{
+"memberCount": "1",
+"lastUpdate": "1-Jan-2025",
+"name": "workgroup:workgroup-owners",
+"description": "Workgroup stem for testing",
+"integrations": [],
+"lastUpdateBy": "pytest"
+}
+"""
+
 # A rare workgroup that has no description
 workgroup_test2_json = """
 {
@@ -160,6 +189,31 @@ workgroup_private1_json = """
 ],
 "name": "private:1",
 "description": "Private Test 1",
+"integrations": [],
+"administrators": [
+],
+"reusable": "FALSE",
+"lastUpdateBy": "pytest"
+}
+"""
+
+# A workgroup with a type of member we've never seen before.
+bad_unknowntype_json = """
+{
+"filter": "NONE",
+"privgroup": "FALSE",
+"visibility": "STANFORD",
+"lastUpdate": "1-Jan-2025",
+"members": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "Machine blargh",
+        "id": "blargh",
+        "type": "COMPUTER"
+    }
+],
+"name": "bad:unknown-type",
+"description": "Workgroup with an unknown type of member",
 "integrations": [],
 "administrators": [
 ],
@@ -626,6 +680,22 @@ def add_workgroup_responses() -> None:
             '"search": "research-computing:*",' +
             '"results": [' +
             workgroup_test1_lite +
+            ']' +
+            '}'
+        )
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/search/workgroup:*',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"search": "workgroup:*",' +
+            '"results": [' +
+            workgroup_testowners_lite + ',' +
+            workgroup_workgroupowners_lite +
             ']' +
             '}'
         )
@@ -1161,6 +1231,15 @@ def add_workgroup_responses() -> None:
         body=workgroup_testowners_json,
     )
 
+    # workgroup:workgroup-owners works
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/workgroup:workgroup-owners',
+        status=200,
+        content_type='application/json',
+        body=workgroup_workgroupowners_json,
+    )
+
     # private:1 works
     responses.add(
         responses.GET,
@@ -1186,6 +1265,15 @@ def add_workgroup_responses() -> None:
         status=200,
         content_type='application/json',
         body=workgroup_test2_json,
+    )
+
+    # bad:unknown-type has an unknown-to-us member type
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:unknown-type',
+        status=200,
+        content_type='application/json',
+        body=bad_unknowntype_json,
     )
 
     # test:missing is a 404
@@ -1718,7 +1806,176 @@ def add_workgroup_responses() -> None:
 
     # ADD MEMBER
 
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/adamhl',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'adamhl was added as a member to the workgroup: test:1',
+            'code': 200,
+            'message': 'Added',
+            'status': 200,
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/cert5225',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'CERTIFICATE',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'adamhl was added as a member to the workgroup: test:1',
+            'code': 200,
+            'message': 'Added',
+            'status': 200,
+        },
+    )
+
     # A few responses that raise bad status codes
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/inactive',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/bad400',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/bad401',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/nobody',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=404,
+        content_type='application/json',
+        json={
+            "notification": "Not Found",
+            "code": 404,
+            "message": "nobody was not found",
+            "status": 404
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/leland',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=409,
+        content_type='application/json',
+        json={
+            "notification": "Conflict",
+            "code": 409,
+            "message": "Member leland of type USER already exist in workgroup: test:1",
+            "status": 409
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/bad500',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=500,
+        content_type='application/json',
+        json={
+            'notification': 'Internal Server Error',
+            'code': 500,
+            'message': 'Internal Server Error',
+            'status': 500,
+        },
+    )
+
     responses.add(
         responses.PUT,
         'http://example.com/wg/v2/test:1/members/bad521',
@@ -1737,7 +1994,102 @@ def add_workgroup_responses() -> None:
 
     # REMOVE MEMBER
 
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:1/members/akkornel',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'akkornel was removed as a member from the workgroup: test:1',
+            'code': 200,
+            'message': 'Removed',
+            'status': 200,
+        },
+    )
+
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/workgroup:test-owners/members/client-cert-1',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'CERTIFICATE',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'client-cert-1 was removed as a member from the workgroup: workgroup:test-owners',
+            'code': 200,
+            'message': 'Removed',
+            'status': 200,
+        },
+    )
+
     # A few responses that raise bad status codes
+
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:1/members/inactive',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:1/members/bad400',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:1/members/bad401',
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
+
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:1/members/bad500',
+        status=500,
+        content_type='application/json',
+        json={
+            'notification': 'Internal Server Error',
+            'code': 500,
+            'message': 'Internal Server Error',
+            'status': 500,
+        },
+    )
+
     responses.add(
         responses.DELETE,
         'http://example.com/wg/v2/test:1/members/bad521',
@@ -1756,9 +2108,180 @@ def add_workgroup_responses() -> None:
 
     # ADD ADMINISTRATOR
 
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/administrators/adamhl',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'adamhl was added as a administrator to the workgroup: test:1',
+            'code': 200,
+            'message': 'Added',
+            'status': 200,
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/create:1/administrators/workgroup:test-owners',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'WORKGROUP',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            "notification": "Conflict",
+            "code": 200,
+            "message": "workgroup:test-owners was added as a administrator to the workgroup: test:1",
+            "status": 200
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/administrators/cert5225',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'CERTIFICATE',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'adamhl was added as a administrator to the workgroup: test:1',
+            'code': 200,
+            'message': 'Added',
+            'status': 200,
+        },
+    )
+
+    # Add a couple of 409 Conflict responses
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/administrators/stanford',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=409,
+        content_type='application/json',
+        json={
+            "notification": "Conflict",
+            "code": 409,
+            "message": "Administrator stanford of type USER already exist in workgroup: test:1",
+            "status": 409
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/administrators/workgroup:test-owners',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'WORKGROUP',
+                },
+                strict_match=True,
+            )
+        ],
+        status=409,
+        content_type='application/json',
+        json={
+            "notification": "Conflict",
+            "code": 409,
+            "message": "Administrator workgroup:test-owners of type WORKGROUP already exist in workgroup: test:1",
+            "status": 409
+        },
+
+    )
 
     # REMOVE ADMINISTRATOR
 
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:1/administrators/stanford',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'stanford was removed as a administrator from the workgroup: test:1',
+            'code': 200,
+            'message': 'Removed',
+            'status': 200,
+        },
+    )
+
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/workgroup:test-owners/administrators/workgroup:workgroup-owners',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'WORKGROUP',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'workgroup:workgroup-owners was removed as a administrator from the workgroup: workgroup:test-owners',
+            'code': 200,
+            'message': 'Removed',
+            'status': 200,
+        },
+    )
+
+    # Add a case of an admin being removed without us realizing
+
+    responses.add(
+        responses.DELETE,
+        'http://example.com/wg/v2/test:1/administrators/workgroup:test-owners',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'WORKGROUP',
+                },
+                strict_match=True,
+            )
+        ],
+        status=404,
+        content_type='application/json',
+        json={
+            'notification': 'workgroup:test-owners is not a administrator of workgroup: test:1',
+            'code': 404,
+            'message': 'Not Found',
+            'status': 404,
+        },
+    )
 
     # GET INTEGRATION
 
