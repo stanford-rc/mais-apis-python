@@ -473,6 +473,11 @@ class WorkgroupMembershipContainer(
         This triggers an API call to remove the identifier from the workgroup.
 
         .. note::
+            As per the set definition, this method does **not** return KeyError
+            if you attempt to discard an element that is not in the set.  If
+            you want a :class:`KeyError` to be raised, use the `remove` method.
+
+        .. note::
             It is possible that your client certificate gained administrator
             access between this instance's creation, and now.  It is also
             possible that your client certificate *lost* administrator access.
@@ -486,8 +491,6 @@ class WorkgroupMembershipContainer(
 
         :raises EOFError: The related Workgroup instance no longer exists.
 
-        :raises KeyError: The identifier was already removed.
-
         :raises WorkgroupDeleted: The workgroup has been deleted.
 
         :raises PermissionError: You did not use a valid certificate, or do not have permissions to perform the operation.
@@ -497,10 +500,6 @@ class WorkgroupMembershipContainer(
         :raises requests.Timeout: The MaIS Workgroup API did not respond in time.
         """
         debug(f"Workgroup TBD: Discarding {self.container_type} {value} from {self._collection_type}")
-
-        # Quickly check if we're removing a member already not present.
-        if value not in self:
-            raise KeyError(value)
 
         # Resolve the workgroup for later calls
         workgroup = self.workgroup
@@ -554,8 +553,9 @@ class WorkgroupMembershipContainer(
             case 401 | 403:
                 warning(f"Permission error on remove {self.collection_type} {value} for {workgroup.name}")
                 raise PermissionError(response.text)
-            case 404: # Just in case
-                raise KeyError(response.text)
+            case 404:
+                # See the note in the method docs for why we ignore this.
+                pass
             case _ if response.status_code != 200:
                 raise NotImplementedError(response.text)
 
