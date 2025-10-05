@@ -454,6 +454,10 @@ class WorkgroupMembershipContainer(
             case 401 | 403:
                 warning(f"Permission error on add {self.collection_type} {value} for {workgroup.name}")
                 raise PermissionError(response.text)
+            case 404:
+                raise ValueError(value)
+            case 409:
+                raise KeyError(value)
             case _ if response.status_code != 200:
                 raise NotImplementedError(response.text)
 
