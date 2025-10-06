@@ -1171,9 +1171,6 @@ class Workgroup:
             case 401 | 403:
                 warning(f"Permission error on get {self.name}")
                 raise PermissionError(response.text)
-            case 404:
-                warning(f"Workgroup {self.name} not found")
-                raise KeyError(self.name)
             case _ if response.status_code != 200:
                 raise NotImplementedError(response.text)
 
