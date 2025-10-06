@@ -1118,6 +1118,26 @@ class Workgroup:
         Since the privgroup's contents potentially depend on ths membership of
         other workgroups, the workgroup's 
 
+        .. note::
+            To get the privgroup for a workgroup, your client certificate must
+            be able to see the membership of this workgroup, otherwise a
+            `PermissionError` will be raised.  See :meth:`can_see_membership`.
+
+        .. warning::
+            It is possible that your client certificate gained administrator
+            access between this instance's creation, and now.  If you think
+            that happened, call :meth:`refresh` before calling this method.
+
+            It is also possible that your client certificate *lost*
+            administrator access, or that a workgroup was made private.  In
+            that case, this method will return a PermissionError even though
+            :meth:`can_see_membership` returns `True`.
+
+        .. danger::
+            It is also possible that someone else has deleted the workgroup.
+            If that happens, the :attr:`deleted` property will be set and a
+            :class:`WorkgroupDeleted` exception will be raised.
+
         :raises ChildProcessError: Something went wrong on the server side (a
             400 or 500 error was returned).
 
@@ -1133,6 +1153,14 @@ class Workgroup:
         if self.deleted:
             raise EOFError('Workgroup has been deleted')
         debug(f"In get_privgroup for {self.name}")
+
+        # If we cannot see a workgroup's membership, then we won't be able to
+        # see the privgroup, so don't bother making the API call.
+        # NOTE: We still catch 401/403 errors, though, just in case permissions
+        # changed since we first fetched the workgroup.
+        if not self.can_see_membership:
+            raise PermissionError()
+
         # Our URL includes the fully-qualified workgroup name, plus `privgroup`
         url_fragment = (
             pathlib.PurePosixPath(self.name) /
