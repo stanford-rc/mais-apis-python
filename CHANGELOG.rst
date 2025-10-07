@@ -21,6 +21,8 @@ Enhancements:
 * Any operation that makes an API call may now raise a `NotImplementedError`.
   This exception will be raised if the API returns an unexpected response code.
 
+* Almost all tests have been added at this point.
+
 Fixes:
 
 * Until now, doing any actions (including ``get()``) on an already-deleted
