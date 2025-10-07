@@ -72,6 +72,26 @@ workgroup_test1_lite = """
 }
 """
 
+workgroup_test1_privgroup = """
+{
+"members": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "Kornel, Karl",
+        "id": "akkornel"
+    }
+],
+"name": "test:1",
+"administrators": [
+    {
+        "lastUpdate": "1-Jan-2025",
+        "name": "Stanford, Leland Jr.",
+        "id": "stanford"
+    }
+]
+}
+"""
+
 workgroup_testowners_json = """
 {
 "filter": "ACADEMIC_ADMINISTRATIVE",
@@ -1792,9 +1812,83 @@ def add_workgroup_responses() -> None:
         },
     )
 
-    # GET PRIVILEGE GROUP
+    # GET PRIVILEGE GROUP (PRIVGROUP)
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/test:1/privgroup',
+        status=200,
+        content_type='application/json',
+        body=workgroup_test1_privgroup,
+    )
+
 
     # A number of special workgroup names return upstream errors
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/test:inactive/privgroup',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w1/privgroup',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w2/privgroup',
+        status=500,
+        content_type='application/json',
+        json={
+            'notification': 'Internal Server Error',
+            'code': 500,
+            'message': 'Internal Server Error',
+            'status': 500,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w3/privgroup',
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/bad:w4/privgroup',
+        status=403,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 403',
+            'code': 403,
+            'message': 'Forbidden',
+            'status': 403,
+        },
+    )
 
     responses.add(
         responses.GET,
