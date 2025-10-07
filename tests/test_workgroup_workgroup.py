@@ -244,6 +244,10 @@ def test_delete(workgroup_client):
     with pytest.raises(EOFError):
         result.can_see_membership
 
+    # Trying to get privgroup should raise an exception
+    with pytest.raises(EOFError):
+        result.get_privgroup()
+
     # Trying to delete again, or to refresh, should raise an exception
     with pytest.raises(EOFError):
         result.delete()
