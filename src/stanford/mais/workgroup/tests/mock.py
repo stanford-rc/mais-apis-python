@@ -1649,7 +1649,7 @@ def add_workgroup_responses() -> None:
         json={
             "notification": "Conflict",
             "code": 200,
-            "message": "workgroup:test-owners was added as a administrator to the workgroup: test:1",
+            "message": "workgroup:test-owners was added as a administrator to the workgroup: create:1",
             "status": 200
         },
     )
@@ -1668,7 +1668,7 @@ def add_workgroup_responses() -> None:
         status=200,
         content_type='application/json',
         json={
-            'notification': 'adamhl was added as a administrator to the workgroup: test:1',
+            'notification': 'cert5225 was added as a administrator to the workgroup: test:1',
             'code': 200,
             'message': 'Added',
             'status': 200,
