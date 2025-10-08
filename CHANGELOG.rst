@@ -9,6 +9,10 @@ Fixes:
 
 Other:
 
+* Change the GitHub Actions workflow, such that when a release is made, a
+  proper release version should be published to Test PyPi.  Release versions
+  are already being published to production PyPi, so this change should only
+  affect Test PyPi.
 
 0.53.0
 ------
