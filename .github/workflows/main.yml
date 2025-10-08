@@ -29,7 +29,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install build
 
-      - name: Make the version number unique
+      - name: Make the version number unique (on non-tag pushes)
+        if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         run: |
           python update-version-for-test-push.py
 
