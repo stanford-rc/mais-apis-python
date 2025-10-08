@@ -8,6 +8,10 @@
 # PyPi, so that the version uploaded is unique, and is also 'earlier' (in
 # version-numbering terms) than the public version identifier.
 
+# NOTE: This should only be run when you intend on making a non-production
+# release.  If you want to send a production release to Test PyPi, then do not
+# run this script!
+
 # For more information about version numbering, see
 # https://packaging.python.org/en/latest/specifications/version-specifiers/
 
