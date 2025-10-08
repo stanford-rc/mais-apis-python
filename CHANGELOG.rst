@@ -1,11 +1,5 @@
-Unreleased
-----------
-
-Enhancements:
-
-
-Fixes:
-
+0.54.0
+------
 
 Other:
 
