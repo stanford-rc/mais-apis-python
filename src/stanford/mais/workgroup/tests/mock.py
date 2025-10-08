@@ -602,79 +602,8 @@ workgroup_create_visibility_json = """
 
 # Add Workgroup responses to the Responses mock session
 def add_workgroup_responses() -> None:
-    # The bad: stem is used for triggering error statuses
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:w1',
-        status=400,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 400',
-            'code': 400,
-            'message': 'Bad Request',
-            'status': 400,
-        },
-    )
 
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:w2',
-        status=500,
-        content_type='application/json',
-        json={
-            'notification': 'Internal Server Error',
-            'code': 500,
-            'message': 'Internal Server Error',
-            'status': 500,
-        },
-    )
-
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:w3',
-        status=401,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 401',
-            'code': 401,
-            'message': 'Unauthorized',
-            'status': 401,
-        },
-    )
-
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:w4',
-        status=403,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 403',
-            'code': 403,
-            'message': 'Forbidden',
-            'status': 403,
-        },
-    )
-
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:w5',
-        status=404,
-        content_type='application/json',
-        json={
-            'notification': 'Not found',
-            'code': 404,
-            'message': 'Not found',
-            'status': 404,
-        },
-    )
-
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:w6',
-        status=521,
-        content_type='text/plain',
-        body='What even is this?',
-    )
+    # SEARCH WORKGROUPS
 
     # Add some search results
     responses.add(
@@ -904,221 +833,54 @@ def add_workgroup_responses() -> None:
     )
 
     # Basic case, but with different filters
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'ACADEMIC_ADMINISTRATIVE',
-                    'privgroup': 'TRUE',
-                    'reusable': 'TRUE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
+    # In these cases, each test changes only one value of one field, based on
+    # the "basic case" above.  So, we can set up a dict of field names, their
+    # non-default values, and what JSON blob should be returned.
+    create_workgroup_field_values: dict[str, dict[str, str]] = {
+        'filter': {
+            'ACADEMIC_ADMINISTRATIVE': workgroup_create_filter_academic_administrative_json,
+            'STUDENT': workgroup_create_filter_student_json,
+            'FACULTY': workgroup_create_filter_faculty_json,
+            'STAFF': workgroup_create_filter_staff_json,
+            'FACULTY_STAFF': workgroup_create_filter_faculty_staff_json,
+            'FACULTY_STUDENT': workgroup_create_filter_faculty_student_json,
+            'STAFF_STUDENT': workgroup_create_filter_staff_student_json,
+            'FACULTY_STAFF_STUDENT': workgroup_create_filter_faculty_staff_student_json,
+        },
+        'privgroup': {
+            'FALSE': workgroup_create_privgroup_json,
+        },
+        'reusable': {
+            'FALSE': workgroup_create_reusable_json,
+        },
+        'visibility': {
+            'PRIVATE': workgroup_create_visibility_json,
+        },
+        
+    }
+    for (field_name, value_response) in create_workgroup_field_values.items():
+        for (value, response) in value_response.items():
+            initial_fields = {
+                'description': 'Create Test 1',
+                'filter': 'NONE',
+                'privgroup': 'TRUE',
+                'reusable': 'TRUE',
+                'visibility': 'STANFORD',
+            }
+            initial_fields[field_name] = value
+            responses.add(
+                responses.POST,
+                'http://example.com/wg/v2/create:1',
+                match=[
+                    matchers.json_params_matcher(
+                        initial_fields,
+                        strict_match=True,
+                    )
+                ],
+                status=201,
+                content_type='application/json',
+                body=response,
             )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_filter_academic_administrative_json,
-    )
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'STUDENT',
-                    'privgroup': 'TRUE',
-                    'reusable': 'TRUE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_filter_student_json,
-    )
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'FACULTY',
-                    'privgroup': 'TRUE',
-                    'reusable': 'TRUE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_filter_faculty_json,
-    )
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'STAFF',
-                    'privgroup': 'TRUE',
-                    'reusable': 'TRUE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_filter_staff_json,
-    )
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'FACULTY_STAFF',
-                    'privgroup': 'TRUE',
-                    'reusable': 'TRUE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_filter_faculty_staff_json,
-    )
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'FACULTY_STUDENT',
-                    'privgroup': 'TRUE',
-                    'reusable': 'TRUE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_filter_faculty_student_json,
-    )
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'STAFF_STUDENT',
-                    'privgroup': 'TRUE',
-                    'reusable': 'TRUE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_filter_staff_student_json,
-    )
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'FACULTY_STAFF_STUDENT',
-                    'privgroup': 'TRUE',
-                    'reusable': 'TRUE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_filter_faculty_staff_student_json,
-    )
-
-    # Basic case, but with privgroup off
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'NONE',
-                    'privgroup': 'FALSE',
-                    'reusable': 'TRUE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_privgroup_json,
-    )
-
-    # Basic case, but with reusable off
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'NONE',
-                    'privgroup': 'TRUE',
-                    'reusable': 'FALSE',
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_reusable_json,
-    )
-
-    # Basic case, but with visibility private
-    responses.add(
-        responses.POST,
-        'http://example.com/wg/v2/create:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'Create Test 1',
-                    'filter': 'NONE',
-                    'privgroup': 'TRUE',
-                    'reusable': 'TRUE',
-                    'visibility': 'PRIVATE',
-                },
-                strict_match=True,
-            )
-        ],
-        status=201,
-        content_type='application/json',
-        body=workgroup_create_visibility_json,
-    )
 
     # Duplicate workgroup
     responses.add(
@@ -1242,58 +1004,87 @@ def add_workgroup_responses() -> None:
 
     # GET WORKGROUP
 
-    # workgroup:test-owners works
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/workgroup:test-owners',
-        status=200,
-        content_type='application/json',
-        body=workgroup_testowners_json,
-    )
+    # These are workgroups that we support fetching.
+    for (url, json_body) in {
+        'http://example.com/wg/v2/workgroup:test-owners': workgroup_testowners_json,
+        'http://example.com/wg/v2/workgroup:workgroup-owners': workgroup_workgroupowners_json,
+        'http://example.com/wg/v2/private:1': workgroup_private1_json,
+        'http://example.com/wg/v2/test:1': workgroup_test1_json,
+        'http://example.com/wg/v2/test:2': workgroup_test2_json,
+        'http://example.com/wg/v2/bad:unknown-type': bad_unknowntype_json,
+    }.items():
+        responses.add(
+            responses.GET,
+            url,
+            status=200,
+            content_type='application/json',
+            body=json_body,
+        )
 
-    # workgroup:workgroup-owners works
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/workgroup:workgroup-owners',
-        status=200,
-        content_type='application/json',
-        body=workgroup_workgroupowners_json,
-    )
+    # To simulate upstream errors on workgroup GET and privgroup GET, we have a
+    # number of workgroups in the `bad:` stem that will always return a
+    # particular response code.
+    get_urls_responses: dict[str, tuple[int, str, str]] = {
+        'http://example.com/wg/v2/bad:w1': (
+            400,
+            'Error code 400',
+            'Bad request'
+        ),
+        'http://example.com/wg/v2/bad:w3': (
+            401,
+            'Error code 401',
+            'Unauthorized'
+        ),
+        'http://example.com/wg/v2/bad:w4': (
+            403,
+            'Error code 403',
+            'Forbidden'
+        ),
+        'http://example.com/wg/v2/bad:w5': (
+            404,
+            'Not found',
+            'Not found'
+        ),
+        'http://example.com/wg/v2/bad:w2': (
+            500,
+            'Internal Server Error',
+            'Internal Server Error'
+        )
+    }
+    for (get_url, get_response) in get_urls_responses.items():
+        (code, notification, message) = get_response
+        responses.add(
+            responses.GET,
+            get_url,
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
+        responses.add(
+            responses.GET,
+            get_url + '/privgroup',
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
 
-    # private:1 works
+    # The bad:w6 workgroup is special
     responses.add(
         responses.GET,
-        'http://example.com/wg/v2/private:1',
-        status=200,
-        content_type='application/json',
-        body=workgroup_private1_json,
-    )
-
-    # test:1 works
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/test:1',
-        status=200,
-        content_type='application/json',
-        body=workgroup_test1_json,
-    )
-
-    # test:2 works
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/test:2',
-        status=200,
-        content_type='application/json',
-        body=workgroup_test2_json,
-    )
-
-    # bad:unknown-type has an unknown-to-us member type
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:unknown-type',
-        status=200,
-        content_type='application/json',
-        body=bad_unknowntype_json,
+        'http://example.com/wg/v2/bad:w6',
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
     )
 
     # test:missing is a 404
@@ -1353,23 +1144,54 @@ def add_workgroup_responses() -> None:
         decoded_json[name] = value
         return json.dumps(decoded_json)
 
-    # Changing description
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': ('x' * 254) + '¿',
-                },
-                strict_match=True,
+    # Make a dict of all our properties, and their possible values
+    properties_possible_values: dict[Literal['description', 'filter', 'privgroup', 'reusable', 'visibility'], tuple[str, ...]] = {
+        # description is a free-form field; let's add one max-length value with
+        # a Latin1 character.
+        'description': (
+            ('x' * 254) + '¿',
+        ),
+        'filter': (
+            'NONE',
+            'ACADEMIC_ADMINISTRATIVE',
+            'STUDENT',
+            'FACULTY',
+            'STAFF',
+            'FACULTY_STAFF',
+            'FACULTY_STUDENT',
+            'STAFF_STUDENT',
+            'FACULTY_STAFF_STUDENT',
+        ),
+        'privgroup': (
+            'TRUE',
+            'FALSE',
+        ),
+        'reusable': (
+            'TRUE',
+            'FALSE',
+        ),
+        'visibility': (
+            'PRIVATE',
+            'STANFORD',
+        ),
+    }
+    for (prop_name, prop_values) in properties_possible_values.items():
+        for prop_value in prop_values:
+            responses.add(
+                responses.PUT,
+                'http://example.com/wg/v2/test:1',
+                match=[
+                    matchers.json_params_matcher(
+                        {
+                            prop_name: prop_value,
+                        },
+                        strict_match=True,
+                    )
+                ],
+                status=200,
+                content_type='application/json',
+                body=change_prop(prop_name, prop_value),
             )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('description', ('x' * 254) + '¿'),
-    )
 
     # Changing test:1 description to 'deleted' gives a special 400
     responses.add(
@@ -1396,89 +1218,50 @@ def add_workgroup_responses() -> None:
     # Changing test:1 description to various special values gives upstream
     # error response codes.
 
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'bad1',
-                },
-                strict_match=True,
-            )
-        ],
-        status=400,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 400',
-            'code': 400,
-            'message': 'Bad Request',
-            'status': 400,
-        },
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'bad2',
-                },
-                strict_match=True,
-            )
-        ],
-        status=500,
-        content_type='application/json',
-        json={
-            'notification': 'Internal Server Error',
-            'code': 500,
-            'message': 'Internal Server Error',
-            'status': 500,
-        },
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'bad3',
-                },
-                strict_match=True,
-            )
-        ],
-        status=401,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 401',
-            'code': 401,
-            'message': 'Unauthorized',
-            'status': 401,
-        },
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'description': 'bad4',
-                },
-                strict_match=True,
-            )
-        ],
-        status=403,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 403',
-            'code': 403,
-            'message': 'Forbidden',
-            'status': 403,
-        },
-    )
+    update_workgroup_description_responses: dict[str, tuple[int, str, str]] = {
+        'bad1': (
+            400,
+            'Error code 400',
+            'Bad Request'
+        ),
+        'bad3': (
+            401,
+            'Error code 401',
+            'Unauthorized'
+        ),
+        'bad4': (
+            403,
+            'Error code 403',
+            'Bad request'
+        ),
+        'bad2': (
+            500,
+            'Internal Server Error',
+            'Internal Server Error'
+        )
+    }
+    for (new_description, description_response) in update_workgroup_description_responses.items():
+        (code, notification, message) = description_response
+        responses.add(
+            responses.PUT,
+            'http://example.com/wg/v2/test:1',
+            match=[
+                matchers.json_params_matcher(
+                    {
+                        'description': new_description,
+                    },
+                    strict_match=True,
+                )
+            ],
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
 
     responses.add(
         responses.PUT,
@@ -1494,254 +1277,6 @@ def add_workgroup_responses() -> None:
         status=521,
         content_type='text/plain',
         body='What even is this?',
-    )
-
-    # Changing filter
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'filter': 'NONE',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('filter', 'NONE'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'filter': 'ACADEMIC_ADMINISTRATIVE',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('filter', 'ACADEMIC_ADMINISTRATIVE'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'filter': 'STUDENT',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('filter', 'STUDENT'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'filter': 'FACULTY',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('filter', 'FACULTY'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'filter': 'STAFF',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('filter', 'STAFF'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'filter': 'FACULTY_STAFF',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('filter', 'FACULTY_STAFF'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'filter': 'FACULTY_STUDENT',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('filter', 'FACULTY_STUDENT'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'filter': 'STAFF_STUDENT',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('filter', 'STAFF_STUDENT'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'filter': 'FACULTY_STAFF_STUDENT',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('filter', 'FACULTY_STAFF_STUDENT'),
-    )
-
-    # Changing privgroup
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'privgroup': 'TRUE',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('privgroup', 'TRUE'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'privgroup': 'FALSE',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('privgroup', 'FALSE'),
-    )
-
-    # Changing reusable
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'reusable': 'TRUE',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('reusable', 'TRUE'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'reusable': 'FALSE',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('reusable', 'FALSE'),
-    )
-
-    # Changing visibility
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'visibility': 'PRIVATE',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('visibility', 'PRIVATE'),
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'visibility': 'STANFORD',
-                },
-                strict_match=True,
-            )
-        ],
-        status=200,
-        content_type='application/json',
-        body=change_prop('visibility', 'STANFORD'),
     )
 
     # DELETE WORKGROUP
@@ -1822,8 +1357,10 @@ def add_workgroup_responses() -> None:
         body=workgroup_test1_privgroup,
     )
 
-
     # A number of special workgroup names return upstream errors
+
+    # NOTE: privgroup responses for bad:XX workgroups, other than bad:w6, are
+    # being generated in the GET WORKGROUP section.
 
     responses.add(
         responses.GET,
@@ -1840,65 +1377,15 @@ def add_workgroup_responses() -> None:
 
     responses.add(
         responses.GET,
-        'http://example.com/wg/v2/bad:w1/privgroup',
-        status=400,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 400',
-            'code': 400,
-            'message': 'Bad Request',
-            'status': 400,
-        },
-    )
-
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:w2/privgroup',
-        status=500,
-        content_type='application/json',
-        json={
-            'notification': 'Internal Server Error',
-            'code': 500,
-            'message': 'Internal Server Error',
-            'status': 500,
-        },
-    )
-
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:w3/privgroup',
-        status=401,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 401',
-            'code': 401,
-            'message': 'Unauthorized',
-            'status': 401,
-        },
-    )
-
-    responses.add(
-        responses.GET,
-        'http://example.com/wg/v2/bad:w4/privgroup',
-        status=403,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 403',
-            'code': 403,
-            'message': 'Forbidden',
-            'status': 403,
-        },
-    )
-
-    responses.add(
-        responses.GET,
         'http://example.com/wg/v2/bad:w6/privgroup',
         status=521,
         content_type='text/plain',
         body='What even is this?',
     )
 
-    # ADD MEMBER
+    # ADD MEMBER and REMOVE MEMBER
+
+    # Some good add-member operations
 
     responses.add(
         responses.PUT,
@@ -1935,158 +1422,14 @@ def add_workgroup_responses() -> None:
         status=200,
         content_type='application/json',
         json={
-            'notification': 'adamhl was added as a member to the workgroup: test:1',
+            'notification': 'cert5225 was added as a member to the workgroup: test:1',
             'code': 200,
             'message': 'Added',
             'status': 200,
         },
     )
 
-    # A few responses that raise bad status codes
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1/members/inactive',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'type': 'USER',
-                },
-                strict_match=True,
-            )
-        ],
-        status=400,
-        content_type='application/json',
-        json={
-            'notification': 'Workgroup is inactive',
-            'code': 400,
-            'message': 'Bad Request',
-            'status': 400,
-        },
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1/members/bad400',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'type': 'USER',
-                },
-                strict_match=True,
-            )
-        ],
-        status=400,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 400',
-            'code': 400,
-            'message': 'Bad Request',
-            'status': 400,
-        },
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1/members/bad401',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'type': 'USER',
-                },
-                strict_match=True,
-            )
-        ],
-        status=401,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 401',
-            'code': 401,
-            'message': 'Unauthorized',
-            'status': 401,
-        },
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1/members/nobody',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'type': 'USER',
-                },
-                strict_match=True,
-            )
-        ],
-        status=404,
-        content_type='application/json',
-        json={
-            "notification": "Not Found",
-            "code": 404,
-            "message": "nobody was not found",
-            "status": 404
-        },
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1/members/leland',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'type': 'USER',
-                },
-                strict_match=True,
-            )
-        ],
-        status=409,
-        content_type='application/json',
-        json={
-            "notification": "Conflict",
-            "code": 409,
-            "message": "Member leland of type USER already exist in workgroup: test:1",
-            "status": 409
-        },
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1/members/bad500',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'type': 'USER',
-                },
-                strict_match=True,
-            )
-        ],
-        status=500,
-        content_type='application/json',
-        json={
-            'notification': 'Internal Server Error',
-            'code': 500,
-            'message': 'Internal Server Error',
-            'status': 500,
-        },
-    )
-
-    responses.add(
-        responses.PUT,
-        'http://example.com/wg/v2/test:1/members/bad521',
-        match=[
-            matchers.json_params_matcher(
-                {
-                    'type': 'USER',
-                },
-                strict_match=True,
-            )
-        ],
-        status=521,
-        content_type='text/plain',
-        body='What even is this?',
-    )
-
-    # REMOVE MEMBER
+    # Some good remove-member operations
 
     responses.add(
         responses.DELETE,
@@ -2130,58 +1473,81 @@ def add_workgroup_responses() -> None:
         },
     )
 
-    # A few responses that raise bad status codes
+    # Add our common API errors
+
+    add_remove_member_responses: dict[str, tuple[int, str, str]] = {
+        'inactive': (
+            400,
+            'Workgroup is inactive',
+            'Bad Request'
+        ),
+        'bad400': (
+            400,
+            'Error code 400',
+            'Bad request'
+        ),
+        'bad401': (
+            401,
+            'Error code 401',
+            'Unauthorized'
+        ),
+        'bad500': (
+            500,
+            'Internal Server Error',
+            'Internal Server Error'
+        )
+    }
+    for (member_name, add_remove_response) in add_remove_member_responses.items():
+        (code, notification, message) = add_remove_response
+        responses.add(
+            responses.PUT,
+            'http://example.com/wg/v2/test:1/members/' + member_name,
+            match=[
+                matchers.json_params_matcher(
+                    {
+                        'type': 'USER',
+                    },
+                    strict_match=True,
+                )
+            ],
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
+        responses.add(
+            responses.DELETE,
+            'http://example.com/wg/v2/test:1/members/' + member_name,
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
+
+    # And our special 521 errors
 
     responses.add(
-        responses.DELETE,
-        'http://example.com/wg/v2/test:1/members/inactive',
-        status=400,
-        content_type='application/json',
-        json={
-            'notification': 'Workgroup is inactive',
-            'code': 400,
-            'message': 'Bad Request',
-            'status': 400,
-        },
-    )
-
-    responses.add(
-        responses.DELETE,
-        'http://example.com/wg/v2/test:1/members/bad400',
-        status=400,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 400',
-            'code': 400,
-            'message': 'Bad Request',
-            'status': 400,
-        },
-    )
-
-    responses.add(
-        responses.DELETE,
-        'http://example.com/wg/v2/test:1/members/bad401',
-        status=401,
-        content_type='application/json',
-        json={
-            'notification': 'Error code 401',
-            'code': 401,
-            'message': 'Unauthorized',
-            'status': 401,
-        },
-    )
-
-    responses.add(
-        responses.DELETE,
-        'http://example.com/wg/v2/test:1/members/bad500',
-        status=500,
-        content_type='application/json',
-        json={
-            'notification': 'Internal Server Error',
-            'code': 500,
-            'message': 'Internal Server Error',
-            'status': 500,
-        },
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/bad521',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
     )
 
     responses.add(
@@ -2198,6 +1564,50 @@ def add_workgroup_responses() -> None:
         status=521,
         content_type='text/plain',
         body='What even is this?',
+    )
+
+    # Finally, a couple of add-member errors unique to add-member
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/nobody',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=404,
+        content_type='application/json',
+        json={
+            "notification": "Not Found",
+            "code": 404,
+            "message": "nobody was not found",
+            "status": 404
+        },
+    )
+
+    responses.add(
+        responses.PUT,
+        'http://example.com/wg/v2/test:1/members/leland',
+        match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=409,
+        content_type='application/json',
+        json={
+            "notification": "Conflict",
+            "code": 409,
+            "message": "Member leland of type USER already exist in workgroup: test:1",
+            "status": 409
+        },
     )
 
     # ADD ADMINISTRATOR
