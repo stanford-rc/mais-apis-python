@@ -1,5 +1,5 @@
-Unreleased
-----------
+0.53.0
+------
 
 Enhancements:
 
