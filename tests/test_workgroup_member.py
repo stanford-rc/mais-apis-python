@@ -209,11 +209,13 @@ def test_add_workgroup(workgroup_client):
     workgroup_client.clear_cache()
 
     # Test adding by PartialWorkgroup
+    # NOTE: Our conditional pop might not get executed, depending on the
+    # randomness of sets.  So, exclude the line from coverage.
     test_results = workgroup_client.search_by_name('workgroup:*')
     assert len(test_results) == 2
     test_result = test_results.pop()
     if test_result.name != 'workgroup:test-owners':
-        test_result = test_results.pop()
+        test_result = test_results.pop() # pragma: no cover
     workgroup = workgroup_client.create(
         name='create:1',
         description='Create Test 1',
