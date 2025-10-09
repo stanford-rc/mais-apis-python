@@ -32,6 +32,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Office/Business",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
@@ -108,7 +109,7 @@ testpaths = [
 requires = [
     "tox>=4.28.3",
 ]
-env_list = "py{311,312,313}-{minimal,latest}"
+env_list = "py{311,312,313,314}-{minimal,latest}"
 
 [tool.tox.env_run_base]
 deps = [
@@ -145,6 +146,7 @@ commands = [
 "3.11" = ["py311-minimal", "py311-latest", "report"]
 "3.12" = ["py312-minimal", "py312-latest", "report"]
 "3.13" = ["py313-minimal", "py313-latest", "report"]
+"3.14" = ["py314-minimal", "py314-latest", "report"]
 
 [tool.bandit.assert_used]
 skips = [ "tests/*.py" ]

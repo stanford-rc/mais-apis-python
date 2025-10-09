@@ -9,6 +9,7 @@ Fixes:
 
 Other:
 
+* This package is now also being tested with Python 3.14.
 
 0.54.0
 ------
