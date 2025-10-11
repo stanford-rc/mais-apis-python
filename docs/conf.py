@@ -45,7 +45,7 @@ extensions: list[str] = [
 intersphinx_mapping: dict[str, tuple[str, None | tuple[str, tuple[str | None, ...]]]] = {
     'python': ('https://docs.python.org/3', None),
     'pytz': ('https://pythonhosted.org/pytz/', None),
-    'requests': ('https://docs.python-requests.org/en/master', None),
+    'requests': ('https://docs.python-requests.org/en/latest/', None),
 }
 
 # Autodoc configuration
