@@ -85,5 +85,5 @@ html_static_path: list[str] = []
 # https://github.com/readthedocs/sphinx_rtd_theme/issues/455).
 html_theme_options: dict[str, Any] = {
     'collapse_navigation': False,
-    'navigation_depth': 2,
+    'navigation_depth': 4,
 }

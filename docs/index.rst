@@ -7,6 +7,7 @@
 
 .. toctree::
    :hidden:
+   :maxdepth: 4
 
    client
    account
