@@ -1116,7 +1116,8 @@ class Workgroup:
         4. Remove all people who do not meet this workgroup's filter.
 
         Since the privgroup's contents potentially depend on ths membership of
-        other workgroups, the workgroup's 
+        other workgroups, and may also depend on the affiliation of each
+        member, the workgroup's privgroup must be fetched when it is needed.
 
         .. note::
             To get the privgroup for a workgroup, your client certificate must
