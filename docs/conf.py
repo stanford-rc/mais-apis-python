@@ -61,6 +61,9 @@ templates_path: Sequence[str] = []
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns: Sequence[str] = ['_build', 'Thumbs.db', '.DS_Store']
 
+# Enable "nitpicky" mode: Warn about all references where the target cannot be
+# found.
+nitpicky = True
 
 # -- Options for HTML output -------------------------------------------------
 
