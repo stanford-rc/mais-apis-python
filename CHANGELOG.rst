@@ -3,6 +3,7 @@ Unreleased
 
 Enhancements:
 
+* Workgroup now has full documentation!
 
 Fixes:
 
