@@ -6,6 +6,7 @@ Enhancements:
 
 Fixes:
 
+* In documentation, a number of references were broken, and have now been fixed.
 
 Other:
 
