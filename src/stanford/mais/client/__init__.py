@@ -25,7 +25,7 @@ from __future__ import annotations
 import collections.abc
 import dataclasses
 import logging
-import pathlib
+import os
 import requests
 import ssl
 from typing import NamedTuple, TypedDict
@@ -120,7 +120,7 @@ class MAISClient():
     :raises TypeError: You did not provide a mapping.
     """
 
-    cert: pathlib.Path
+    cert: os.PathLike
     """The path to a TLS client certificate.
 
     This may contain *either* a single TLS client certificate, *or* a TLS
@@ -133,9 +133,15 @@ class MAISClient():
 
     A test load will be made before the constructor completes.
 
-    .. note:
+    .. note::
         If you provide your own ``session``, then this parameter is ignored,
-        though the test will still be performed
+        though the test will still be performed.
+
+    .. warning::
+        If you provide a non-absolute path, it may not be relative to a
+        home directory (like ``~``), or to a variable (like ``%UserProfile%``).
+        If you have such a path, run it through :meth:`pathlib.Path.resolve`
+        first.
 
     :raises FileNotFoundError: The file does not exist.
 
@@ -145,7 +151,7 @@ class MAISClient():
         there was some other problem loading the certificate.
     """
 
-    key: pathlib.Path | None = None
+    key: os.PathLike | None = None
     """The path to a TLS private key.
 
     This must be the private key associated with the provided certificate, any
@@ -163,9 +169,15 @@ class MAISClient():
     A test load of the key and certificate will be made before the constructor
     completes.
 
-    .. note:
+    .. note::
         If you provide your own ``session``, then this parameter is ignored.
         though the test will still be performed
+
+    .. warning::
+        If you provide a non-absolute path, it may not be relative to a
+        home directory (like ``~``), or to a variable (like ``%UserProfile%``).
+        If you have such a path, run it through :meth:`pathlib.Path.resolve`
+        first.
 
     :raises FileNotFoundError: The file does not exist.
 
@@ -217,12 +229,8 @@ class MAISClient():
         if not isinstance(self.urls, collections.abc.Mapping):
             raise TypeError('urls')
 
-        # Check if cert is a string, and convert if needed.
-        if not isinstance(self.cert, pathlib.Path):
-            self.__dict__['cert'] = pathlib.Path(self.cert)
-
         # Try opening the file, to confirm it can be opened.
-        with self.cert.open(mode='r') as f:
+        with open(self.cert, mode='r') as f:
             pass
 
         # Try to parse the client certificate.
@@ -264,8 +272,8 @@ class MAISClient():
     @classmethod
     def prod(
         cls,
-        cert: pathlib.Path,
-        key: pathlib.Path | None = None,
+        cert: os.PathLike,
+        key: os.PathLike | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to production (PROD) APIs.
@@ -307,8 +315,8 @@ class MAISClient():
     @classmethod
     def uat(
         cls,
-        cert: pathlib.Path,
-        key: pathlib.Path | None = None,
+        cert: os.PathLike,
+        key: os.PathLike | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to production-track test (UAT)
@@ -351,8 +359,8 @@ class MAISClient():
     @classmethod
     def uat1(
         cls,
-        cert: pathlib.Path,
-        key: pathlib.Path | None = None,
+        cert: os.PathLike,
+        key: os.PathLike | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to connect to UAT1 APIs, used
