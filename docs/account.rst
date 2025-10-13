@@ -3,7 +3,7 @@ Account API
 ===========
 
 This is the documentation for the Python client for the MaIS Account API.
-Everything on this page is located in the :mod:`stanford.mais.account` module.
+Everything on this page is located in the ``stanford.mais.account`` module.
 
 To begin using the MaIS Account API, you should first instantiate a
 :class:`~stanford.mais.client.MAISClient` object.  Once that is done, you can
