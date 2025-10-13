@@ -219,7 +219,7 @@ class Account():
       US/Pacific time zone, in the form of a POSIX timestamp tht has been
       multiplied by 1,000 and microseconds added on to the end.  You can parse
       this using :meth:`datetime.datetime.fromtimestamp` and the third-party
-      :meth:`pytz.timezone` as follows:
+      ``pytz.timezone`` as follows:
 
       .. code-block:: python
 

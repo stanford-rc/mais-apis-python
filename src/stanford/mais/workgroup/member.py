@@ -79,16 +79,16 @@ class WorkgroupMembership:
     Within this class, the members (or administrators) are divided into three
     categories, each of which has its own property accessor:
 
-    * :meth:`people` provides access to the set of members who are people.  The
+    * :attr:`people` provides access to the set of members who are people.  The
       values stored are SUNetIDs, and the type is
       :class:`WorkgroupMembershipPersonContainer`.
 
-    * :meth:`workgroups` provides access to the set of nested workgroups.  The
+    * :attr:`workgroups` provides access to the set of nested workgroups.  The
       values stored are fully-qualified workgroup names (in the typical
       'stem:name' form), and the type is
       :class:`WorkgroupMembershipWorkgroupContainer`.
 
-    * :meth:`certificates` provides access to the set of certificates.  The
+    * :attr:`certificates` provides access to the set of certificates.  The
       values stored are certificate subject common names (CNs), and the type is
       :class:`WorkgroupMembershipCertificateContainer`.
 
@@ -237,21 +237,21 @@ class WorkgroupMembershipContainer(
     Either all people, all certificates, or all workgroups.
 
     This container acts like a :class:`set`, and so all of the normal set
-    methods (like :func:`len` and :func:`~set.add`) are supported.  `in` is
-    supported to check for membership.
+    methods (like :func:`len` and :meth:`~frozenset.add`) are supported.  `in`
+    is supported to check for membership.
 
     .. warning::
         Changes made here result in API calls, changing the Workgroup
         membership.  Be very careful before you do things like calling
-        :meth:`~set.clear`.
+        :meth:`~frozenset.clear`.
 
     .. note::
-        Changes made here happen synchronously within the Workgroups API,
-        but asynchronously elsewhere.  In other words, when calls like
-        :meth:`~set.add` return successfully, you know that the change has been
-        made and takes effect immediately within Workgroup Manager, but it will
-        take time for the change to propagate to the privgroup, and to
-        downstream clients like LDAP.
+        Changes made here happen synchronously within the Workgroups API, but
+        asynchronously elsewhere.  In other words, when calls like
+        :meth:`~frozenset.add` return successfully, you know that the change
+        has been made and takes effect immediately within Workgroup Manager,
+        but it will take time for the change to propagate to the privgroup, and
+        to downstream clients like LDAP.
     """
 
     _identifiers: set[str]
@@ -370,8 +370,10 @@ class WorkgroupMembershipContainer(
 
         .. danger::
             It is also possible that someone else has deleted the workgroup.
-            If that happens, the :attr:`deleted` property will be set and a
-            :class:`WorkgroupDeleted` exception will be raised.
+            If that happens, the
+            :attr:`~stanford.mais.workgroup.Workgroup.deleted` property will be
+            set and a :class:`~stanford.mais.workgroup.WorkgroupDeleted`
+            exception will be raised.
 
         :raises ChildProcessError:
             Something went wrong on the server side (a 400 or 500 error was
@@ -379,7 +381,7 @@ class WorkgroupMembershipContainer(
 
         :raises EOFError: The related Workgroup instance no longer exists.
 
-        :raises KeyErrror: The identifier was already added.
+        :raises KeyError: The identifier was already added.
 
         :raises WorkgroupDeleted: The workgroup has been deleted.
 
@@ -488,8 +490,10 @@ class WorkgroupMembershipContainer(
 
         .. danger::
             It is also possible that someone else has deleted the workgroup.
-            If that happens, the :attr:`deleted` property will be set and a
-            :class:`WorkgroupDeleted` exception will be raised.
+            If that happens, the
+            :attr:`~stanford.mais.workgroup.Workgroup.deleted` property will be
+            set and a :class:`~stanford.mais.workgroup.WorkgroupDeleted`
+            exception will be raised.
 
         :raises ChildProcessError: Something went wrong on the server side (a 400 or 500 error was returned).
 
@@ -639,7 +643,7 @@ class WorkgroupMembershipWorkgroupContainer(WorkgroupMembershipContainer):
     * :meth:`~object.__contains__` (also known as ``in``)
 
     .. note::
-        Regardless of what you :meth:`~set.add` — :class:`str`,
+        Regardless of what you :meth:`~frozenset.add` — :class:`str`,
         :class:`~stanford.mais.workgroup.Workgroup` or
         :class:`~stanford.mais.workgroup.PartialWorkgroup` — the set will only
         ever contain (and return) strings.

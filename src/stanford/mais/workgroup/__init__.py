@@ -610,9 +610,11 @@ class WorkgroupClient():
 
         .. danger::
             If you are holding a reference to an existing :class:`Workgroup`,
-            or to one of the the Workgroup's :class:`WorkgroupMembership`
-            or :class:`WorkgroupMembershipContainer`, clearing the cache does
-            not invalidate those references!
+            or to one of the the Workgroup's
+            :class:`~stanford.mais.workgroup.member.WorkgroupMembership`
+            or
+            :class:`~stanford.mais.workgroup.member.WorkgroupMembershipContainer`,
+            clearing the cache does not invalidate those references!
 
             This method should not be called unless you know what you are
             doing.

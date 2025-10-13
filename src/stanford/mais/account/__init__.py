@@ -180,11 +180,11 @@ class PartialAccount:
 class AccountClient():
     """
 
-    The :class:`AccountClient` is the second thing you will instantiate when you
-    want to interact with the MaIS Account API.  (The first thing you
-    instantiate is a :class:`MAISClient`).  Once you have a
-    :class:`MAISClient`, you pass it to the :class:`AccountClient` constructor
-    with this parameter:
+    The :class:`AccountClient` is the second thing you will instantiate when
+    you want to interact with the MaIS Account API.  (The first thing you
+    instantiate is a :class:`~stanford.mais.client.MAISClient`).  Once you have
+    a :class:`~stanford.mais.client.MAISClient`, you pass it to the
+    :class:`AccountClient` constructor with this parameter:
 
     :param stanford.mais.client.MAISClient client: The MAIS client to use.
 

@@ -85,9 +85,9 @@ class WorkgroupFilter(enum.Enum):
         or do not want it to apply to your workgroup stem, contact MaIS.
 
     .. note::
-        Normally, calling :func:`str` on an :class:`~enum.Enum` will result in
+        Normally, calling ``str`` on an :class:`~enum.Enum` will result in
         a fully-qualified string (for example, ``WorkgroupFilter.NONE``).
-        If you cal' :func:`str` here, only the value (for example, ``NONE``)
+        If you call ``str`` here, only the value (for example, ``NONE``)
         will be returned.
     """
 
@@ -153,9 +153,9 @@ class WorkgroupVisibility(enum.Enum):
     membership.  The different options available are defined here.
 
     .. note::
-        Normally, calling :func:`str` on an :class:`~enum.Enum` will result in
+        Normally, calling ``str`` on an :class:`~enum.Enum` will result in
         a fully-qualified string (for example, ``WorkgroupVisibility.PRIVATE``).
-        If you call :func:`str` here, only the value (for example, ``PRIVATE``)
+        If you call ``str`` here, only the value (for example, ``PRIVATE``)
         will be returned.
     """
 
