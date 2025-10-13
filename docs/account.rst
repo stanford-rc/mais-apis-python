@@ -22,6 +22,9 @@ Each account is returned as an instance of the
 Account API Client
 ==================
 
+.. autoclass:: stanford.mais.account.account.AccountServiceTypes
+   :members:
+
 .. autoclass:: stanford.mais.account.AccountClient
    :members:
 
