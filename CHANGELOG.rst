@@ -5,6 +5,9 @@ Enhancements:
 
 * Workgroup now has full documentation!
 
+* All documentation has been reorganized, to include both narrative
+  documentation and docstring-based documentation.
+
 Fixes:
 
 * In documentation, a number of references were broken, and have now been fixed.
