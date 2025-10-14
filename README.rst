@@ -138,15 +138,13 @@ The following APIs are supported:
   accounts don't exist (so you don't have to filter them out).  Also provided
   is code for quickly validating a collection of SUNetIDs.
 
-Work is in progress on the following APIs:
-
 * `Workgroup`_: Full support for operations on individual workgroups.
   Creating workgroups.  Searching for workgroup by name, or by member (member
   SUNetID, member certificate, or member (nested) workgroup).
   Modifying workgroup properties and membership.  Deleting workgroups.
-  Fetching privilege groups.  Checking and making linkages.
+  Fetching privilege groups.
 
-  *Not currently planned*: Anything related to workgroup integrations.
+  *Not currently planned*: Anything related to workgroup integration linkages.
 
 Support is not planned for the following APIs, as the author does not
 currently have a need for them:

@@ -3,6 +3,8 @@ Unreleased
 
 Enhancements:
 
+* Workgroup is now a supported API!
+
 * Workgroup now has full documentation!
 
 * All documentation has been reorganized, to include both narrative
