@@ -490,6 +490,12 @@ who are people.  If a workgroup is nested, then the nested workgroup's
 privgroup is calculated and included.  Finally, filters are applied.  When
 constructing a privgroup, all certificates are ignored.
 
+.. note::
+   The Workgroup Manager web site only makes privgroup listings available
+   to workgroup administrators.  The API, however, allows all client
+   certificates to get the privgroup of all stanford-visible workgroups, and
+   all workgroups where the client certificate is an administrator.
+
 .. important::
    The steps for generating a privgroup listing is complicated.  For details,
    see the Module Documentation of
