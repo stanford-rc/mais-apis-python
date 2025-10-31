@@ -652,6 +652,19 @@ def add_workgroup_responses() -> None:
 
     responses.add(
         responses.GET,
+        'http://example.com/wg/v2/search/ba:*',
+        status=400,
+        content_type='application/json',
+        json={
+            "notification": "Search String length must be at least 4 characters before using wildcards",
+            "code": 400,
+            "message": "Bad Request",
+            "status":400,
+        }
+    )
+
+    responses.add(
+        responses.GET,
         'http://example.com/wg/v2/search/bad:w1',
         status=400,
         content_type='application/json',
