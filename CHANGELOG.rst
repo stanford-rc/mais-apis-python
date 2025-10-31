@@ -3,6 +3,8 @@ Unreleased
 
 Enhancements:
 
+* When using WorkgroupClient.search_by_name, if you put a wildcard too early in
+  the string, you'll now get an IndexError instead of a ChildProcessError.
 
 Fixes:
 
