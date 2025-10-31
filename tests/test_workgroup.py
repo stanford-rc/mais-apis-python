@@ -113,6 +113,8 @@ def test_search_by_name_bad(workgroup_client):
         workgroup_client.search_by_name('')
     with pytest.raises(ValueError):
         workgroup_client.search_by_name('*')
+    with pytest.raises(IndexError):
+        workgroup_client.search_by_name('ba:*')
     with pytest.raises(ChildProcessError):
         workgroup_client.search_by_name('bad:w1')
     with pytest.raises(PermissionError):

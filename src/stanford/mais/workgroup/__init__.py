@@ -303,17 +303,24 @@ class WorkgroupClient():
             ``research-computing:sysadmins*``.
 
             To search across all stems, you may omit the ``*``.  However, you
-            must provide at least for characters before the first wildcard.
+            must provide at least four characters before the first wildcard.
             For exaple, ``mais*`` will work, but ``mai*`` will fail.
 
             You may have multiple wildcards in your search.
 
+            .. important::
+               If you own a one- or two-character stem, the "at least four
+               characters before the first wildcard" limit means you are not
+               allowed to list all the workgroups in your stem.  For example,
+               for the ``hr`` stem, you would be searching for ``hr:*``, which
+               only has three characters before the first wildcard.
+
         :returns: A collection of partial workgroups.
 
         :raises ChildProcessError: Something went wrong on the server side (a
-            400 or 500 error was returned).  This exception is also raised if
-            you are doing a not-stem-limited search, and you do not have at
-            least 4 characters before the first wildcard.
+            400 or 500 error was returned).
+
+        :raises IndexError: You had a wildcard too early in your search.
 
         :raises KeyError: The workgroup does not exist.
 
@@ -354,7 +361,17 @@ class WorkgroupClient():
 
         # Catch a number of bad errors.
         match response.status_code:
-            case 400 | 500:
+            case 400:
+                # Before raising an exception, we need to check the position of
+                # any wildcards.
+                wildcard_position = search.find('*')
+                if (wildcard_position >= 0) and (wildcard_position <= 3):
+                    error(f"Search {search} has wildcard at position {wildcard_position}")
+                    raise IndexError(response.text)
+                else:
+                    error(f"Upstream API error: {response.text}")
+                    raise ChildProcessError(response.text)
+            case 500:
                 error(f"Upstream API error: {response.text}")
                 raise ChildProcessError(response.text)
             case 401 | 403:

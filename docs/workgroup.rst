@@ -91,6 +91,11 @@ of the workgroup:
     nero_workgroup_results = wclient.search_by_name('nero:*')
     nero_workgroups = list(result.workgroup() for result in nero_workgroup_results)
 
+.. important::
+   You must have at least four characters in your search string, before your
+   first wildcard.  Searching for ``abc:*`` will work, but if you search for
+   ``ab:*``, you'll get an IndexError.
+
 Although it's common to put a single asterisk at the end of the search—for a
 "starts with" type of search—you can put wildcards in the middle of a search:
 
