@@ -107,10 +107,20 @@ def test_get_test1(workgroup_client) -> None:
 # NOTE: This is meant to test the preëmptive PermissionError that
 # get_privgroup() raises when can_see_members() is False.
 def test_get_private(workgroup_client):
-    workgroup = workgroup_client['private:1']
 
+    # Test our preëmptive privgroup check
+    result1 = workgroup_client['private:1']
     with pytest.raises(PermissionError):
-        workgroup.get_privgroup()
+        result1.get_privgroup()
+    workgroup_client.clear_cache()
+
+    # Next, test handling a proper API response
+    result2 = workgroup_client['test:1']
+    result2._name = 'private:1'
+    with pytest.raises(PermissionError):
+        result2.get_privgroup()
+    workgroup_client.clear_cache()
+
 
 # Use special workgroup names to test upstream failures, including
 # PermissionError coming from the API.

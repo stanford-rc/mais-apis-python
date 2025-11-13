@@ -1211,11 +1211,22 @@ class Workgroup:
         administrators: set[PrivgroupEntry] = set()
         members: set[PrivgroupEntry] = set()
 
-        # Process the results and return
+        # Process the results into sets
         for administrator in results['administrators']:
             administrators.add(PrivgroupEntry.from_json(administrator))
         for member in results['members']:
             members.add(PrivgroupEntry.from_json(member))
+
+        # Are both sets empty?  We probably lost access to the workgroup.
+        if len(administrators) == 0 and len(members) == 0:
+            warning(f"We got empty privgroup after API call: {results['message']}")
+            # If we got a message, then it's a permission error.  Otherwise,
+            # return it to the client as normal.
+            if (
+                'message' in results and
+                results['message'] == 'This is a private workgroup!'
+            ):
+                raise PermissionError()
 
         debug(f"Returning {len(administrators)} admins and {len(members)} members")
         return PrivgroupContents(
