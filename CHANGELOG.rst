@@ -8,6 +8,10 @@ Enhancements:
 
 Fixes:
 
+* Fix a TOCTOU issue where you had admin access to a private workgroup at the
+  time of fetch, but lost access between then and the ``get_privgroup()`` call.
+  Instead of returning an empty privgroup, now a ``PermissionError`` will be
+  raised.  (#31)
 
 Other:
 
