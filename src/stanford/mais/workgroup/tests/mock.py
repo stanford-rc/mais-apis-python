@@ -217,6 +217,17 @@ workgroup_private1_json = """
 }
 """
 
+workgroup_private1_privgroup = """
+{
+"members": [
+],
+"name": "private:1",
+"message": "This is a private workgroup!",
+"administrators": [
+]
+}
+"""
+
 # A workgroup with a type of member we've never seen before.
 bad_unknowntype_json = """
 {
@@ -1368,6 +1379,14 @@ def add_workgroup_responses() -> None:
         status=200,
         content_type='application/json',
         body=workgroup_test1_privgroup,
+    )
+
+    responses.add(
+        responses.GET,
+        'http://example.com/wg/v2/private:1/privgroup',
+        status=200,
+        content_type='application/json',
+        body=workgroup_private1_privgroup,
     )
 
     # A number of special workgroup names return upstream errors
