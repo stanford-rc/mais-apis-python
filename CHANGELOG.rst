@@ -9,6 +9,9 @@ Fixes:
 
 Other:
 
+* The URLs for the Workgroup PROD and UAT APIs have changed.  The old URLs have
+  been deprecated, and will stop working in January, 2026.  **This is an
+  important change for Workgroup users!**
 
 0.54.0
 ------
