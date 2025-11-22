@@ -124,10 +124,13 @@ Besides searching for workgroups by name, you can also search for workgroups
 based on who (or what) is included in a workgroup.
 :meth:`~stanford.mais.workgroup.WorkgroupClient.search_by_user` searches for
 workgroups by SUNetID, returning workgroups containing the user as a direct
-**or indirect** member or administrator.  
+**or indirect** member or administrator.
+:meth:`~stanford.mais.workgroup.WorkgroupClient.search_by_workgroup` and
+:meth:`~stanford.mais.workgroup.WorkgroupClient.search_by_certificate` perform
+the same search, based on member workgroups and nested certificates.
 
 .. important::
-   This search may give unexpected results!
+   These searches may give unexpected results!
 
 For example, say a user is a member of workgroup `test:a`, and `test:a` is
 nested into the administrators of `test:b`.  Here is what you would see when
