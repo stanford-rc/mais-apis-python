@@ -80,10 +80,11 @@ check if a workgroup exists:
 Searching by Name
 -----------------
 
-Workgroups can be searched for by using a "starts with" -style search with
-wildcards.  Search results do not include all the details of the workgroups, so
-if you want full information, you need to make a call to fetch the full details
-of the workgroup:
+Workgroups can be searched for by name.
+:meth:`~stanford.mais.workgroup.WorkgroupClient.search_by_name` performs a
+"starts with" -style search with wildcards.  Search results do not include all
+the details of the workgroups, so if you want full information, you need to
+make a call to fetch the full details of the workgroup:
 
 .. code-block:: python
 
