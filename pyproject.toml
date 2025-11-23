@@ -133,7 +133,7 @@ deps = [
 
 [tool.tox.env.latest]
 deps = [
-    "requests >2.32.4, <3.0",
+    "requests >2.32.5, <3.0",
     "setuptools >=80.9.0",
 ]
 
