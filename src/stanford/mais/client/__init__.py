@@ -246,10 +246,9 @@ class MAISClient():
         # Do we need to create our own Session?
         if not hasattr(self, 'session'):
             debug('Creating Session')
-            # Set up a session with our cert/key, timeouts, and also specify
-            # that we want JSON responses.
-
             new_session = _CustomSession()
+
+            # Set up our cert/key.
             if self.key is None:
                 new_session.cert = str(self.cert)
             else:
@@ -257,11 +256,17 @@ class MAISClient():
                     str(self.cert),
                     str(self.key),
                 )
+
+            # Set up custom timeouts, if provided.
             if self.timeout is not None:
                 new_session.timeout = self.timeout
+
+            # Ask for JSON responses
             new_session.headers.update({
                 'Accept': 'application/json',
             })
+
+            # Finally, put the new session into place
             object.__setattr__(self, 'session', new_session)
         else:
             debug('Using client-provided session')
