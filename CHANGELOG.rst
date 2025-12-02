@@ -13,6 +13,12 @@ Fixes:
   Instead of returning an empty privgroup, now a ``PermissionError`` will be
   raised.  (#31)
 
+* The Workgroup.last_update property does not take into account workgroup
+  membership changes.  It only resets when a workgroup property (description,
+  filter, privgroup, reusable, visibility) is changed.  The docstring of
+  ``Workgroup.last_update`` has been updated, along with the narrative
+  documentation.  (#45)
+
 Other:
 
 * The URLs for the Workgroup PROD and UAT APIs have changed.  The old URLs have
