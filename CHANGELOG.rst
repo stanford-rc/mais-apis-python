@@ -19,6 +19,9 @@ Other:
   been deprecated, and will stop working in January, 2026.  **This is an
   important change for Workgroup users!**
 
+* We now set a custom HTTP User-Agent: In case we ever cause problems for MaIS
+  APIs, this will help them identify the SDK that is causing the trouble!  (#46)
+
 0.55.0
 ------
 
