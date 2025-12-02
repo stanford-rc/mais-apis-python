@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import importlib.metadata
 import itertools
+import platform
 import pytest
 import ssl
 from stanford.mais.client import MAISClient
@@ -40,6 +42,25 @@ def test_good_uat(snakeoil_cert):
     client = MAISClient.uat(snakeoil_cert)
     for service in services:
         assert service in client.urls
+
+# Test that our client session sets the headers we expect
+def test_headers(snakeoil_cert):
+    client = MAISClient.prod(snakeoil_cert)
+    session = client.session
+
+    # Accept header should be set to a fixed string
+    assert 'Accept' in session.headers
+    assert session.headers['Accept'] == 'application/json'
+
+    # User-Agent header is composed of our Python version, the version of the
+    # requests package, and our pacakge version.
+    assert 'User-Agent' in session.headers
+    python_version = platform.python_version()
+    requests_version = importlib.metadata.version('requests')
+    our_version = importlib.metadata.version('stanford-mais')
+    assert session.headers['User-Agent'] == (
+        f"Python/{python_version} requests/{requests_version} stanford-mais/{our_version}"
+    )
 
 # Test if we can get a client with separate key and cert
 def test_good_prod_certkey(snakeoil_cert_key):

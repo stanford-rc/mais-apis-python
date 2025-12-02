@@ -24,8 +24,10 @@ from __future__ import annotations
 # Start with stdlib imports
 import collections.abc
 import dataclasses
+import importlib.metadata
 import logging
 import os
+import platform
 import requests
 import ssl
 from typing import NamedTuple, TypedDict
@@ -38,6 +40,13 @@ info = logger.info
 # We are the root for this module, so do library-wide logging configuration.
 # See https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
 logging.getLogger('stanford.mais.client').addHandler(logging.NullHandler())
+
+# Define our custom user-agent, a static string
+USER_AGENT = ' '.join((
+    ('Python/' + platform.python_version()),
+    ('requests/' + importlib.metadata.version('requests')),
+    ('stanford-mais/' + importlib.metadata.version('stanford-mais')),
+))
 
 # Define
 class _URLs(TypedDict, total=False):
@@ -197,7 +206,8 @@ class MAISClient():
 
     If you provide your own Session, then you are responsible for configuring
     it, and the ``cert``, ``key``, and ``timeout`` parameters are
-    ignored.
+    ignored.  You must also set the `Accept` header to `application/json`, and
+    you should also set the `User-Agent` header.
     """
 
     timeout: Timeout | float | None = None
@@ -264,6 +274,11 @@ class MAISClient():
             # Ask for JSON responses
             new_session.headers.update({
                 'Accept': 'application/json',
+            })
+
+            # Set our custom user-agent
+            new_session.headers.update({
+                'User-Agent': USER_AGENT,
             })
 
             # Finally, put the new session into place
