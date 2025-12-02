@@ -330,9 +330,9 @@ Two properties are read-only, and can only be read if the workgroup is not
 deleted:
 
 * :attr:`~stanford.mais.workgroup.Workgroup.last_update`: The
-  :class:`datetime.date` when the workgroup (not the
+  :class:`datetime.date` when the workgroup's properties (not the
   :class:`~stanford.mais.workgroup.Workgroup` instance, the actual underlying
-  workgroup) was last changed.
+  workgroup) were last changed.
 
   .. warning::
      This date is in the Stanford-local time zone.  Remember to take

@@ -775,10 +775,10 @@ class Workgroup:
 
     @property
     def last_update(self) -> datetime.date:
-        """The date when the workgroup was last updated.
+        """The date when the workgroup's properties last changed.
 
-        When the workgroup's properties, members, or administrators are
-        updated, this datestamp resets.
+        When any of a workgroup's properties are changed—description, filter,
+        privgroup, reusable, or visibility—this datestamp resets.
 
         .. warning::
             This date is in the Stanford-local time zone.  Remember to take
@@ -789,9 +789,9 @@ class Workgroup:
             Workgroup API provides.
 
         .. danger::
-            Privgroup member and administrator changes do not reset the
-            last_update datestamp.  This is a "last updated" for the workgroup,
-            not the privgroup!
+            Member and administrator changes do not reset the last_update
+            datestamp.  This is a "last updated" for the workgroup's
+            properties, not for the membership!
 
         :raises EOFError: The workgroup has been deleted.
         """
