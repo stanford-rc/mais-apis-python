@@ -21,9 +21,8 @@ Fixes:
 
 Other:
 
-* The URLs for the Workgroup PROD and UAT APIs have changed.  The old URLs have
-  been deprecated, and will stop working in January, 2026.  **This is an
-  important change for Workgroup users!**
+* The URLs for the Workgroup PROD and UAT APIs changed in January 2026.  This
+  change was separately released as version 0.55.1.
 
 * We now set a custom HTTP User-Agent: In case we ever cause problems for MaIS
   APIs, this will help them identify the SDK that is causing the trouble!  (#46)
