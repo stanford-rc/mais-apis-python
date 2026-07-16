@@ -108,8 +108,7 @@ class MAISClient():
 
     **You probably do not want to call this directly.** For convenience, you
     should one of the ready-made constructors, :meth:`MAISClient.prod` and
-    :meth:`MAISClient.uat`.  :meth:`MAISClient.uat1` is also available for the
-    temporary UAT1 environment.
+    :meth:`MAISClient.uat`.
 
     This class is documented here only to be a reference for the
     parameters you will need to provide when using a convenience constructor
@@ -370,56 +369,6 @@ class MAISClient():
                 'privilege': 'https://registry-uat.stanford.edu/doc/privileges/',
                 'student': 'https://studentws-uat.stanford.edu/v1/person/',
                 'workgroup': 'https://workgroupsvc-uat.stanford.edu/workgroups/2.0/',
-            },
-            cert=cert,
-            key=key,
-            timeout=timeout,
-        )
-
-    @classmethod
-    def uat1(
-        cls,
-        cert: os.PathLike,
-        key: os.PathLike | None = None,
-        timeout: Timeout | float | None = None,
-    ) -> MAISClient:
-        """Return a client configured to connect to connect to UAT1 APIs, used
-        for Sequoia testing.
-
-        UAT1 is available for the Account, Authority (also known as
-        "Privilege") APIs, since those are the APIs that directly depend on
-        data from HR.
-
-        If you have credentials that work for UAT, they will work for UAT1.
-
-        .. note::
-           UAT1 does have a Workgroup API, but it uses the XML-based 1.0 API.
-           This Python package uses the JSON-based 2.0 API.  Therefore, this
-           Python package will not work with UAT1 at this time.
-
-        .. note::
-           A new client instance is created every time you call this.  If
-           you want to take advantage of caching, call this only once per
-           thread.
-
-        :param cert: See :class:`MAISClient` for more information.
-
-        :param key: See :class:`MAISClient` for more information.
-
-        :param timeout: See :class:`MAISClient` for more information.
-
-        :raises FileNotFoundError: The file does not exist.
-
-        :raises PermissionError: We do not have read permission on the file.
-
-        :raises ssl.SSLError: The private key and certificate do not match, or
-            there was some other problem loading the certificate.
-        """
-        return cls(
-            urls={
-                'account': 'https://accountws-uat.stanford.edu/accounts/',
-                'person': 'https://registry-uat.stanford.edu/doc/person/',
-                'privilege': 'https://registry-uat.stanford.edu/doc/privileges/',
             },
             cert=cert,
             key=key,
