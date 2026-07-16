@@ -21,7 +21,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
     - name: Perform Bandit Analysis
       uses: PyCQA/bandit-action@67a458d90fa11fb1463e91e7f4c8f068b5863c7f
@@ -38,12 +38,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@e296a935590eb16afc0c0108289f68c87e2a89a5
+      uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a
       with:
         languages: python
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@e296a935590eb16afc0c0108289f68c87e2a89a5
+      uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a
