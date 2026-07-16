@@ -562,7 +562,7 @@ class AccountClient():
         info(f"Fetching all {query['type']} changed to {current_status} in the last {days} days…")
         response = session.get(
             urllib.parse.urljoin(
-                self.client.urls['account'],
+                self.client.urls['account']['cert'],
                 '?' + urllib.parse.urlencode(query),
             ),
         )

@@ -48,7 +48,17 @@ USER_AGENT = ' '.join((
     ('stanford-mais/' + importlib.metadata.version('stanford-mais')),
 ))
 
-# Define
+# Define types for our URLs
+class _URLAuthMethod(TypedDict, total=False):
+    """The different methods for authenticating to a MaIS API.
+
+    Some MaIS APIs are accessed using client-certificate authentication, some
+    are accessed using OAuth authentication, and those APIs that are in
+    transition can be accessed by using either authentication method.
+    """
+    cert: str
+    oauth: str
+
 class _URLs(TypedDict, total=False):
     """The different services that MaIS provides, and their API endpoints.
 
@@ -56,12 +66,12 @@ class _URLs(TypedDict, total=False):
        Just because a service is listed here, does not mean this package
        supports it.
     """
-    account: str
-    course: str
-    person: str
-    privilege: str
-    student: str
-    workgroup: str
+    account: _URLAuthMethod
+    course: _URLAuthMethod
+    person: _URLAuthMethod
+    privilege: _URLAuthMethod
+    student: _URLAuthMethod
+    workgroup: _URLAuthMethod
 
 # Define a Named Tuple for the most detailed form of timeout
 class Timeout(NamedTuple):
@@ -118,8 +128,17 @@ class MAISClient():
     urls: _URLs
     """A mapping of API to URL.
 
-    This mapping uses API names (like ``account``) as keys, and the base URL as
-    the value.
+    This mapping uses API names (like ``account``) as keys.  The values are
+    dicts that can have up to two keys:
+
+    * If the `cert` key is present, this is the URL to use for
+    certificate-based authentication.
+    * If the `oauth` key is present, this is the URL to use for OAuth-based
+    authentication.
+
+    If both keys are present, the URL used will depend on if the user provides
+    a certificate or an OAuth client, with OAuth being preferred over
+    certificate.
 
     If you decided to not use the convenience constructors
     (:meth:`MAISClient.prod`, etc.), then you will need to provide entries for
@@ -319,12 +338,24 @@ class MAISClient():
         """
         return cls(
             urls={
-                'account': 'https://accountws.stanford.edu/accounts/',
-                'course': 'https://registry.stanford.edu/doc/courseclass/',
-                'person': 'https://registry.stanford.edu/doc/person/',
-                'privilege': 'https://registry.stanford.edu/doc/privileges/',
-                'student': 'https://studentws.stanford.edu/v1/person/',
-                'workgroup': 'https://workgroupsvc.stanford.edu/workgroups/2.0/',
+                'account': {
+                    'cert': 'https://accountws.stanford.edu/accounts/',
+                },
+                'course': {
+                    'cert': 'https://registry.stanford.edu/doc/courseclass/',
+                },
+                'person': {
+                    'cert': 'https://registry.stanford.edu/doc/person/',
+                },
+                'privilege': {
+                    'cert': 'https://registry.stanford.edu/doc/privileges/',
+                },
+                'student': {
+                    'cert': 'https://studentws.stanford.edu/v1/person/',
+                },
+                'workgroup': {
+                    'cert': 'https://workgroupsvc.stanford.edu/workgroups/2.0/',
+                },
             },
             cert=cert,
             key=key,
@@ -363,12 +394,24 @@ class MAISClient():
         """
         return cls(
             urls={
-                'account': 'https://accountws-uat.stanford.edu/accounts/',
-                'course': 'https://registry-uat.stanford.edu/doc/courseclass/',
-                'person': 'https://registry-uat.stanford.edu/doc/person/',
-                'privilege': 'https://registry-uat.stanford.edu/doc/privileges/',
-                'student': 'https://studentws-uat.stanford.edu/v1/person/',
-                'workgroup': 'https://workgroupsvc-uat.stanford.edu/workgroups/2.0/',
+                'account': {
+                    'cert': 'https://accountws-uat.stanford.edu/accounts/',
+                },
+                'course': {
+                    'cert': 'https://registry-uat.stanford.edu/doc/courseclass/',
+                },
+                'person': {
+                    'cert': 'https://registry-uat.stanford.edu/doc/person/',
+                },
+                'privilege': {
+                    'cert': 'https://registry-uat.stanford.edu/doc/privileges/',
+                },
+                'student': {
+                    'cert': 'https://studentws-uat.stanford.edu/v1/person/',
+                },
+                'workgroup': {
+                    'cert': 'https://workgroupsvc-uat.stanford.edu/workgroups/2.0/',
+                },
             },
             cert=cert,
             key=key,

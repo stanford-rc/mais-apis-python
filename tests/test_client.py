@@ -31,17 +31,28 @@ services = (
     'workgroup',
 )
 
-# Test if we can make a PROD client, it has URLs defined, and we get a Session
+# Test if we can make a PROD client, it has at least one URL defined, and we
+# get a Session
 def test_good_prod(snakeoil_cert):
     client = MAISClient.prod(snakeoil_cert)
     for service in services:
         assert service in client.urls
+
+        assert (
+               ('cert' in client.urls[service])
+            or ('oauth' in client.urls[service])
+        )
 
 # Test the same with UAT.
 def test_good_uat(snakeoil_cert):
     client = MAISClient.uat(snakeoil_cert)
     for service in services:
         assert service in client.urls
+
+        assert (
+               ('cert' in client.urls[service])
+            or ('oauth' in client.urls[service])
+        )
 
 # Test that our client session sets the headers we expect
 def test_headers(snakeoil_cert):

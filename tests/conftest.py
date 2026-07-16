@@ -99,8 +99,12 @@ def mais_client(snakeoil_cert):
     #with responses.RequestsMock() as rsps:
     mais_client = MAISClient(
         urls={
-            'account': 'http://example.com/accounts/',
-            'workgroup': 'http://example.com/wg/v2/',
+            'account': {
+                'cert': 'http://example.com/accounts/',
+            },
+            'workgroup': {
+                'cert': 'http://example.com/wg/v2/',
+            },
         },
         cert=snakeoil_cert,
     )

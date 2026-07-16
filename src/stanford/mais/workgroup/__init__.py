@@ -654,7 +654,7 @@ class WorkgroupClient():
 
         # We can't use urllib.parse.urljoin, because it interprets the colon in
         # the workgroup name.  So, extract the path and use pathlib.
-        url_components = urllib.parse.urlparse(self.client.urls['workgroup'])
+        url_components = urllib.parse.urlparse(self.client.urls['workgroup']['cert'])
 
         url_path = pathlib.PurePosixPath(url_components.path)
         if fragment is None:
