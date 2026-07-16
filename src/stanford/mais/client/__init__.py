@@ -24,6 +24,7 @@ from __future__ import annotations
 # Start with stdlib imports
 import collections.abc
 import dataclasses
+import functools
 import importlib.metadata
 import logging
 import os
@@ -147,7 +148,7 @@ class MAISClient():
     :raises TypeError: You did not provide a mapping.
     """
 
-    cert: os.PathLike
+    cert: os.PathLike | None = None
     """The path to a TLS client certificate.
 
     This may contain *either* a single TLS client certificate, *or* a TLS
@@ -210,6 +211,8 @@ class MAISClient():
 
     :raises PermissionError: We do not have read permission on the file.
 
+    :raises TypeError: You provided a key, but no certificate.
+
     :raises ssl.SSLError: The private key and certificate do not match, or
         there was some other problem loading the certificate.
     """
@@ -257,19 +260,29 @@ class MAISClient():
         if not isinstance(self.urls, collections.abc.Mapping):
             raise TypeError('urls')
 
-        # Try opening the file, to confirm it can be opened.
-        with open(self.cert, mode='r') as f:
-            pass
+        # Has a key been provided, but no cert?
+        if self.key is not None and self.cert is None:
+            raise TypeError('Client key provided, but no client cert.')
 
-        # Try to parse the client certificate.
-        sslc = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-        if self.key is None:
-            sslc.load_cert_chain(str(self.cert))
-        else:
-            sslc.load_cert_chain(
-                str(self.cert),
-                keyfile=str(self.key),
-            )
+        # If a Client Cert has been provided, check it.
+        if self.cert is not None:
+            # Try opening the file, to confirm it can be opened.
+            with open(self.cert, mode='r') as f:
+                pass
+
+            # Try to parse the client certificate.
+            sslc = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            if self.key is None:
+                sslc.load_cert_chain(str(self.cert))
+            else:
+                sslc.load_cert_chain(
+                    str(self.cert),
+                    keyfile=str(self.key),
+                )
+
+        # TODO: Has an OAuth Client Secret been provided, but no ID?
+
+        # TODO: Can we test the Client ID/Secret?
 
         # Do we need to create our own Session?
         if not hasattr(self, 'session'):
@@ -310,7 +323,7 @@ class MAISClient():
     @classmethod
     def prod(
         cls,
-        cert: os.PathLike,
+        cert: os.PathLike | None = None,
         key: os.PathLike | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
@@ -365,7 +378,7 @@ class MAISClient():
     @classmethod
     def uat(
         cls,
-        cert: os.PathLike,
+        cert: os.PathLike | None = None,
         key: os.PathLike | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
@@ -417,6 +430,18 @@ class MAISClient():
             key=key,
             timeout=timeout,
         )
+
+    @functools.cached_property
+    def has_cert(self):
+        """Returns True if a client certificate has been provided.
+        """
+        return True if self.cert is not None else False
+
+    @functools.cached_property
+    def has_oauth(self):
+        """Returns True if OAuth credentials have been provided.
+        """
+        return False
 
 # Create a custom Requests Session class
 

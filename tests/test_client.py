@@ -189,3 +189,7 @@ nux9GN0Ph5vkIQgG2jb2MW2Eq729iT6zDw==
             cert=good_cert_path,
             key=bad_key_path,
         )
+
+# Making a MAISClient that has no auth at all should succeed.
+def test_no_auth():
+    MAISClient.prod()

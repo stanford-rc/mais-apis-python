@@ -189,13 +189,17 @@ class WorkgroupClient():
         This checks the provided client, and (if needed) sets up the Requests
         session.
 
-        :raises TypeError: A client was not provided.
+        :raises TypeError: A client was not provided, or the client is not configured for TLS authentication.
         """
         debug('In __post_init__')
 
         # Check the client type
         if not isinstance(self.client, stanford.mais.client.MAISClient):
             raise TypeError('client')
+
+        # Check if cert auth is available
+        if not self.client.has_cert:
+            raise TypeError('Client-certificate authentication is required')
 
         # That's it!
         return None

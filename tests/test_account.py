@@ -28,6 +28,13 @@ def test_badclient():
     with pytest.raises(TypeError):
         AccountClient(client='blah')
 
+# An AccountClient with a no-auth MAISClient should throw.
+def test_noauthclient():
+    with pytest.raises(TypeError):
+        AccountClient(client=MAISClient.prod())
+
+# TODO: An AccountClient with only OAUth credentials should throw.
+
 """
 Account:
 - get with non-ASCII raises ValueError

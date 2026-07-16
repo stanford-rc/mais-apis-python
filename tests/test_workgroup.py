@@ -35,6 +35,13 @@ def test_badclient():
     with pytest.raises(TypeError):
         WorkgroupClient(client='blah')
 
+# A WorkgroupClient with a no-auth MAISClient should throw.
+def test_noauthclient():
+    with pytest.raises(TypeError):
+        WorkgroupClient(client=MAISClient.prod())
+
+# TODO: A WorkgroupClient with only OAUth credentials should throw.
+
 """
 Workgroup:
 - return 400/500 raises ChildProcessError
