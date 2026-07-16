@@ -1,6 +1,7 @@
 
 # Ignore editor files
 *.swp
+.claude
 
 # Ignore venv
 bin
