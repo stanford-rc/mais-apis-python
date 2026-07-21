@@ -72,13 +72,6 @@ available, for connecting to the three Environments that most users will use:
 * :meth:`~stanford.mais.client.MAISClient.uat` connects you to MaIS'
   UAT APIs.  This is what you will probably use during testing and development.
 
-* :meth:`~stanford.mais.client.MAISClient.uat1` connects you to MaIS'
-  special UAT1 API.  This is what you will probably use during Pinnacle project
-  work.
-
-.. warning::
-   Not all MaIS applications and APIs are present in the UAT1 environment.
-
 Here is a partial example (with parameters elided) showing how to access the
 different MAIS Environments:
 
