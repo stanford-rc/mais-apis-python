@@ -449,7 +449,7 @@ in a stem:
      test_workgroup = test_workgroup_result.workgroup()
      test_workgroup.members.people.discard(person_to_remove)
 
-Since the :meth:`~frozenset.discard` method only removes from the set if the
+Since the :meth:`~set.discard` method only removes from the set if the
 element is in the set (in other words, it ignores :class:`KeyError`), we do not
 need to check for set membership first.
 

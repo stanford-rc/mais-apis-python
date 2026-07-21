@@ -237,18 +237,18 @@ class WorkgroupMembershipContainer(
     Either all people, all certificates, or all workgroups.
 
     This container acts like a :class:`set`, and so all of the normal set
-    methods (like :func:`len` and :meth:`~frozenset.add`) are supported.  `in`
+    methods (like :func:`len` and :meth:`~set.add`) are supported.  `in`
     is supported to check for membership.
 
     .. warning::
         Changes made here result in API calls, changing the Workgroup
         membership.  Be very careful before you do things like calling
-        :meth:`~frozenset.clear`.
+        :meth:`~set.clear`.
 
     .. note::
         Changes made here happen synchronously within the Workgroups API, but
         asynchronously elsewhere.  In other words, when calls like
-        :meth:`~frozenset.add` return successfully, you know that the change
+        :meth:`~set.add` return successfully, you know that the change
         has been made and takes effect immediately within Workgroup Manager,
         but it will take time for the change to propagate to the privgroup, and
         to downstream clients like LDAP.
@@ -636,14 +636,14 @@ class WorkgroupMembershipWorkgroupContainer(WorkgroupMembershipContainer):
     or :class:`~stanford.mais.workgroup.PartialWorkgroup` instance, in addition
     to a string:
 
-    * :meth:`~frozenset.add`
+    * :meth:`~set.add`
 
-    * :meth:`~frozenset.discard`
+    * :meth:`~set.discard`
 
     * :meth:`~object.__contains__` (also known as ``in``)
 
     .. note::
-        Regardless of what you :meth:`~frozenset.add` — :class:`str`,
+        Regardless of what you :meth:`~set.add` — :class:`str`,
         :class:`~stanford.mais.workgroup.Workgroup` or
         :class:`~stanford.mais.workgroup.PartialWorkgroup` — the set will only
         ever contain (and return) strings.
