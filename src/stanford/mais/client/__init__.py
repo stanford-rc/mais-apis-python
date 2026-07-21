@@ -133,9 +133,9 @@ class MAISClient():
     dicts that can have up to two keys:
 
     * If the `cert` key is present, this is the URL to use for
-    certificate-based authentication.
+      certificate-based authentication.
     * If the `oauth` key is present, this is the URL to use for OAuth-based
-    authentication.
+      authentication.
 
     If both keys are present, the URL used will depend on if the user provides
     a certificate or an OAuth client, with OAuth being preferred over
