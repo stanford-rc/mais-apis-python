@@ -32,6 +32,9 @@ updates:
         patterns:
           - "*"
 
+    ignore:
+      - dependency-name: "sphinx" # See Issue #56
+
   # Check GitHub Actions at the same time
   - package-ecosystem: "github-actions"
     directory: "/"

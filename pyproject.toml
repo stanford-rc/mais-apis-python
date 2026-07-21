@@ -44,7 +44,8 @@ dependencies = [
 
 [project.optional-dependencies]
 docs = [
-    "sphinx >=5.0, <9.0",
+    "sphinx >=5.0, <9.0", # NOTE: Sphinx 9.0+ causes weird warnings!
+                          # See Issue #56 for details.
     "sphinx-rtd-theme",
 ]
 test = [
