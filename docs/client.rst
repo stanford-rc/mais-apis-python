@@ -50,13 +50,108 @@ project (and the :class:`~stanford.mais.client.MAISClient`) can access all of
 them.
 
 **************
+Authentication
+**************
+
+MaIS APIs use two different forms of authentication:
+
+* **Client certificates**.  With client-certificate authentication, you create
+  an RSA private key and TLS CSR.  MaIS issues you a certificate, using their
+  private CA.  All API calls are authenticated using the private key and
+  certificate.
+
+  Certificates are enabled to only work with one environment
+  (typically either PROD or UAT).  Within that environment, your certificate
+  can be enabled to work with multiple services.  For example, you might have a
+  certificate that can work with the UAT Account and UAT Workgroup APIs.
+
+  Certificates are valid for several years.  When it comes close to
+  expiration, MaIS notifies you by email.  You can then obtain a renewed
+  certificate.
+
+* **OAuth**.  With OAuth authentication, MaIS issues you an OAuth 2.0 Client ID
+  and Client Secret.  You use the OAuth 2.0 client-credentials flow to obtain
+  an OAuth access token.  All API calls are authenticated using the access
+  token.
+
+  OAuth Client IDs are enabled to work with only one environment (typically
+  either PROD or UAT).  Within that environment, your Client ID can be enabled
+  to work with multiple services.  For example, you might have a Client ID that
+  can work with the UAT Account and UAT Workgroup APIs.
+
+  Access tokens are valid for one hour.  We obtain an access token when the
+  :class:`~stanford.mais.client.MAISClient` is instantiated.  After 55 minutes,
+  the next API call will trigger a refresh of the access token.
+
+  The OAuth Client ID and Client Secret do not expire.  However, as per `MinSec
+  for SaaS/PaaS`_, you should obtain a new Client Secret at least once every
+  year.
+
+.. _MinSec for SaaS/PaaS: https://uit.stanford.edu/guide/securitystandards/saas_paas
+
+API Transition
+==============
+
+MaIS is working to transition their APIs to using OAuth authentication.  That
+means APIs can be in one of three different states:
+
+1. The API only uses client-certificate authentication.
+
+2. The API is available through two endpoints:
+
+   * One endpoint uses client-certificate authentication.
+
+   * One endpoint uses OAuth authentication.
+
+3. The API only uses OAuth authentication.
+
+Here is how this SDK is handling the transition:
+
+* :class:`~stanford.mais.client.MAISClient` now supports recording both
+  client-certificate and OAuth endpoint URLs for an API.  Also, the
+  :class:`~stanford.mais.client.MAISClient` constructor now supports providing
+  an OAuth Client ID and Client Secret, in addition to client certificate and
+  private key.
+
+  You can choose to provide either OAuth credentials or a client-certificate,
+  or both.
+
+* Each API client (for example, the
+  :class:`~stanford.mais.account.AccountClient` or the
+  :class:`~stanford.mais.workgroup.WorkgroupClient`) will either support
+  client-certificate authentication, OAuth authentication, or both.
+
+  If you try to instantiate a client, and you do not have the authentication
+  credential required, the client will raise an exception.  The client's
+  documentation will say what form of authentication it supports.
+
+* When an OAuth endpoint is made available, the
+  :class:`~stanford.mais.client.MAISClient` convenience methods
+  :meth:`~stanford.mais.client.MAISClient.prod` and
+  :meth:`~stanford.mais.client.MAISClient.uat` are updated to add the OAuth
+  endpoint URLs.
+
+* After a round of testing, the API's client is updated to support
+  OAuth authentication.
+
+  If an API client supports both OAuth authentication and client-certificate
+  authentication, OAuth will be the preferred authenticaton method.
+
+* When an API removes support for client-certificate authentication, that
+  support will be removed from this SDK.
+
+When OAuth support is added for an API, the :doc:`Changelog <changes>` will
+be updated.  Similarly, when client-certificate support is removed from an API,
+the :doc:`Changelog <changes>` will be updated.
+
+**************
 The MAISClient
 **************
 
-To get access to MaIS APIs, you will need a client certificate with permissions
-to the appropriate service and environment, and you will also need to
-instantiate a :class:`~stanford.mais.client.MAISClient` using the appropriate
-class method.
+To get access to MaIS APIs, you will need a client certificate — or OAuth
+client credential — with permissions to the appropriate service and
+environment, and you will also need to instantiate a
+:class:`~stanford.mais.client.MAISClient` using the appropriate class method.
 
 For more information on how to obtain a client certificate, and get permission
 to use MaIS APIs, read `Getting Started with the MaIS Web APIs`_.

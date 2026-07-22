@@ -179,9 +179,11 @@ Requirements
   We do allow Requests 2.28.2, as packaged in Debian bookworm, but we do not
   currently test against it.
 
-* A client certificate, issued by `MaIS`_, with permissions to the APIs you
-  want to use, in the appropriate tier (such as PROD (production) or UAT).  See
-  the `Getting Started`_ guide for more information.
+* Either a client certificate or an OAuth client credential — both of which are
+  issued by `MaIS`_ — which has permissions to the APIs you want to use, in the
+  appropriate tier (such as PROD (production) or UAT).  Some APIs only work
+  with a client certificate.  See the `Getting Started`_ guide for more
+  information.
 
 * Testing requires `PyTest <https://docs.pytest.org/en/latest/>`_ and
   `pytest-responses <https://pypi.org/project/pytest-responses/>`_.

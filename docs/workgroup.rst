@@ -9,6 +9,9 @@ To begin using the MaIS Workgroup API, you should first instantiate a
 :class:`~stanford.mais.client.MAISClient`.  Once that is done, you can
 use it to instantiate a :class:`~stanford.mais.workgroup.WorkgroupClient`.
 
+The Workgroup API supports both certificate- and OAuth-based authentication,
+but right now this SDK only supports certificate-based authentication.
+
 .. _Workgroup API Client:
 
 ********************
@@ -23,6 +26,12 @@ access the Workgroup API.  Instantiating a
 
     client = MAISClient(...)
     wclient = WorkgroupClient(client)
+
+.. warning::
+   If you use a :class:`~stanford.mais.client.MAISClient` that does not have a
+   client certificate configured, and you try to instantiate an
+   :class:`~stanford.mais.workgroup.WorkgroupClient`, an exception will be
+   raised.
 
 For performance, the :class:`~stanford.mais.workgroup.WorkgroupClient`
 maintains a cache of fetched workgroups.  To clear the cache, call

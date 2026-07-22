@@ -9,6 +9,8 @@ To begin using the MaIS Account API, you should first instantiate a
 :class:`~stanford.mais.client.MAISClient` object.  Once that is done, you can
 use it to instantiate an :class:`stanford.mais.account.AccountClient`.
 
+The Account API only supports certificate-based authentication.
+
 .. note::
    All Account instances are read-only.  You cannot use this SDK to create or
    change accounts.
@@ -25,6 +27,11 @@ access the Account API.  Instantiating a
 
     client = MAISClient(...)
     wclient = AccountClient(client)
+
+.. warning::
+   If you use a :class:`~stanford.mais.client.MAISClient` that does not have a
+   client certificate configured, and you try to instantiate an
+   :class:`~stanford.mais.account.AccountClient`, an exception will be raised.
 
 For performance, the :class:`~stanford.mais.account.AccountClient`
 maintains a cache of fetched accounts.  To clear the cache, call
