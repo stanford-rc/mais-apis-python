@@ -311,8 +311,9 @@ class Account():
         session = client.client.session
 
         # Make the request for the SUNetID.
+        # The AccountClient already checked if `session` exists.
         info(f"Fetching {sunetid} from the Account API…")
-        response = session.get(
+        response = session.get( # type: ignore[union-attr]
             urllib.parse.urljoin(client.client.urls['account']['cert'], sunetid),
         )
 

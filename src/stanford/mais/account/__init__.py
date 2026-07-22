@@ -558,13 +558,14 @@ class AccountClient():
         session = self.client.session
 
         # Do the search.
+        # (The constructor already checked if the session exists.)
         query = {
             'type': ('self' if get_people is True else 'functional'),
             'status': current_status,
             'statusdays': str(days),
         }
         info(f"Fetching all {query['type']} changed to {current_status} in the last {days} days…")
-        response = session.get(
+        response = session.get( # type: ignore[union-attr]
             urllib.parse.urljoin(
                 self.client.urls['account']['cert'],
                 '?' + urllib.parse.urlencode(query),

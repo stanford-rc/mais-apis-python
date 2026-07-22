@@ -423,7 +423,8 @@ class WorkgroupMembershipContainer(
 
         # Do a PUT call to make the add.
         # In addition to the path, we need to provide the identifier type.
-        response = session.put(
+        # (The constructor already checked if the session exists.)
+        response = session.put( # type:ignore[union-attr]
             workgroup.client._url(
                 fragment=url_path,
             ),
@@ -528,7 +529,8 @@ class WorkgroupMembershipContainer(
 
         # Do a DELETE call to do the removal.
         # In addition to the path, we need to provide the identifier type.
-        response = session.delete(
+        # (The constructor already checked if the session exists.)
+        response = session.delete( # type: ignore[union-attr]
             workgroup.client._url(
                 fragment=url_path,
             ),

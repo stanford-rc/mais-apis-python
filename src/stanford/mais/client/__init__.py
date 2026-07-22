@@ -232,8 +232,8 @@ class MAISClient():
         there was some other problem loading the certificate.
     """
 
-    session: requests.Session = dataclasses.field(repr=False, init=False)
-    """The Requests Session to use for API requests.
+    session: requests.Session | None = dataclasses.field(default=None, repr=False, init=False)
+    """The Requests Session to use for certificate-auth API requests.
 
     In most cases, you should not provide a Session during instance creation.
     The default behavior is to let the class constructor create the Session,
@@ -300,35 +300,39 @@ class MAISClient():
         # TODO: Can we test the Client ID/Secret?
 
         # Do we need to create our own Session?
-        if not hasattr(self, 'session'):
-            debug('Creating Session')
-            new_session = _CustomSession()
-
-            # Set up our cert/key.
-            if self.key is None:
-                new_session.cert = str(self.cert)
+        if self.session is None:
+            # Only create a Session if we have a cert
+            if self.cert is None:
+                debug('No cert - Skipping session creation')
             else:
-                new_session.cert = (
-                    str(self.cert),
-                    str(self.key),
-                )
+                debug('Creating Session')
+                new_session = _CustomSession()
 
-            # Set up custom timeouts, if provided.
-            if self.timeout is not None:
-                new_session.timeout = self.timeout
+                # Set up our cert/key.
+                if self.key is None:
+                    new_session.cert = str(self.cert)
+                else:
+                    new_session.cert = (
+                        str(self.cert),
+                        str(self.key),
+                    )
 
-            # Ask for JSON responses
-            new_session.headers.update({
-                'Accept': 'application/json',
-            })
+                # Set up custom timeouts, if provided.
+                if self.timeout is not None:
+                    new_session.timeout = self.timeout
 
-            # Set our custom user-agent
-            new_session.headers.update({
-                'User-Agent': USER_AGENT,
-            })
+                # Ask for JSON responses
+                new_session.headers.update({
+                    'Accept': 'application/json',
+                })
 
-            # Finally, put the new session into place
-            object.__setattr__(self, 'session', new_session)
+                # Set our custom user-agent
+                new_session.headers.update({
+                    'User-Agent': USER_AGENT,
+                })
+
+                # Finally, put the new session into place
+                object.__setattr__(self, 'session', new_session)
         else:
             debug('Using client-provided session')
 

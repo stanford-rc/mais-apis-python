@@ -355,11 +355,12 @@ class WorkgroupClient():
         )
 
         # Make the request for the Workgroup.
+        # (The constructor already checked if the session exists.)
         get_url = self._url(
             fragment=get_fragment,
         )
         debug(f"Doing GET of {get_url}")
-        response = self.client.session.get(
+        response = self.client.session.get( # type: ignore[union-attr]
             get_url,
         )
 
@@ -439,6 +440,7 @@ class WorkgroupClient():
             raise ValueError('Search string is empty')
 
         # Make the request for the Workgroup.
+        # (The constructor already checked if the session exists.)
         get_url = self._url(
             query_dict={
                 'type': target_type,
@@ -446,7 +448,7 @@ class WorkgroupClient():
             },
         )
         debug(f"Doing GET of {get_url}")
-        response = self.client.session.get(
+        response = self.client.session.get( # type: ignore[union-attr]
             get_url,
         )
 

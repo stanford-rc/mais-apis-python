@@ -265,12 +265,13 @@ class Workgroup:
         session = client.client.session
 
         # Make the Workgroup.
+        # (The constructor already checked if the session exists.)
         post_url = client._url(
             fragment=name,
         )
         debug(f"Filter is '{filter}' — Visibility is '{visibility}'")
         debug(f"Running POST to {post_url} to create workgroup")
-        response = client.client.session.post(
+        response = client.client.session.post( # type:ignore[union-attr]
             post_url,
             json={
                 'description': description,
@@ -384,11 +385,12 @@ class Workgroup:
                 debug(f"{name} expired in cache.  Re-fetching…")
 
         # Make the request for the Workgroup.
+        # (The constructor already checked if the session exists.)
         get_url = client._url(
             fragment=name,
         )
         debug(f"Doing GET of {get_url}")
-        response = client.client.session.get(
+        response = client.client.session.get( # type:ignore[union-attr]
             get_url,
         )
 
@@ -480,11 +482,12 @@ class Workgroup:
             raise EOFError('Workgroup has been deleted')
 
         # Make the request for the Workgroup.
+        # (The constructor already checked if the session exists.)
         get_url = self.client._url(
             fragment=self.name,
         )
         debug(f"Doing GET of {get_url}")
-        response = self.client.client.session.get(
+        response = self.client.client.session.get( # type: ignore[union-attr]
             get_url,
         )
 
@@ -1168,7 +1171,8 @@ class Workgroup:
             pathlib.PurePosixPath('privgroup')
         )
 
-        response = self.client.client.session.get(
+        # (The constructor already checked if the session exists.)
+        response = self.client.client.session.get( # type: ignore[union-attr]
             self.client._url(
                 fragment=url_fragment,
             ),
@@ -1296,7 +1300,8 @@ class Workgroup:
             raise EOFError('Workgroup has been deleted')
 
         # Make the request for the Workgroup.
-        response = self.client.client.session.put(
+        # (The constructor already checked if the session exists.)
+        response = self.client.client.session.put( # type: ignore[union-attr]
             self.client._url(
                 fragment=self.name
             ),
@@ -1510,7 +1515,8 @@ class Workgroup:
             raise EOFError('Workgroup has (already) been deleted')
 
         # Make the request to delete the Workgroup.
-        response = self.client.client.session.delete(
+        # (The constructor already checked if the session exists.)
+        response = self.client.client.session.delete( # type: ignore[union-attr]
             self.client._url(
                 fragment=self.name
             ),
