@@ -65,6 +65,10 @@ exclude_patterns: Sequence[str] = ['_build', 'Thumbs.db', '.DS_Store']
 # found.
 nitpicky = True
 
+# Some references do not exist, so we ignore them
+nitpick_ignore = [
+]
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
