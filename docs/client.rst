@@ -42,12 +42,9 @@ platform as their non-production infrastructure's 'source of truth', having
 users authenticate via UAT Stanford Login, use UAT LDAP, use UAT Workgroup
 Manager, etc.
 
-Clients who are testing data related to the Pinnacle project also have access
-to the temporary UAT1 environment.  This is an example of how environments can
-be 'spun up' as needed for larger projects.  MaIS developers also create their
-own environments, as needed for their work.  With proper configuration, this
-project (and the :class:`~stanford.mais.client.MAISClient`) can access all of
-them.
+MaIS developers also create their own environments, as needed for their work.
+With proper configuration, this project (and the
+:class:`~stanford.mais.client.MAISClient`) can access all of them.
 
 **************
 Authentication
@@ -292,7 +289,7 @@ Custom Environments
 
 If you are a MaIS developer, you might wish to use a
 :class:`~stanford.mais.client.MAISClient` with an environment that is not PROD,
-UAT, or UAT1.  Hello!
+UAT.  Hello!
 
 This is the only situation in which you would call the
 :class:`~stanford.mais.client.MAISClient` constructor directly, instead of
