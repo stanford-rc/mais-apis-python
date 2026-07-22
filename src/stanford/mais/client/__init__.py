@@ -148,6 +148,21 @@ class MAISClient():
     :raises TypeError: You did not provide a mapping.
     """
 
+    token_url: str
+    """The URL to the OAuth 2.0 token endpoint.
+
+    This is the URL that will be used to obtain OAuth 2.0 Access Tokens.
+    All OAuth-using APIs will use the same OAuth 2.0 Authorization Server.  The
+    client-credentials flow is used, with no scopes requested.
+
+    Refresh tokens are not normally used with the client-credentials flow.  If
+    we receive a refresh token, it will be used for as long as this
+    :class:`MAISClient` instance exists, but it will not be stored anywhere.
+
+    We do not support PKCE, nor do we support revocation of no-longer-needed
+    tokens.
+    """
+
     cert: os.PathLike | None = None
     """The path to a TLS client certificate.
 
@@ -370,6 +385,7 @@ class MAISClient():
                     'cert': 'https://workgroupsvc.stanford.edu/workgroups/2.0/',
                 },
             },
+            token_url='https://mais.auth.us-west-2.amazoncognito.com/oauth2/token',
             cert=cert,
             key=key,
             timeout=timeout,
@@ -426,6 +442,7 @@ class MAISClient():
                     'cert': 'https://workgroupsvc-uat.stanford.edu/workgroups/2.0/',
                 },
             },
+            token_url='https://mais-uat.auth.us-west-2.amazoncognito.com/oauth2/token',
             cert=cert,
             key=key,
             timeout=timeout,

@@ -106,6 +106,7 @@ def mais_client(snakeoil_cert):
                 'cert': 'http://example.com/wg/v2/',
             },
         },
+        token_url='http://example.com/oauth2/token',
         cert=snakeoil_cert,
     )
 
