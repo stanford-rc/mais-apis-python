@@ -448,18 +448,6 @@ class MAISClient():
             timeout=timeout,
         )
 
-    @functools.cached_property
-    def has_cert(self):
-        """Returns True if a client certificate has been provided.
-        """
-        return True if self.cert is not None else False
-
-    @functools.cached_property
-    def has_oauth(self):
-        """Returns True if OAuth credentials have been provided.
-        """
-        return False
-
 # Create a custom Requests Session class
 
 class _CustomSession(requests.Session):

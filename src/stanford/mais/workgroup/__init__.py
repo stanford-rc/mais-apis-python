@@ -198,7 +198,7 @@ class WorkgroupClient():
             raise TypeError('client')
 
         # Check if cert auth is available
-        if not self.client.has_cert:
+        if self.client.session is None:
             raise TypeError('Client-certificate authentication is required')
 
         # That's it!
