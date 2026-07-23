@@ -20,6 +20,7 @@ import requests
 import responses
 
 from stanford.mais.client import MAISClient
+from stanford.mais.client.tests.mock import add_token_responses
 from stanford.mais.account import AccountClient
 from stanford.mais.account.tests.mock import add_account_responses
 from stanford.mais.workgroup import WorkgroupClient
@@ -91,11 +92,17 @@ R0XW
     return (snakeoil_cert_path, snakeoil_key_path)
 
 # For tests that require a good MAIS client, return one.
-# Also make fixtures for each service's client
+# Also make fixtures for each service's client, as well as for the OAuth
+# Authorization Servers' Token Endpoint.
 # NOTE: These fixtures are all per-test, not per-session, because Responses
 # mocks get cleared at the end of the test.  So, we need to reset each time.
 @pytest.fixture()
 def mais_client(snakeoil_cert):
+    # Add the different responses for each of our APIs
+    add_token_responses()
+    add_account_responses()
+    add_workgroup_responses()
+
     #with responses.RequestsMock() as rsps:
     mais_client = MAISClient(
         urls={
@@ -108,11 +115,9 @@ def mais_client(snakeoil_cert):
         },
         token_url='http://example.com/oauth2/token',
         cert=snakeoil_cert,
+        client_id='good1',
+        client_secret='good2'
     )
-
-    # Add the different responses for each of our APIs
-    add_account_responses()
-    add_workgroup_responses()
 
     # Send out the MaIS Client, in our mocked-up environment!
     return mais_client
