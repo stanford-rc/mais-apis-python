@@ -46,6 +46,7 @@ logging.getLogger('stanford.mais.client').addHandler(logging.NullHandler())
 USER_AGENT = ' '.join((
     ('Python/' + platform.python_version()),
     ('requests/' + importlib.metadata.version('requests')),
+    ('authlib/' + importlib.metadata.version('Authlib')),
     ('stanford-mais/' + importlib.metadata.version('stanford-mais')),
 ))
 

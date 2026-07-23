@@ -43,6 +43,7 @@ extensions: list[str] = [
 
 # Intersphinx mappings
 intersphinx_mapping: dict[str, tuple[str, None | tuple[str, tuple[str | None, ...]]]] = {
+    'authlib': ('https://docs.authlib.org/en/stable/', None),
     'python': ('https://docs.python.org/3', None),
     'pytz': ('https://pythonhosted.org/pytz/', None),
     'requests': ('https://docs.python-requests.org/en/latest/', None),

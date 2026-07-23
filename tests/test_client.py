@@ -68,9 +68,10 @@ def test_headers(snakeoil_cert):
     assert 'User-Agent' in session.headers
     python_version = platform.python_version()
     requests_version = importlib.metadata.version('requests')
+    authlib_version = importlib.metadata.version('Authlib')
     our_version = importlib.metadata.version('stanford-mais')
     assert session.headers['User-Agent'] == (
-        f"Python/{python_version} requests/{requests_version} stanford-mais/{our_version}"
+        f"Python/{python_version} requests/{requests_version} authlib/{authlib_version} stanford-mais/{our_version}"
     )
 
 # Test if we can get a client with separate key and cert

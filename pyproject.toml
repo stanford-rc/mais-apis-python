@@ -39,6 +39,7 @@ classifiers = [
 
 requires-python = ">=3.11, <4.0"
 dependencies = [
+    "Authlib >=1.2.0, <2.0",
     "requests >=2.28.2, <3.0",
 ]
 
@@ -51,6 +52,7 @@ docs = [
 test = [
     "coverage >= 5.3",
     "mypy >= 1.0.0",
+    "types-Authlib",
     "types-requests",
     "pytest >=8.4.1, <9.2.0",
     "pytest-cov",
@@ -115,6 +117,7 @@ env_list = "py{311,312,313,314}-{minimal,latest}"
 [tool.tox.env_run_base]
 deps = [
     "mypy >=0.910, <1.0",
+    "types-Authlib",
     "types-requests",
     "pytest >=8.4.1, <9.1.0",
     "pytest-cov >=4.0.0",
@@ -128,12 +131,14 @@ set_env = { PYTHONTRACEMALLOC = "20" }
 
 [tool.tox.env.minimal]
 deps = [
+    "Authlib==1.2.0",
     "requests==2.30.0",
     "setuptools==66.1.1",
 ]
 
 [tool.tox.env.latest]
 deps = [
+    "Authlib <2.0",
     "requests >2.32.5, <3.0",
     "setuptools >=80.9.0",
 ]

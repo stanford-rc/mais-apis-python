@@ -179,6 +179,11 @@ Requirements
   We do allow Requests 2.28.2, as packaged in Debian bookworm, but we do not
   currently test against it.
 
+* `Authlib`_ 1.2.0, or any later 1.x.
+
+  Python 3.12 requires at least Authlib 1.2.1; Python 3.13 requires at least
+  Authlib 1.4.0.
+
 * Either a client certificate or an OAuth client credential — both of which are
   issued by `MaIS`_ — which has permissions to the APIs you want to use, in the
   appropriate tier (such as PROD (production) or UAT).  Some APIs only work
@@ -188,7 +193,8 @@ Requirements
 * Testing requires `PyTest <https://docs.pytest.org/en/latest/>`_ and
   `pytest-responses <https://pypi.org/project/pytest-responses/>`_.
 
-* Linting requires `MyPy <http://www.mypy-lang.org/>`_ and `types-requests
+* Linting requires `MyPy <http://www.mypy-lang.org/>`_, `types-Authlib
+  <https://pypi.org/project/types-Authlib/>`_, and `types-requests
   <https://pypi.org/project/types-requests/>`_.
 
 * Building documentation requires `Sphinx <http://www.sphinx-doc.org/>`_ and
@@ -200,6 +206,7 @@ safe to use these modules, so long as you don't share instances across
 threads/processes.
 
 .. _Requests: https://requests.readthedocs.io/
+.. _Authlib: https://authlib.org/
 .. _MaIS: https://uit.stanford.edu/team/mais
 .. _Getting Started: https://uit.stanford.edu/developers/apis/getting-started
 
