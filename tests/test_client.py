@@ -34,7 +34,7 @@ services = (
 # Test if we can make a PROD client, it has at least one URL defined, and we
 # get a Session
 def test_good_prod(snakeoil_cert):
-    client = MAISClient.prod(snakeoil_cert)
+    client = MAISClient.prod(cert=snakeoil_cert)
     for service in services:
         assert service in client.urls
 
@@ -45,7 +45,7 @@ def test_good_prod(snakeoil_cert):
 
 # Test the same with UAT.
 def test_good_uat(snakeoil_cert):
-    client = MAISClient.uat(snakeoil_cert)
+    client = MAISClient.uat(cert=snakeoil_cert)
     for service in services:
         assert service in client.urls
 
@@ -56,7 +56,7 @@ def test_good_uat(snakeoil_cert):
 
 # Test that our client session sets the headers we expect
 def test_headers(snakeoil_cert):
-    client = MAISClient.prod(snakeoil_cert)
+    client = MAISClient.prod(cert=snakeoil_cert)
     session = client.session
 
     # Accept header should be set to a fixed string
