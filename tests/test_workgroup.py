@@ -42,7 +42,7 @@ def test_noauthclient():
 
 def test_authmismatch(snakeoil_cert):
     # Make a client with only a cert endpoint
-    mais_client = MAISClient(
+    mais_client = MAISClient( # nosec: B106
         urls={
             'workgroup': {
                 'cert': 'http://example.com/wg/v2/',

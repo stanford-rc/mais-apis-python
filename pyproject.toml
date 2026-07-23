@@ -154,5 +154,19 @@ commands = [
 "3.13" = ["py313-minimal", "py313-latest", "report"]
 "3.14" = ["py314-minimal", "py314-latest", "report"]
 
+[tool.bandit]
+exclude_dirs = [
+    # These three files are test-related files that are raising B105 & B106
+    # (hardcoded_password_string and hardcoded_password_funcarg).  That makes
+    # sense, as we're hardcoding OAuth 2.0 client credentials & tokens in
+    # tests.  Problem is, the general_hardcoded_password plugin doesn't support
+    # the same method of configuration as the assert_used plugin.  So, we have
+    # to ignore the files entirely.
+    # See https://github.com/PyCQA/bandit/issues/982
+    "src/stanford/mais/client/tests/mock.py",
+    "tests/conftest.py",
+    "tests/test_client.py",
+]
+
 [tool.bandit.assert_used]
 skips = [ "tests/*.py" ]

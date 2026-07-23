@@ -501,7 +501,7 @@ class MAISClient():
         :raises ssl.SSLError: The private key and certificate do not match, or
             there was some other problem loading the certificate.
         """
-        return cls(
+        return cls( # nosec: B106
             urls={
                 'account': {
                     'cert': 'https://accountws.stanford.edu/accounts/',
@@ -566,7 +566,7 @@ class MAISClient():
         :raises ssl.SSLError: The private key and certificate do not match, or
             there was some other problem loading the certificate.
         """
-        return cls(
+        return cls( # nosec: B106
             urls={
                 'account': {
                     'cert': 'https://accountws-uat.stanford.edu/accounts/',
