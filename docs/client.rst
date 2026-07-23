@@ -316,19 +316,44 @@ using one of its class methods (like
 :meth:`~stanford.mais.client.MAISClient.prod` or
 :meth:`~stanford.mais.client.MAISClient.uat`).  You will need to create a
 :class:`~stanford.mais.client._URLs` instance, which is a
-:class:`typing.TypedDict` containing one key for each MaIS API: The key is the
-API name and the value is the base URL.
+:class:`typing.TypedDict` containing one key for each MaIS API.  The key is the
+API name.
+
+The values of :class:`~stanford.mais.client._URLs` items are
+:class:`~stanford.mais.client._URLAuthMethod` instances.  This is another
+:class:`typing.TypedDict`, containing two keys:
+
+* `cert`, if present, is the URL to the API's endpoint for certificate-based
+  authentication.
+
+* `oauth`, if present, if the URL to the API's endpoint for OAuth-based
+  authentication.
+
+For each key, the value is the API endpoint's base URL.
+
+In addition to the URLs, the :class:`~stanford.mais.client.MAISClient`
+constructor needs the URL to the OAuth Authorization Server's Token Endpoint.
+This is required even if you are not using OAuth.
+
+Here is an example of how you can configure a custom dev environment:
 
 .. code-block:: python
 
    dev_environment = stanford.mais.client._URLs(
-     account='https://localhost:4000/accounts/',
+     account=stanford.mais.client._URLAuthMethod(
+        cert='https://localhost:4000/accounts/',
+    ),
+     workgroup=stanford.mais.client._URLAuthMethod(
+        cert='https://localhost:4000/workgroups/',
+        cert='https://localhost:4000/oauth/workgroups/',
+    ),
    )
    credentials = pathlib.Path(os.environ['devcert'])
 
    dev_client = MAISClient(
      cert=credentials.expanduser().resolve(strict=True),
      urls=dev_environment,
+     token_url='https://localhost:4000/oauth2/token',
    )
    dev_account = AccountClient(dev_client)
 
@@ -364,3 +389,8 @@ does not have a convenience function (like
 .. autoclass:: stanford.mais.client._URLs
    :members:
 
+Each entry in a :class:`~stanford.mais.client._URLs` requires a
+:class:`~stanford.mais.client._URLAuthMethod`.
+
+.. autoclass:: stanford.mais.client._URLAuthMethod
+   :members:
