@@ -33,7 +33,21 @@ def test_noauthclient():
     with pytest.raises(TypeError):
         AccountClient(client=MAISClient.prod())
 
-# TODO: An AccountClient with only OAUth credentials should throw.
+def test_authmismatch(snakeoil_cert):
+    # Make a client with only a cert endpoint
+    mais_client = MAISClient(
+        urls={
+            'account': {
+                'cert': 'http://example.com/accounts/',
+            },
+        },
+        token_url='http://example.com/oauth2/token',
+        cert=snakeoil_cert,
+    )
+
+    # Try using it
+    with pytest.raises(TypeError):
+        AccountClient(client=MAISClient.prod())
 
 """
 Account:

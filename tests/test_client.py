@@ -190,6 +190,18 @@ nux9GN0Ph5vkIQgG2jb2MW2Eq729iT6zDw==
             key=bad_key_path,
         )
 
+# Test missing client_id or client_secret should throw
+def test_missing_client_credentials():
+    with pytest.raises(TypeError):
+        MAISClient.prod(
+            client_id='blah',
+        )
+    with pytest.raises(TypeError):
+        MAISClient.prod(
+            client_secret='blah',
+        )
+
+
 # Making a MAISClient that has no auth at all should succeed.
 def test_no_auth():
     MAISClient.prod()

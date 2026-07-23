@@ -40,7 +40,21 @@ def test_noauthclient():
     with pytest.raises(TypeError):
         WorkgroupClient(client=MAISClient.prod())
 
-# TODO: A WorkgroupClient with only OAUth credentials should throw.
+def test_authmismatch(snakeoil_cert):
+    # Make a client with only a cert endpoint
+    mais_client = MAISClient(
+        urls={
+            'workgroup': {
+                'cert': 'http://example.com/wg/v2/',
+            },
+        },
+        token_url='http://example.com/oauth2/token',
+        cert=snakeoil_cert,
+    )
+
+    # Try using it
+    with pytest.raises(TypeError):
+        WorkgroupClient(client=MAISClient.prod())
 
 """
 Workgroup:

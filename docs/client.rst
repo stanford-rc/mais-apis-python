@@ -190,11 +190,30 @@ Constructor Parameters
 All of the :class:`~stanford.mais.client.MAISClient` constructor class methods
 take the same parameters:
 
-* ``cert``: A path to a client certificate
+* ``cert``: A path to a client certificate.
 
 * ``key``: optional path to a client certificate key.
 
-The parameters can be any "path-like" object, including a string or a
+* ``client_id``: An OAuth 2.0 client ID.
+
+* ``client_secret``: An OAuth 2.0 client secret.
+
+To use OAuth client authentication, you must provide both ``client_id`` and
+``client_secret``.  These must be the actual Client ID and Client Secret.  If
+you need to read the ID and Secret from elsewhere (from files, or from the
+environment), that is your responsibility.  If you are not using OAuth client
+authentication, do not set ``client_id`` or ``client_secret`` (they will
+default to ``None``).
+
+To use client-certificate authentication, you must have the certificate and
+private key in files.  You provide at least ``cert``.  If you are not using
+client-certificate authentication, do not set ``cert`` (it will default to
+``None``).
+
+If you are using client-certificate authentication and the certificate's
+private key is in a separate file, you must provide the path in ``key``.
+
+``cert`` and ``key`` can be any "path-like" object, including a string or a
 :class:`pathlib.Path`.
 
 For example, here is a basic case, with client certificate and private key in

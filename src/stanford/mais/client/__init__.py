@@ -163,6 +163,46 @@ class MAISClient():
     tokens.
     """
 
+    client_id: str | None = None
+    """An OAuth 2.0 Client ID.
+
+    An OAuth 2.0 Client ID, to be used for any MaIS API that supports
+    OAuth-based authentication.  Check each API's documentation to see if it
+    uses OAuth-based or certificate-based authentication.
+
+    If you do not want to use OAuth-based authenticaton, set this to ``None``.
+
+    If you provide a Client ID, you must also provide a Client Secret.  An
+    access token will be obtained before the constructor completes.
+
+    .. warning::
+        This package is designed to prefer OAuth-based authentication over
+        certificate-based authentication.  As MaIS APIs migrate to OAuth-based
+        authentication, you must ensure your OAuth credential is updated to
+        work with those APIs.
+
+    .. note::
+        If you provide your own ``oauth2_session``, then this parameter is
+        ignored, though the constructor will still try to obtain an access
+        token.
+
+    :raises TypeError: You provided an OAuth Client ID, but no Client Secret.
+    """
+
+    client_secret: str | None = None
+    """An OAuth 2.0 Client Secret.
+
+    This must be the secret associated with the provided Client ID.  If you did
+    not provide a Client ID, then this must be set to ``None``.
+
+    .. note::
+        If you provide your own ``oauth2_session``, then this parameter is
+        ignored, though the constructor will still try to obtain an access
+        token.
+
+    :raises TypeError: You provided an OAuth Client Secret, but no Client ID.
+    """
+
     cert: os.PathLike | None = None
     """The path to a TLS client certificate.
 
@@ -295,9 +335,13 @@ class MAISClient():
                     keyfile=str(self.key),
                 )
 
-        # TODO: Has an OAuth Client Secret been provided, but no ID?
+        # Has an OAuth Client ID been provided, but no Secret?
+        if self.client_id is not None and self.client_secret is None:
+            raise TypeError('Client ID provided, but no Client Secret')
 
-        # TODO: Can we test the Client ID/Secret?
+        # Has an OAuth Client Secret been provided, but no ID?
+        if self.client_secret is not None and self.client_id is None:
+            raise TypeError('Client Secret provided, but no Client ID')
 
         # Do we need to create our own Session?
         if self.session is None:
@@ -344,6 +388,8 @@ class MAISClient():
         cls,
         cert: os.PathLike | None = None,
         key: os.PathLike | None = None,
+        client_id: str | None = None,
+        client_secret: str | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to production (PROD) APIs.
@@ -358,6 +404,10 @@ class MAISClient():
         :param cert: See :class:`MAISClient` for more information.
 
         :param key: See :class:`MAISClient` for more information.
+
+        :param client_id: See :class:`MAISClient` for more information.
+
+        :param client_secret: See :class:`MAISClient` for more information.
 
         :param timeout: See :class:`MAISClient` for more information.
 
@@ -392,6 +442,8 @@ class MAISClient():
             token_url='https://mais.auth.us-west-2.amazoncognito.com/oauth2/token',
             cert=cert,
             key=key,
+            client_id=client_id,
+            client_secret=client_secret,
             timeout=timeout,
         )
 
@@ -400,6 +452,8 @@ class MAISClient():
         cls,
         cert: os.PathLike | None = None,
         key: os.PathLike | None = None,
+        client_id: str | None = None,
+        client_secret: str | None = None,
         timeout: Timeout | float | None = None,
     ) -> MAISClient:
         """Return a client configured to connect to production-track test (UAT)
@@ -415,6 +469,10 @@ class MAISClient():
         :param cert: See :class:`MAISClient` for more information.
 
         :param key: See :class:`MAISClient` for more information.
+
+        :param client_id: See :class:`MAISClient` for more information.
+
+        :param client_secret: See :class:`MAISClient` for more information.
 
         :param timeout: See :class:`MAISClient` for more information.
 
@@ -449,6 +507,8 @@ class MAISClient():
             token_url='https://mais-uat.auth.us-west-2.amazoncognito.com/oauth2/token',
             cert=cert,
             key=key,
+            client_id=client_id,
+            client_secret=client_secret,
             timeout=timeout,
         )
 
