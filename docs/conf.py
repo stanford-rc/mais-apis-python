@@ -68,6 +68,8 @@ nitpicky = True
 
 # Some references do not exist, so we ignore them
 nitpick_ignore = [
+    ('py:exc', 'authlib.integrations.requests_client.OAuthError'),
+    ('py:class', 'authlib.integrations.requests_client.oauth2_session.OAuth2Session'),
 ]
 
 # -- Options for HTML output -------------------------------------------------

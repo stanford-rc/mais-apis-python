@@ -20,7 +20,10 @@ import itertools
 import platform
 import pytest
 import ssl
+import time
+from authlib.integrations.requests_client import OAuthError
 from stanford.mais.client import MAISClient
+from stanford.mais.client.tests.mock import add_token_responses
 
 services = (
     'account',
@@ -202,6 +205,76 @@ def test_missing_client_credentials():
             client_secret='blah',
         )
 
+# Test that our token auto-refreshes correctly
+def test_oauth_refresh(mais_client):
+    oauth2_session = mais_client.oauth2_session
+
+    # Our token should already be active
+    assert oauth2_session.ensure_active_token() is True
+
+    # Make a note of the current access token, then change it
+    old_access_token = oauth2_session.token['access_token']
+    oauth2_session.token['access_token'] = 'x'
+
+    # Change the expiration time, and ensure it's expired
+    old_expires_at = oauth2_session.token['expires_at']
+    oauth2_session.token['expires_at'] = 1
+    assert oauth2_session.token.is_expired() is True
+
+    # Sleep two seconds, to ensure expiration times are different
+    time.sleep(2)
+
+    # Check for an active token; this triggers the refresh
+    assert oauth2_session.ensure_active_token() is True
+
+    # Check the token has actually refreshed
+    assert oauth2_session.token['access_token'] == old_access_token
+    assert oauth2_session.token['expires_at'] != old_expires_at
+
+# Test for an invalid Client ID
+def test_bad_clent_id():
+    # Normally we add responses mocks inside a PyTest fixture.  But we cannot
+    # do that here.  Why?  Because we need to test for an exception that is
+    # raised during the constructor.
+    add_token_responses()
+
+    with pytest.raises(OAuthError):
+        mais_client = MAISClient(
+            urls={
+                'account': {
+                    'cert': 'http://example.com/accounts/',
+                },
+                'workgroup': {
+                    'cert': 'http://example.com/wg/v2/',
+                    'oauth': 'http://example.com/oauth/wg/v2',
+                },
+            },
+            token_url='http://example.com/oauth2/token',
+            client_id='bad',
+            client_secret='good',
+        )
+
+def test_bad_client_secret():
+    # Normally we add responses mocks inside a PyTest fixture.  But we cannot
+    # do that here.  Why?  Because we need to test for an exception that is
+    # raised during the constructor.
+    add_token_responses()
+
+    with pytest.raises(OAuthError):
+        mais_client = MAISClient(
+            urls={
+                'account': {
+                    'cert': 'http://example.com/accounts/',
+                },
+                'workgroup': {
+                    'cert': 'http://example.com/wg/v2/',
+                    'oauth': 'http://example.com/oauth/wg/v2',
+                },
+            },
+            token_url='http://example.com/oauth2/token',
+            client_id='good',
+            client_secret='bad',
+        )
 
 # Making a MAISClient that has no auth at all should succeed.
 def test_no_auth():

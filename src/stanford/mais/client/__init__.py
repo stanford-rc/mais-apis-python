@@ -33,6 +33,9 @@ import requests
 import ssl
 from typing import NamedTuple, TypedDict
 
+# Next, do third-party imports
+from authlib.integrations.requests_client.oauth2_session import OAuth2Session
+
 # Set up logging
 logger = logging.getLogger(__name__)
 debug = logger.debug
@@ -188,6 +191,8 @@ class MAISClient():
         token.
 
     :raises TypeError: You provided an OAuth Client ID, but no Client Secret.
+
+    :raises authlib.integrations.requests_client.OAuthError: You provided an invalid OAuth Client ID.
     """
 
     client_secret: str | None = None
@@ -202,6 +207,8 @@ class MAISClient():
         token.
 
     :raises TypeError: You provided an OAuth Client Secret, but no Client ID.
+
+    :raises authlib.integrations.requests_client.OAuthError: You provided an invalid OAuth Client Secret.
     """
 
     cert: os.PathLike | None = None
@@ -285,6 +292,24 @@ class MAISClient():
     it, and the ``cert``, ``key``, and ``timeout`` parameters are
     ignored.  You must also set the `Accept` header to `application/json`, and
     you should also set the `User-Agent` header.
+
+    This Session will be used for APIs that use certificate authentication.
+    """
+
+    oauth2_session: OAuth2Session | None = dataclasses.field(default=None, repr=False, init=False)
+    """The OAuth2Session to use for OAuth2-auth API requests.
+
+    In most cases, you should not provide an OAuth2Session during instance
+    creation.  The default behavior is to let the class constructor create the
+    OAuth2Session, using the ``client_id`` and ``default_timeout`` parameters.
+    Automatic token refresh is configured, along with some headers.
+
+    If you provide your own OAuth2Session, then you are responsible for
+    configuring it, and the ``client_id`` and ``timeout`` parameters are
+    ignored.  You must also set the `Accept` header to `application/json`, and
+    you should also set the `User-Agent` header.
+
+    This OAuth2Session will be used for APIs that use OAuth 2.0 authentication.
     """
 
     timeout: Timeout | float | None = None
@@ -380,6 +405,63 @@ class MAISClient():
                 object.__setattr__(self, 'session', new_session)
         else:
             debug('Using client-provided session')
+
+        # Do we need to create our own OAuth2Session?
+        if self.oauth2_session is None:
+            # Only create an OAuth2Session if we have a Client ID
+            if self.client_id is None:
+                debug('No Client ID - Skipping oauth2_session creation')
+            else:
+                debug('Creating OAuth2Session')
+
+                # Prepare our OAuth2Session constructor arguments
+                # NOTE: Most Authlib documentation tells you to provide the
+                # token endpoint and grant type when you are making the
+                # `fetch_token` call.  Instead, you should provide it as part
+                # of the OAuth2Session constructor.
+                #
+                # If you provide the token_endpoint and grant_type here, they
+                # are passed through to the underlying OAuth2Client
+                # constructor.  *That* constructor will store them as metadata,
+                # and the metadata is used when refreshing expired access
+                # tokens!
+                oauth2_session_args = {
+                    'client_id': self.client_id,
+                    'client_secret': self.client_secret,
+                    'token_endpoint': self.token_url,
+                    'grant_type': 'client_credentials',
+                    'leeway': 300, # 5 minutes
+                }
+
+                # If we have a timeout, add it
+                # NOTE: Typeshed does not have a type for default_timeout.
+                if self.timeout is not None:
+                    oauth2_session_args['default_timeout'] = self.timeout # type: ignore[assignment]
+
+                # Make our session, with or without a timeout
+                new_oauth2_session = OAuth2Session(
+                    **oauth2_session_args
+                )
+
+                # Ask for JSON responses
+                new_oauth2_session.headers.update({ # type: ignore[attr-defined]
+                    'Accept': 'application/json',
+                })
+
+                # Set our custom user-agent
+                new_oauth2_session.headers.update({ # type: ignore[attr-defined]
+                    'User-Agent': USER_AGENT,
+                })
+
+                # Finally, put the new session into place
+                object.__setattr__(self, 'oauth2_session', new_oauth2_session)
+        else:
+            debug('Using client-provided oauth2_session')
+
+        # If using OAuth, fetch our first token
+        if self.oauth2_session is not None:
+            debug('Fetching initial access token')
+            self.oauth2_session.fetch_token()
 
         # That's it!
         return None
