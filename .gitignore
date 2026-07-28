@@ -16,6 +16,7 @@ __pycache__
 *.cer
 *.key
 *.req
+*.env
 
 # Ignore packaging stuff
 *.egg-info
