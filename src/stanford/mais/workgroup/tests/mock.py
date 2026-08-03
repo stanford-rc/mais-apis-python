@@ -629,10 +629,46 @@ def add_workgroup_responses() -> None:
             '}'
         )
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/search/noresults:*',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"search": "noresults:*",' +
+            '"results": []' +
+            '}'
+        )
+    )
 
     responses.add(
         responses.GET,
         'http://example.com/wg/v2/search/test:*',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"search": "research-computing:*",' +
+            '"results": [' +
+            workgroup_test1_lite +
+            ']' +
+            '}'
+        )
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/search/test:*',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=200,
         content_type='application/json',
         body=(
@@ -660,10 +696,47 @@ def add_workgroup_responses() -> None:
             '}'
         )
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/search/workgroup:*',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"search": "workgroup:*",' +
+            '"results": [' +
+            workgroup_testowners_lite + ',' +
+            workgroup_workgroupowners_lite +
+            ']' +
+            '}'
+        )
+    )
 
     responses.add(
         responses.GET,
         'http://example.com/wg/v2/search/ba:*',
+        status=400,
+        content_type='application/json',
+        json={
+            "notification": "Search String length must be at least 4 characters before using wildcards",
+            "code": 400,
+            "message": "Bad Request",
+            "status":400,
+        }
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/search/ba:*',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=400,
         content_type='application/json',
         json={
@@ -686,10 +759,44 @@ def add_workgroup_responses() -> None:
             'status': 400,
         },
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/search/bad:w1',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
 
     responses.add(
         responses.GET,
         'http://example.com/wg/v2/search/bad:w3',
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/search/bad:w3',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=401,
         content_type='application/json',
         json={
@@ -707,10 +814,49 @@ def add_workgroup_responses() -> None:
         content_type='text/plain',
         body='What even is this?',
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/search/bad:w6',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
 
     responses.add(
         responses.GET,
         'http://example.com/wg/v2?type=WORKGROUP&id=workgroup:test-owners',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"administrators_count": 1,' +
+            '"members": [' +
+            '],' +
+            '"members_count": 0,' +
+            '"id": "workgroup:test-owners",' +
+            '"type": "workgroup",' +
+            '"results": [' +
+            workgroup_test1_lite +
+            '],' +
+            '"administrators": [' +
+            workgroup_test1_lite +
+            ']' +
+            '}'
+        )
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2?type=WORKGROUP&id=workgroup:test-owners',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=200,
         content_type='application/json',
         body=(
@@ -753,10 +899,62 @@ def add_workgroup_responses() -> None:
             '}'
         )
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2?type=CERTIFICATE&id=client-cert-1',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"administrators_count": 1,' +
+            '"members": [' +
+            '],' +
+            '"members_count": 1,' +
+            '"id": "client-cert-1",' +
+            '"type": "certificate",' +
+            '"results": [' +
+            workgroup_testowners_lite +
+            '],' +
+            '"administrators": [' +
+            workgroup_testowners_lite +
+            ']' +
+            '}'
+        )
+    )
 
     responses.add(
         responses.GET,
         'http://example.com/wg/v2?type=CERTIFICATE&id=nonexistant',
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"administrators_count": 0,' +
+            '"members": [' +
+            '],' +
+            '"members_count": 0,' +
+            '"id": "nonexistant",' +
+            '"type": "certificate",' +
+            '"results": [' +
+            '],' +
+            '"administrators": [' +
+            ']' +
+            '}'
+        )
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2?type=CERTIFICATE&id=nonexistant',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=200,
         content_type='application/json',
         body=(
@@ -787,6 +985,23 @@ def add_workgroup_responses() -> None:
             'status': 400,
         },
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2?type=CERTIFICATE&id=bad400',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
 
     responses.add(
         responses.GET,
@@ -800,10 +1015,39 @@ def add_workgroup_responses() -> None:
             'status': 401,
         },
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2?type=CERTIFICATE&id=bad401',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
 
     responses.add(
         responses.GET,
         'http://example.com/wg/v2?type=CERTIFICATE&id=bad521',
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2?type=CERTIFICATE&id=bad521',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=521,
         content_type='text/plain',
         body='What even is this?',
@@ -830,7 +1074,33 @@ def add_workgroup_responses() -> None:
             ']' +
             '}'
         )
-
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2?type=USER&id=akkornel',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=200,
+        content_type='application/json',
+        body=(
+            '{' +
+            '"administrators_count": 0,' +
+            '"members": [' +
+            workgroup_test1_lite +
+            '],' +
+            '"members_count": 1,' +
+            '"id": "akkornel",' +
+            '"type": "user",' +
+            '"results": [' +
+            workgroup_test1_lite +
+            '],' +
+            '"administrators": [' +
+            ']' +
+            '}'
+        )
     )
 
     # CREATE WORKGROUP
@@ -840,6 +1110,28 @@ def add_workgroup_responses() -> None:
         responses.POST,
         'http://example.com/wg/v2/create:1',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=201,
+        content_type='application/json',
+        body=workgroup_create1_json,
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/oauth/wg/v2/create:1',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'description': 'Create Test 1',
@@ -905,12 +1197,55 @@ def add_workgroup_responses() -> None:
                 content_type='application/json',
                 body=response,
             )
+            responses.add(
+                responses.POST,
+                'http://example.com/oauth/wg/v2/create:1',
+                match=[
+                    matchers.header_matcher({
+                        'Authorization': 'Bearer abcdef123',
+                    }),
+                    matchers.json_params_matcher(
+                        initial_fields,
+                        strict_match=True,
+                    )
+                ],
+                status=201,
+                content_type='application/json',
+                body=response,
+            )
 
     # Duplicate workgroup
     responses.add(
         responses.POST,
         'http://example.com/wg/v2/create:dupe',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=409,
+        content_type='application/json',
+        json={
+            'notification': 'create:dupe workgroup already exist.',
+            'code': 409,
+            'message': 'Conflict',
+            'status': 409,
+        },
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/oauth/wg/v2/create:dupe',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'description': 'Create Test 1',
@@ -956,8 +1291,35 @@ def add_workgroup_responses() -> None:
             'message': 'Bad Request',
             'status': 400,
         },
-
     )
+    responses.add(
+        responses.POST,
+        'http://example.com/oauth/wg/v2/create:bad400',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+
     responses.add(
         responses.POST,
         'http://example.com/wg/v2/create:bad401',
@@ -984,6 +1346,34 @@ def add_workgroup_responses() -> None:
     )
     responses.add(
         responses.POST,
+        'http://example.com/oauth/wg/v2/create:bad401',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
+
+    responses.add(
+        responses.POST,
         'http://example.com/wg/v2/create:bad521',
         match=[
             matchers.json_params_matcher(
@@ -1003,8 +1393,58 @@ def add_workgroup_responses() -> None:
     )
     responses.add(
         responses.POST,
+        'http://example.com/oauth/wg/v2/create:bad521',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+
+    responses.add(
+        responses.POST,
         'http://example.com/wg/v2/create:inactive',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'Create Test 1',
+                    'filter': 'NONE',
+                    'privgroup': 'TRUE',
+                    'reusable': 'TRUE',
+                    'visibility': 'STANFORD',
+                },
+                strict_match=True,
+            )
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+    responses.add(
+        responses.POST,
+        'http://example.com/oauth/wg/v2/create:inactive',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'description': 'Create Test 1',
@@ -1040,6 +1480,20 @@ def add_workgroup_responses() -> None:
         responses.add(
             responses.GET,
             url,
+            status=200,
+            content_type='application/json',
+            body=json_body,
+        )
+        # The OAuth URL is similar to the client-cert URL
+        oauth_url = url.replace('/wg/', '/oauth/wg/')
+        responses.add(
+            responses.GET,
+            oauth_url,
+            match=[
+                matchers.header_matcher({
+                    'Authorization': 'Bearer abcdef123',
+                }),
+            ],
             status=200,
             content_type='application/json',
             body=json_body,
@@ -1101,11 +1555,59 @@ def add_workgroup_responses() -> None:
                 'status': code,
             },
         )
+        # The OAuth URL is similar to the client-cert URL
+        oauth_get_url = get_url.replace('/wg/', '/oauth/wg/')
+        responses.add(
+            responses.GET,
+            oauth_get_url,
+            match=[
+                matchers.header_matcher({
+                    'Authorization': 'Bearer abcdef123',
+                }),
+            ],
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
+        responses.add(
+            responses.GET,
+            oauth_get_url + '/privgroup',
+            match=[
+                matchers.header_matcher({
+                    'Authorization': 'Bearer abcdef123',
+                }),
+            ],
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
 
     # The bad:w6 workgroup is special
     responses.add(
         responses.GET,
         'http://example.com/wg/v2/bad:w6',
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/bad:w6',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=521,
         content_type='text/plain',
         body='What even is this?',
@@ -1122,11 +1624,43 @@ def add_workgroup_responses() -> None:
             'message': 'Workgroup test:missing does not exist',
         },
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/test:missing',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=404,
+        content_type='application/json',
+        json={
+            'code': 404,
+            'message': 'Workgroup test:missing does not exist',
+        },
+    )
 
     # test:deleted is a workgroup which has been deleted
     responses.add(
         responses.GET,
         'http://example.com/wg/v2/test:inactive',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/test:inactive',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=400,
         content_type='application/json',
         json={
@@ -1216,12 +1750,53 @@ def add_workgroup_responses() -> None:
                 content_type='application/json',
                 body=change_prop(prop_name, prop_value),
             )
+            responses.add(
+                responses.PUT,
+                'http://example.com/oauth/wg/v2/test:1',
+                match=[
+                    matchers.header_matcher({
+                        'Authorization': 'Bearer abcdef123',
+                    }),
+                    matchers.json_params_matcher(
+                        {
+                            prop_name: prop_value,
+                        },
+                        strict_match=True,
+                    )
+                ],
+                status=200,
+                content_type='application/json',
+                body=change_prop(prop_name, prop_value),
+            )
 
     # Changing test:1 description to 'deleted' gives a special 400
     responses.add(
         responses.PUT,
         'http://example.com/wg/v2/test:1',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'description': 'delete',
+                },
+                strict_match=True,
+            )
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'description': 'delete',
@@ -1286,11 +1861,52 @@ def add_workgroup_responses() -> None:
                 'status': code,
             },
         )
+        responses.add(
+            responses.PUT,
+            'http://example.com/oauth/wg/v2/test:1',
+            match=[
+                matchers.header_matcher({
+                    'Authorization': 'Bearer abcdef123',
+                }),
+                matchers.json_params_matcher(
+                    {
+                        'description': new_description,
+                    },
+                    strict_match=True,
+                )
+            ],
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
 
     responses.add(
         responses.PUT,
         'http://example.com/wg/v2/test:1',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'description': '521',
+                },
+                strict_match=True,
+            )
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'description': '521',
@@ -1318,11 +1934,45 @@ def add_workgroup_responses() -> None:
             'status': 200,
         }
     )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/test:1',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup: test:1 has been deleted and all members and administrators removed',
+            'code': 200,
+            'message': 'Deleted',
+            'status': 200,
+        }
+    )
 
     # Deleting workgroup:test-owners returns a 400
     responses.add(
         responses.DELETE,
         'http://example.com/wg/v2/workgroup:test-owners',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 400',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/workgroup:test-owners',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=400,
         content_type='application/json',
         json={
@@ -1346,6 +1996,23 @@ def add_workgroup_responses() -> None:
             'status': 401,
         },
     )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/private:1',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=401,
+        content_type='application/json',
+        json={
+            'notification': 'Error code 401',
+            'code': 401,
+            'message': 'Unauthorized',
+            'status': 401,
+        },
+    )
 
     # Deleting bad:521 returns a 521
     responses.add(
@@ -1355,12 +2022,40 @@ def add_workgroup_responses() -> None:
         content_type='text/plain',
         body='What even is this?',
     )
-    
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/bad:521',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
 
     # test:deleted is a workgroup which has been deleted
     responses.add(
         responses.DELETE,
         'http://example.com/wg/v2/test:inactive',
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/test:inactive',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=400,
         content_type='application/json',
         json={
@@ -1380,10 +2075,34 @@ def add_workgroup_responses() -> None:
         content_type='application/json',
         body=workgroup_test1_privgroup,
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/test:1/privgroup',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=200,
+        content_type='application/json',
+        body=workgroup_test1_privgroup,
+    )
 
     responses.add(
         responses.GET,
         'http://example.com/wg/v2/private:1/privgroup',
+        status=200,
+        content_type='application/json',
+        body=workgroup_private1_privgroup,
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/private:1/privgroup',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=200,
         content_type='application/json',
         body=workgroup_private1_privgroup,
@@ -1406,10 +2125,39 @@ def add_workgroup_responses() -> None:
             'status': 400,
         },
     )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/test:inactive/privgroup',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
+        status=400,
+        content_type='application/json',
+        json={
+            'notification': 'Workgroup is inactive',
+            'code': 400,
+            'message': 'Bad Request',
+            'status': 400,
+        },
+    )
 
     responses.add(
         responses.GET,
         'http://example.com/wg/v2/bad:w6/privgroup',
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+    responses.add(
+        responses.GET,
+        'http://example.com/oauth/wg/v2/bad:w6/privgroup',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+        ],
         status=521,
         content_type='text/plain',
         body='What even is this?',
@@ -1439,11 +2187,57 @@ def add_workgroup_responses() -> None:
             'status': 200,
         },
     )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1/members/adamhl',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'adamhl was added as a member to the workgroup: test:1',
+            'code': 200,
+            'message': 'Added',
+            'status': 200,
+        },
+    )
 
     responses.add(
         responses.PUT,
         'http://example.com/wg/v2/test:1/members/cert5225',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'CERTIFICATE',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'cert5225 was added as a member to the workgroup: test:1',
+            'code': 200,
+            'message': 'Added',
+            'status': 200,
+        },
+    )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1/members/cert5225',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'type': 'CERTIFICATE',
@@ -1483,11 +2277,57 @@ def add_workgroup_responses() -> None:
             'status': 200,
         },
     )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/test:1/members/akkornel',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'akkornel was removed as a member from the workgroup: test:1',
+            'code': 200,
+            'message': 'Removed',
+            'status': 200,
+        },
+    )
 
     responses.add(
         responses.DELETE,
         'http://example.com/wg/v2/workgroup:test-owners/members/client-cert-1',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'CERTIFICATE',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'client-cert-1 was removed as a member from the workgroup: workgroup:test-owners',
+            'code': 200,
+            'message': 'Removed',
+            'status': 200,
+        },
+    )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/workgroup:test-owners/members/client-cert-1',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'type': 'CERTIFICATE',
@@ -1564,6 +2404,47 @@ def add_workgroup_responses() -> None:
             },
         )
 
+        responses.add(
+            responses.PUT,
+            'http://example.com/oauth/wg/v2/test:1/members/' + member_name,
+            match=[
+                matchers.header_matcher({
+                    'Authorization': 'Bearer abcdef123',
+                }),
+                matchers.json_params_matcher(
+                    {
+                        'type': 'USER',
+                    },
+                    strict_match=True,
+                )
+            ],
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
+        responses.add(
+            responses.DELETE,
+            'http://example.com/oauth/wg/v2/test:1/members/' + member_name,
+            match=[
+                matchers.header_matcher({
+                    'Authorization': 'Bearer abcdef123',
+                }),
+            ],
+            status=code,
+            content_type='application/json',
+            json={
+                'notification': notification,
+                'code': code,
+                'message': message,
+                'status': code,
+            },
+        )
+
     # And our special 521 errors
 
     responses.add(
@@ -1581,11 +2462,47 @@ def add_workgroup_responses() -> None:
         content_type='text/plain',
         body='What even is this?',
     )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1/members/bad521',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
 
     responses.add(
         responses.DELETE,
         'http://example.com/wg/v2/test:1/members/bad521',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=521,
+        content_type='text/plain',
+        body='What even is this?',
+    )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/test:1/members/bad521',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'type': 'USER',
@@ -1620,11 +2537,57 @@ def add_workgroup_responses() -> None:
             "status": 404
         },
     )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1/members/nobody',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=404,
+        content_type='application/json',
+        json={
+            "notification": "Not Found",
+            "code": 404,
+            "message": "nobody was not found",
+            "status": 404
+        },
+    )
 
     responses.add(
         responses.PUT,
         'http://example.com/wg/v2/test:1/members/leland',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=409,
+        content_type='application/json',
+        json={
+            "notification": "Conflict",
+            "code": 409,
+            "message": "Member leland of type USER already exist in workgroup: test:1",
+            "status": 409
+        },
+    )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1/members/leland',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'type': 'USER',
@@ -1664,6 +2627,29 @@ def add_workgroup_responses() -> None:
             'status': 200,
         },
     )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1/administrators/adamhl',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'adamhl was added as a administrator to the workgroup: test:1',
+            'code': 200,
+            'message': 'Added',
+            'status': 200,
+        },
+    )
 
     responses.add(
         responses.PUT,
@@ -1685,11 +2671,57 @@ def add_workgroup_responses() -> None:
             "status": 200
         },
     )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/create:1/administrators/workgroup:test-owners',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'type': 'WORKGROUP',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            "notification": "Conflict",
+            "code": 200,
+            "message": "workgroup:test-owners was added as a administrator to the workgroup: create:1",
+            "status": 200
+        },
+    )
 
     responses.add(
         responses.PUT,
         'http://example.com/wg/v2/test:1/administrators/cert5225',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'CERTIFICATE',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'cert5225 was added as a administrator to the workgroup: test:1',
+            'code': 200,
+            'message': 'Added',
+            'status': 200,
+        },
+    )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1/administrators/cert5225',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'type': 'CERTIFICATE',
@@ -1729,6 +2761,29 @@ def add_workgroup_responses() -> None:
             "status": 409
         },
     )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1/administrators/stanford',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=409,
+        content_type='application/json',
+        json={
+            "notification": "Conflict",
+            "code": 409,
+            "message": "Administrator stanford of type USER already exist in workgroup: test:1",
+            "status": 409
+        },
+    )
 
     responses.add(
         responses.PUT,
@@ -1749,7 +2804,29 @@ def add_workgroup_responses() -> None:
             "message": "Administrator workgroup:test-owners of type WORKGROUP already exist in workgroup: test:1",
             "status": 409
         },
-
+    )
+    responses.add(
+        responses.PUT,
+        'http://example.com/oauth/wg/v2/test:1/administrators/workgroup:test-owners',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'type': 'WORKGROUP',
+                },
+                strict_match=True,
+            )
+        ],
+        status=409,
+        content_type='application/json',
+        json={
+            "notification": "Conflict",
+            "code": 409,
+            "message": "Administrator workgroup:test-owners of type WORKGROUP already exist in workgroup: test:1",
+            "status": 409
+        },
     )
 
     # REMOVE ADMINISTRATOR
@@ -1758,6 +2835,29 @@ def add_workgroup_responses() -> None:
         responses.DELETE,
         'http://example.com/wg/v2/test:1/administrators/stanford',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'USER',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'stanford was removed as a administrator from the workgroup: test:1',
+            'code': 200,
+            'message': 'Removed',
+            'status': 200,
+        },
+    )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/test:1/administrators/stanford',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'type': 'USER',
@@ -1795,6 +2895,29 @@ def add_workgroup_responses() -> None:
             'status': 200,
         },
     )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/workgroup:test-owners/administrators/workgroup:workgroup-owners',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
+            matchers.json_params_matcher(
+                {
+                    'type': 'WORKGROUP',
+                },
+                strict_match=True,
+            )
+        ],
+        status=200,
+        content_type='application/json',
+        json={
+            'notification': 'workgroup:workgroup-owners was removed as a administrator from the workgroup: workgroup:test-owners',
+            'code': 200,
+            'message': 'Removed',
+            'status': 200,
+        },
+    )
 
     # Add a case of an admin being removed without us realizing
 
@@ -1802,6 +2925,29 @@ def add_workgroup_responses() -> None:
         responses.DELETE,
         'http://example.com/wg/v2/test:1/administrators/workgroup:test-owners',
         match=[
+            matchers.json_params_matcher(
+                {
+                    'type': 'WORKGROUP',
+                },
+                strict_match=True,
+            )
+        ],
+        status=404,
+        content_type='application/json',
+        json={
+            'notification': 'workgroup:test-owners is not a administrator of workgroup: test:1',
+            'code': 404,
+            'message': 'Not Found',
+            'status': 404,
+        },
+    )
+    responses.add(
+        responses.DELETE,
+        'http://example.com/oauth/wg/v2/test:1/administrators/workgroup:test-owners',
+        match=[
+            matchers.header_matcher({
+                'Authorization': 'Bearer abcdef123',
+            }),
             matchers.json_params_matcher(
                 {
                     'type': 'WORKGROUP',
