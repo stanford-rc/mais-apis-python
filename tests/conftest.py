@@ -115,8 +115,6 @@ def mais_client(snakeoil_cert):
         },
         token_url='http://example.com/oauth2/token',
         cert=snakeoil_cert,
-        client_id='good1',
-        client_secret='good2'
     )
 
     # Send out the MaIS Client, in our mocked-up environment!
