@@ -520,6 +520,7 @@ class MAISClient():
                 },
                 'workgroup': {
                     'cert': 'https://workgroupsvc.stanford.edu/workgroups/2.0/',
+                    'oauth': 'https://mais.suapi.stanford.edu/workgroups/v2/api/',
                 },
             },
             token_url='https://mais.auth.us-west-2.amazoncognito.com/oauth2/token',
@@ -585,6 +586,7 @@ class MAISClient():
                 },
                 'workgroup': {
                     'cert': 'https://workgroupsvc-uat.stanford.edu/workgroups/2.0/',
+                    'oauth': 'https://mais.suapiuat.stanford.edu/workgroups/v2/api/',
                 },
             },
             token_url='https://mais-uat.auth.us-west-2.amazoncognito.com/oauth2/token',
