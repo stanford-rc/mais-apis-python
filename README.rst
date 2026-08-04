@@ -74,19 +74,40 @@ Here is an example of how you can use the Accounts API through this SDK:
    # validated_results.inactive={'lelandjr'}
    # validated_results.unknown={'asld-gkm'}
 
-Here is an example of how you can use the Workgroup API through this SDK:
+Here is an example of how you can use the Workgroup API (which supports both
+client-certificate and OAuth authentication) through this SDK:
 
 .. code-block:: python
 
     from stanford.mais.client import MAISClient
     from stanford.mais.workgroup import WorkgroupClient
-    from pathlib import Path
 
     # Keep this secret!
+    from pathlib import Path
     client_cert = Path('client.pem')
 
-    # Set up clients
-    client = MAISClient.prod(client_cert)  # You can also use .uat() for UAT.
+    # You can also use OAuth.  Keep the Client Secret secret!
+    from os import environ # See https://12factor.net/config
+    client_id = environ['OAUTH_CLIENT_ID']
+    client_secret = environ['OAUTH_CLIENT_SECRET']
+
+    # Set up clients…
+    client = MAISClient.prod(  # You can also use .uat() for UAT.
+        cert=client_cert,
+    )
+    # … or, to use OAuth…
+    client = MAISClient.prod(
+        client_id=client_id,
+        client_secret=client_secret,
+    )
+    # … or, enable support for both!
+    client = MAISClient.prod(
+        cert=client_cert,
+        client_id=client_id,
+        client_secret=client_secret,
+    )
+
+    # WorkgroupClient will prefer OAuth over client-cert, but supports both.
     workgroups = WorkgroupClient(client)
 
     # Fetch a workgroup
@@ -137,11 +158,15 @@ The following APIs are supported:
   accounts don't exist (so you don't have to filter them out).  Also provided
   is code for quickly validating a collection of SUNetIDs.
 
+  This API supports only client-certificate authentication.
+
 * `Workgroup`_: Full support for operations on individual workgroups.
   Creating workgroups.  Searching for workgroup by name, or by member (member
   SUNetID, member certificate, or member (nested) workgroup).
   Modifying workgroup properties and membership.  Deleting workgroups.
   Fetching privilege groups.
+
+  This API supports both client-certificate and OAuth authentication.
 
   *Not currently planned*: Anything related to workgroup integration linkages.
 
