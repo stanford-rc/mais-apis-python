@@ -6,6 +6,16 @@ Enhancements:
 * When using WorkgroupClient.search_by_name, if you put a wildcard too early in
   the string, you'll now get an IndexError instead of a ChildProcessError.
 
+* WorkgroupClient now works with the new OAuth-based Workgroup 2.0 API, for
+  PROD and UAT.  All of the client methods work the same, just provide a
+  ``MAISClient`` that's been provisioned with OAuth credentials.
+
+* MAISClient now takes OAuth credentials, in addition to (or instead of) a
+  client certificate.  If you are only using OAuth APIs, you only need OAuth
+  credentials; if you are only using client-certificate APIs, you only need a
+  client certificate; if you are using both types of APIs, you can provide both
+  types of credentials.
+
 Fixes:
 
 * Fix a TOCTOU issue where you had admin access to a private workgroup at the
