@@ -119,6 +119,28 @@ def mais_client(snakeoil_cert):
 
     # Send out the MaIS Client, in our mocked-up environment!
     return mais_client
+@pytest.fixture()
+def mais_client_oauth(snakeoil_cert):
+    # Add the different responses for each of our APIs
+    add_token_responses()
+    add_account_responses()
+    add_workgroup_responses()
+
+    #with responses.RequestsMock() as rsps:
+    mais_client = MAISClient(
+        urls={
+            'workgroup': {
+                'oauth': 'http://example.com/oauth/wg/v2/',
+            },
+        },
+        token_url='http://example.com/oauth2/token',
+        cert=snakeoil_cert,
+        client_id='good1',
+        client_secret='good2'
+    )
+
+    # Send out the MaIS Client, in our mocked-up environment!
+    return mais_client
 
 @pytest.fixture()
 def account_client(mais_client) -> AccountClient:
@@ -127,3 +149,6 @@ def account_client(mais_client) -> AccountClient:
 @pytest.fixture()
 def workgroup_client(mais_client) -> WorkgroupClient:
     return WorkgroupClient(client=mais_client)
+@pytest.fixture()
+def workgroup_client_oauth(mais_client_oauth) -> WorkgroupClient:
+    return WorkgroupClient(client=mais_client_oauth)

@@ -206,21 +206,8 @@ def test_missing_client_credentials():
         )
 
 # Test that our token auto-refreshes correctly
-def test_oauth_refresh():
-    # Normally we add responses mocks inside a PyTest fixture.  But we cannot
-    # do that here.  Why?  Because we need to test for an exception that is
-    # raised during the constructor.
-    add_token_responses()
-
-    # Make a client that has OAuth2 credentials, then grab our OAuth2 session.
-    mais_client = MAISClient(
-        urls={
-        },
-        token_url='http://example.com/oauth2/token',
-        client_id='good1',
-        client_secret='good2',
-    )
-    oauth2_session = mais_client.oauth2_session
+def test_oauth_refresh(mais_client_oauth):
+    oauth2_session = mais_client_oauth.oauth2_session
 
     # Our token should already be active
     assert oauth2_session.ensure_active_token() is True
