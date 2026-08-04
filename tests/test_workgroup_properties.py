@@ -27,6 +27,13 @@ This script tests that changes to Workgroup properties behave as expected.
 
 
 # Workgroup name is read-only
+def test_oauth_name(workgroup_client_oauth):
+    result = workgroup_client_oauth['test:1']
+    assert result.name == 'test:1'
+
+    # Changing the name should fail
+    with pytest.raises(AttributeError):
+        result.name = 'test:2'
 def test_name(workgroup_client):
     result = workgroup_client['test:1']
     assert result.name == 'test:1'
@@ -36,6 +43,30 @@ def test_name(workgroup_client):
         result.name = 'test:2'
 
 # Test description
+def test_oauth_description(workgroup_client_oauth):
+    result = workgroup_client_oauth['test:1']
+    assert result.description == 'Test 1'
+
+    # Test changing description, including a Latin1 character
+    result.description = ('x' * 254) + '¿'
+    assert result.description == ('x' * 254) + '¿'
+
+    # Too-short or Too-long descriptions should fail
+    with pytest.raises(IndexError):
+        result.description = ''
+    with pytest.raises(IndexError):
+        result.description = ('x' * 256)
+
+    # Descriptions with non-Latin1 or invisible characters should fail
+    with pytest.raises(ValueError):
+        result.description = '€'
+    with pytest.raises(ValueError):
+        result.description = '\t'
+
+    # As a special test, changing the description to "deleted" should raise a
+    # WorkgroupDeleted exception.
+    with pytest.raises(WorkgroupDeleted):
+        result.description = 'delete'
 def test_description(workgroup_client):
     result = workgroup_client['test:1']
     assert result.description == 'Test 1'
@@ -62,6 +93,19 @@ def test_description(workgroup_client):
         result.description = 'delete'
 
 # Use special descriptions to test upstream failures
+def test_oauth_upstream(workgroup_client_oauth):
+    result = workgroup_client_oauth['test:1']
+
+    with pytest.raises(ChildProcessError):
+        result.description = 'bad1'
+    with pytest.raises(ChildProcessError):
+        result.description = 'bad2'
+    with pytest.raises(PermissionError):
+        result.description = 'bad3'
+    with pytest.raises(PermissionError):
+        result.description = 'bad4'
+    with pytest.raises(NotImplementedError):
+        result.description = '521'
 def test_upstream(workgroup_client):
     result = workgroup_client['test:1']
 
@@ -77,6 +121,41 @@ def test_upstream(workgroup_client):
         result.description = '521'
 
 # Test filter
+def test_oauth_filter(workgroup_client_oauth):
+    result = workgroup_client_oauth['test:1']
+    assert result.filter == WorkgroupFilter.NONE
+
+    # Test each filter value works
+    result.filter = WorkgroupFilter.ACADEMIC_ADMINISTRATIVE
+    assert result.filter == WorkgroupFilter.ACADEMIC_ADMINISTRATIVE
+
+    result.filter = WorkgroupFilter.STUDENT
+    assert result.filter == WorkgroupFilter.STUDENT
+
+    result.filter = WorkgroupFilter.FACULTY
+    assert result.filter == WorkgroupFilter.FACULTY
+
+    result.filter = WorkgroupFilter.STAFF
+    assert result.filter == WorkgroupFilter.STAFF
+
+    result.filter = WorkgroupFilter.FACULTY_STAFF
+    assert result.filter == WorkgroupFilter.FACULTY_STAFF
+
+    result.filter = WorkgroupFilter.FACULTY_STUDENT
+    assert result.filter == WorkgroupFilter.FACULTY_STUDENT
+
+    result.filter = WorkgroupFilter.STAFF_STUDENT
+    assert result.filter == WorkgroupFilter.STAFF_STUDENT
+
+    result.filter = WorkgroupFilter.FACULTY_STAFF_STUDENT
+    assert result.filter == WorkgroupFilter.FACULTY_STAFF_STUDENT
+
+    result.filter = WorkgroupFilter.NONE
+    assert result.filter == WorkgroupFilter.NONE
+
+    # Check an invalid filter string
+    with pytest.raises(ValueError):
+        result.filter = 'bsdf'
 def test_filter(workgroup_client):
     result = workgroup_client['test:1']
     assert result.filter == WorkgroupFilter.NONE
@@ -84,28 +163,28 @@ def test_filter(workgroup_client):
     # Test each filter value works
     result.filter = WorkgroupFilter.ACADEMIC_ADMINISTRATIVE
     assert result.filter == WorkgroupFilter.ACADEMIC_ADMINISTRATIVE
-    
+
     result.filter = WorkgroupFilter.STUDENT
     assert result.filter == WorkgroupFilter.STUDENT
-    
+
     result.filter = WorkgroupFilter.FACULTY
     assert result.filter == WorkgroupFilter.FACULTY
-    
+
     result.filter = WorkgroupFilter.STAFF
     assert result.filter == WorkgroupFilter.STAFF
-    
+
     result.filter = WorkgroupFilter.FACULTY_STAFF
     assert result.filter == WorkgroupFilter.FACULTY_STAFF
-    
+
     result.filter = WorkgroupFilter.FACULTY_STUDENT
     assert result.filter == WorkgroupFilter.FACULTY_STUDENT
-    
+
     result.filter = WorkgroupFilter.STAFF_STUDENT
     assert result.filter == WorkgroupFilter.STAFF_STUDENT
-    
+
     result.filter = WorkgroupFilter.FACULTY_STAFF_STUDENT
     assert result.filter == WorkgroupFilter.FACULTY_STAFF_STUDENT
-    
+
     result.filter = WorkgroupFilter.NONE
     assert result.filter == WorkgroupFilter.NONE
 
@@ -114,6 +193,20 @@ def test_filter(workgroup_client):
         result.filter = 'bsdf'
 
 # Test privgroup
+def test_oauth_privgroup(workgroup_client_oauth):
+    result = workgroup_client_oauth['test:1']
+    assert result.privgroup == True
+
+    # Test changing privgroup works
+    result.privgroup = False
+    assert result.privgroup == False
+
+    result.privgroup = True
+    assert result.privgroup == True
+
+    # Test a non-bool
+    with pytest.raises(TypeError):
+        result.privgroup = 'blah'
 def test_privgroup(workgroup_client):
     result = workgroup_client['test:1']
     assert result.privgroup == True
@@ -130,6 +223,20 @@ def test_privgroup(workgroup_client):
         result.privgroup = 'blah'
 
 # Test reusable
+def test_oauth_reusable(workgroup_client_oauth):
+    result = workgroup_client_oauth['test:1']
+    assert result.reusable == True
+
+    # Test changing reusable works
+    result.reusable = False
+    assert result.reusable == False
+
+    result.reusable = True
+    assert result.reusable == True
+
+    # Test a non-bool
+    with pytest.raises(TypeError):
+        result.reusable = 'blah'
 def test_reusable(workgroup_client):
     result = workgroup_client['test:1']
     assert result.reusable == True

@@ -28,6 +28,17 @@ that time, and all the exceptions which might be thrown.
 
 # Test the most simple form of workgroup creation, with everything set to
 # default values.
+def test_workgroup_oauth_create_simple(workgroup_client_oauth):
+    result = workgroup_client_oauth.create(
+        name='create:1',
+        description='Create Test 1',
+    )
+    assert result.name == 'create:1'
+    assert result.description == 'Create Test 1'
+    assert result.filter == WorkgroupFilter.NONE
+    assert result.privgroup is True
+    assert result.reusable is True
+    assert result.visibility == WorkgroupVisibility.STANFORD
 def test_workgroup_create_simple(workgroup_client):
     result = workgroup_client.create(
         name='create:1',
@@ -41,6 +52,29 @@ def test_workgroup_create_simple(workgroup_client):
     assert result.visibility == WorkgroupVisibility.STANFORD
 
 # Test creating with different filters
+def test_workgroup_oauth_create_filters(workgroup_client_oauth):
+    for filter_value in (
+        WorkgroupFilter.NONE,
+        WorkgroupFilter.ACADEMIC_ADMINISTRATIVE,
+        WorkgroupFilter.STUDENT,
+        WorkgroupFilter.FACULTY,
+        WorkgroupFilter.STAFF,
+        WorkgroupFilter.FACULTY_STAFF,
+        WorkgroupFilter.FACULTY_STUDENT,
+        WorkgroupFilter.STAFF_STUDENT,
+        WorkgroupFilter.FACULTY_STAFF_STUDENT,
+    ):
+        result = workgroup_client_oauth.create(
+            name='create:1',
+            description='Create Test 1',
+            filter=filter_value,
+        )
+        assert result.name == 'create:1'
+        assert result.description == 'Create Test 1'
+        assert result.filter == filter_value
+        assert result.privgroup is True
+        assert result.reusable is True
+        assert result.visibility == WorkgroupVisibility.STANFORD
 def test_workgroup_create_filters(workgroup_client):
     for filter_value in (
         WorkgroupFilter.NONE,
@@ -66,6 +100,18 @@ def test_workgroup_create_filters(workgroup_client):
         assert result.visibility == WorkgroupVisibility.STANFORD
 
 # Test creating with privgroup off
+def test_workgroup_oauth_create_privgroup(workgroup_client_oauth):
+    result = workgroup_client_oauth.create(
+        name='create:1',
+        description='Create Test 1',
+        privgroup=False,
+    )
+    assert result.name == 'create:1'
+    assert result.description == 'Create Test 1'
+    assert result.filter == WorkgroupFilter.NONE
+    assert result.privgroup is False
+    assert result.reusable is True
+    assert result.visibility == WorkgroupVisibility.STANFORD
 def test_workgroup_create_privgroup(workgroup_client):
     result = workgroup_client.create(
         name='create:1',
@@ -80,6 +126,18 @@ def test_workgroup_create_privgroup(workgroup_client):
     assert result.visibility == WorkgroupVisibility.STANFORD
 
 # Test creating with reusable off
+def test_workgroup_oauth_create_reusable(workgroup_client_oauth):
+    result = workgroup_client_oauth.create(
+        name='create:1',
+        description='Create Test 1',
+        reusable=False,
+    )
+    assert result.name == 'create:1'
+    assert result.description == 'Create Test 1'
+    assert result.filter == WorkgroupFilter.NONE
+    assert result.privgroup is True
+    assert result.reusable is False
+    assert result.visibility == WorkgroupVisibility.STANFORD
 def test_workgroup_create_reusable(workgroup_client):
     result = workgroup_client.create(
         name='create:1',
@@ -94,6 +152,18 @@ def test_workgroup_create_reusable(workgroup_client):
     assert result.visibility == WorkgroupVisibility.STANFORD
 
 # Test creating with visibility private
+def test_workgroup_oauth_create_visibility(workgroup_client_oauth):
+    result = workgroup_client_oauth.create(
+        name='create:1',
+        description='Create Test 1',
+        visibility=WorkgroupVisibility.PRIVATE
+    )
+    assert result.name == 'create:1'
+    assert result.description == 'Create Test 1'
+    assert result.filter == WorkgroupFilter.NONE
+    assert result.privgroup is True
+    assert result.reusable is True
+    assert result.visibility == WorkgroupVisibility.PRIVATE
 def test_workgroup_create_visibility(workgroup_client):
     result = workgroup_client.create(
         name='create:1',
@@ -108,6 +178,62 @@ def test_workgroup_create_visibility(workgroup_client):
     assert result.visibility == WorkgroupVisibility.PRIVATE
 
 # Test checking of name issues (including duplicate workgroup)
+def test_workgroup_oauth_create_name(workgroup_client_oauth):
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='',
+            description='Create Test 1',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='create:',
+            description='Create Test 1',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name=':1',
+            description='Create Test 1',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='créate:1',
+            description='Create Test 1',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='create:üno',
+            description='Create Test 1',
+        )
+    with pytest.raises(IndexError):
+        workgroup_client_oauth.create(
+            name='create:111111111111111111111111111111111111111111111111111111111111111111111111111',
+            description='Create Test 1',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='-create:1',
+            description='Create Test 1',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='_create:1',
+            description='Create Test 1',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='create:_1',
+            description='Create Test 1',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='create:-1',
+            description='create test 1',
+        )
+    with pytest.raises(KeyError):
+        workgroup_client_oauth.create(
+            name='create:dupe',
+            description='Create Test 1',
+        )
 def test_workgroup_create_name(workgroup_client):
     with pytest.raises(ValueError):
         workgroup_client.create(
@@ -166,6 +292,27 @@ def test_workgroup_create_name(workgroup_client):
         )
 
 # Test checking of description issues
+def test_workgroup_oauth_create_description(workgroup_client_oauth):
+    with pytest.raises(IndexError):
+        workgroup_client_oauth.create(
+            name='create:1',
+            description='',
+        )
+    with pytest.raises(IndexError):
+        workgroup_client_oauth.create(
+            name='create:1',
+            description='1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='create:1',
+            description='Euro symbol € is not in Latin1!',
+        )
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.create(
+            name='create:1',
+            description='Bell symbol \007 is not printable!',
+        )
 def test_workgroup_create_description(workgroup_client):
     with pytest.raises(IndexError):
         workgroup_client.create(
@@ -189,6 +336,27 @@ def test_workgroup_create_description(workgroup_client):
         )
 
 # Test upstream misc. failures that could happen during Workgroup creation
+def test_workgroup_oauth_create_fail(workgroup_client_oauth):
+    with pytest.raises(ChildProcessError):
+        workgroup_client_oauth.create(
+            name='create:bad400',
+            description='Create Test 1',
+        )
+    with pytest.raises(PermissionError):
+        workgroup_client_oauth.create(
+            name='create:bad401',
+            description='Create Test 1',
+        )
+    with pytest.raises(NotImplementedError):
+        workgroup_client_oauth.create(
+            name='create:bad521',
+            description='Create Test 1',
+        )
+    with pytest.raises(WorkgroupDeleted):
+        workgroup_client_oauth.create(
+            name='create:inactive',
+            description='Create Test 1',
+        )
 def test_workgroup_create_fail(workgroup_client):
     with pytest.raises(ChildProcessError):
         workgroup_client.create(

@@ -40,21 +40,41 @@ def test_noauthclient():
     with pytest.raises(TypeError):
         WorkgroupClient(client=MAISClient.prod())
 
+# Test that we have a valid API endpoint for our auth method.
 def test_authmismatch(snakeoil_cert):
-    # Make a client with only a cert endpoint
-    mais_client = MAISClient( # nosec: B106
+    # For this test, we are making custom MAISClient instances.
+    # So, we need to mock OAuth token generation
+    from stanford.mais.client.tests.mock import add_token_responses
+    add_token_responses()
+
+    # Make a client that has OAuth creds, but only a cert endpoint.
+    mais_client1 = MAISClient( # nosec: B106
         urls={
             'workgroup': {
                 'cert': 'http://example.com/wg/v2/',
             },
         },
         token_url='http://example.com/oauth2/token',
+        client_id='good1',
+        client_secret='good2'
+    )
+
+    # Make a client that has a client cert, but only an OAuth endpoint
+    mais_client2 = MAISClient( # nosec: B106
+        urls={
+            'workgroup': {
+                'oauth': 'http://example.com/oauth/wg/v2/',
+            },
+        },
+        token_url='http://example.com/oauth2/token',
         cert=snakeoil_cert,
     )
 
-    # Try using it
+    # Both WorkgroupClient instantiations should fail
     with pytest.raises(TypeError):
-        WorkgroupClient(client=MAISClient.prod())
+        WorkgroupClient(client=mais_client1)
+    with pytest.raises(TypeError):
+        WorkgroupClient(client=mais_client2)
 
 """
 Workgroup:
@@ -69,6 +89,23 @@ Workgroup `bad:w4` returns a 403
 Workgroup `bad:w5` returns a 404
 Workgroup `test:inactive` returns a special 400 for an inactive workgroup
 """
+def test_oauth_badqueries(workgroup_client_oauth):
+    with pytest.raises(ChildProcessError):
+        wc = workgroup_client_oauth['bad:w1']
+    with pytest.raises(ChildProcessError):
+        wc = workgroup_client_oauth['bad:w2']
+    with pytest.raises(PermissionError):
+        wc = workgroup_client_oauth['bad:w3']
+    with pytest.raises(PermissionError):
+        wc = workgroup_client_oauth['bad:w4']
+    with pytest.raises(KeyError):
+        wc = workgroup_client_oauth['bad:w5']
+    with pytest.raises(NotImplementedError):
+        wc = workgroup_client_oauth['bad:w6']
+    with pytest.raises(KeyError):
+        wc = workgroup_client_oauth['test:inactive']
+    with pytest.raises(WorkgroupDeleted):
+        wc = workgroup_client_oauth['test:inactive']
 def test_badqueries(workgroup_client):
     with pytest.raises(ChildProcessError):
         wc = workgroup_client['bad:w1']
@@ -89,6 +126,13 @@ def test_badqueries(workgroup_client):
 
 # Test that the get method and the key-based methods work
 # Once we test this, we'll use the key-based methods from now on.
+def test_oauth_get_vs_key(workgroup_client_oauth):
+    key_result = workgroup_client_oauth['test:1']
+    get_result = Workgroup.get(
+        client=workgroup_client_oauth,
+        name='test:1',
+    )
+    assert key_result is get_result
 def test_get_vs_key(workgroup_client):
     key_result = workgroup_client['test:1']
     get_result = Workgroup.get(
@@ -98,21 +142,44 @@ def test_get_vs_key(workgroup_client):
     assert key_result is get_result
 
 # Test that support for the `in` keyword works
+def test_oauth_in(workgroup_client_oauth):
+    assert 'test:1' in workgroup_client_oauth
+    assert 'bad:w5' not in workgroup_client_oauth
 def test_in(workgroup_client):
     assert 'test:1' in workgroup_client
     assert 'bad:w5' not in workgroup_client
 
 # Test we can access ourselves through the workgroup
+def test_oauth_client(workgroup_client_oauth):
+    result = workgroup_client_oauth['test:1']
+    assert result.client is workgroup_client_oauth
 def test_client(workgroup_client):
     result = workgroup_client['test:1']
     assert result.client is workgroup_client
 
 # Test a search that returns no results
+def test_oauth_search_empty(workgroup_client_oauth):
+    results = workgroup_client_oauth.search_by_name('noresults:*')
+    assert len(results) == 0
 def test_search_empty(workgroup_client):
     results = workgroup_client.search_by_name('noresults:*')
     assert len(results) == 0
 
 # Test a search that returns results
+def test_oauth_search_by_name(workgroup_client_oauth):
+    results = workgroup_client_oauth.search_by_name('test:*')
+
+    # Check we got the correct number of results
+    assert len(results) == 1
+
+    # For each returned workgroup, check it can load the full workgroup, and
+    # that things match.
+    for result in results:
+        full_result = result.workgroup(workgroup_client_oauth)
+
+        assert result.name == full_result.name
+        assert result.description == full_result.description
+        assert result.last_update == full_result.last_update
 def test_search_by_name(workgroup_client):
     results = workgroup_client.search_by_name('test:*')
 
@@ -129,6 +196,19 @@ def test_search_by_name(workgroup_client):
         assert result.last_update == full_result.last_update
 
 # Test invalid searches by name
+def test_oauth_search_by_name_bad(workgroup_client_oauth):
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.search_by_name('')
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.search_by_name('*')
+    with pytest.raises(IndexError):
+        workgroup_client_oauth.search_by_name('ba:*')
+    with pytest.raises(ChildProcessError):
+        workgroup_client_oauth.search_by_name('bad:w1')
+    with pytest.raises(PermissionError):
+        workgroup_client_oauth.search_by_name('bad:w3')
+    with pytest.raises(NotImplementedError):
+        workgroup_client_oauth.search_by_name('bad:w6')
 def test_search_by_name_bad(workgroup_client):
     with pytest.raises(ValueError):
         workgroup_client.search_by_name('')
@@ -144,6 +224,18 @@ def test_search_by_name_bad(workgroup_client):
         workgroup_client.search_by_name('bad:w6')
 
 # Search for member user
+def test_oauth_search_by_member_user(workgroup_client_oauth):
+    results = workgroup_client_oauth.search_by_user('akkornel')
+
+    # Check we got one result, and that it matches what we expect
+    assert len(results.is_member) == 1
+    assert len(results.is_administrator) == 0
+    result = list(results.is_member)[0]
+    assert result.name == 'test:1'
+    assert result.description == 'Test 1'
+    assert result.last_update.year == 2025
+    assert result.last_update.month == 1
+    assert result.last_update.day == 1
 def test_search_by_member_user(workgroup_client):
     results = workgroup_client.search_by_user('akkornel')
 
@@ -158,6 +250,18 @@ def test_search_by_member_user(workgroup_client):
     assert result.last_update.day == 1
 
 # Search for member workgroup
+def test_oauth_search_by_member_workgroup(workgroup_client_oauth):
+    results = workgroup_client_oauth.search_by_workgroup('workgroup:test-owners')
+
+    # Check we got one result, and that it matches what we expect
+    assert len(results.is_member) == 0
+    assert len(results.is_administrator) == 1
+    result = list(results.is_administrator)[0]
+    assert result.name == 'test:1'
+    assert result.description == 'Test 1'
+    assert result.last_update.year == 2025
+    assert result.last_update.month == 1
+    assert result.last_update.day == 1
 def test_search_by_member_workgroup(workgroup_client):
     results = workgroup_client.search_by_workgroup('workgroup:test-owners')
 
@@ -172,6 +276,18 @@ def test_search_by_member_workgroup(workgroup_client):
     assert result.last_update.day == 1
 
 # Search for member certificate
+def test_oauth_search_by_member_cert(workgroup_client_oauth):
+    results = workgroup_client_oauth.search_by_certificate('client-cert-1')
+
+    # Check we got one result, and that it matches what we expect
+    assert len(results.is_member) == 0
+    assert len(results.is_administrator) == 1
+    result = list(results.is_administrator)[0]
+    assert result.name == 'workgroup:test-owners'
+    assert result.description == 'Workgroup stem for testing'
+    assert result.last_update.year == 2025
+    assert result.last_update.month == 1
+    assert result.last_update.day == 1
 def test_search_by_member_cert(workgroup_client):
     results = workgroup_client.search_by_certificate('client-cert-1')
 
@@ -186,6 +302,19 @@ def test_search_by_member_cert(workgroup_client):
     assert result.last_update.day == 1
 
 # Do a few bad search-by-X calls
+def test_oauth_search_by_bad(workgroup_client_oauth):
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.search_by_user('')
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.search_by_workgroup('')
+    with pytest.raises(ValueError):
+        workgroup_client_oauth.search_by_certificate('')
+    with pytest.raises(ChildProcessError):
+        workgroup_client_oauth.search_by_certificate('bad400')
+    with pytest.raises(PermissionError):
+        workgroup_client_oauth.search_by_certificate('bad401')
+    with pytest.raises(NotImplementedError):
+        workgroup_client_oauth.search_by_certificate('bad521')
 def test_search_by_bad(workgroup_client):
     with pytest.raises(ValueError):
         workgroup_client.search_by_user('')
@@ -201,6 +330,12 @@ def test_search_by_bad(workgroup_client):
         workgroup_client.search_by_certificate('bad521')
 
 # Search for a certificate that does not exist
+def test_oauth_search_by_member_cert_empty(workgroup_client_oauth):
+    results = workgroup_client_oauth.search_by_certificate('nonexistant')
+
+    # Check we got zero results
+    assert len(results.is_member) == 0
+    assert len(results.is_administrator) == 0
 def test_search_by_member_cert_empty(workgroup_client):
     results = workgroup_client.search_by_certificate('nonexistant')
 
@@ -209,6 +344,11 @@ def test_search_by_member_cert_empty(workgroup_client):
     assert len(results.is_administrator) == 0
 
 # Test clearing the cache works
+def test_oauth_clear(workgroup_client_oauth):
+    wg1_result1 = workgroup_client_oauth['test:1']
+    workgroup_client_oauth.clear_cache()
+    wg1_result2 = workgroup_client_oauth['test:1']
+    assert wg1_result1 is not wg1_result2
 def test_clear(workgroup_client):
     wg1_result1 = workgroup_client['test:1']
     workgroup_client.clear_cache()
