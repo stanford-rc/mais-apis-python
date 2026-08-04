@@ -204,10 +204,14 @@ Requirements
   We do allow Requests 2.28.2, as packaged in Debian bookworm, but we do not
   currently test against it.
 
-* `Authlib`_ 1.2.0, or any later 1.x.
+* `Authlib`_ 1.3.2, or any later 1.x.
 
-  Python 3.12 requires at least Authlib 1.2.1; Python 3.13 requires at least
-  Authlib 1.4.0.
+  An important note for Debian users: Debian oldstable ships with Authlib
+  1.2.0, which is not compatible.  If you use Debian oldstable, you should
+  either not use OAuth, or install a newer Authlib (for example, by using a
+  virtualenv).
+
+  Python 3.13 requires at least Authlib 1.4.0.
 
 * Either a client certificate or an OAuth client credential — both of which are
   issued by `MaIS`_ — which has permissions to the APIs you want to use, in the
