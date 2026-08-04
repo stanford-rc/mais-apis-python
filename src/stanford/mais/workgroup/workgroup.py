@@ -261,20 +261,13 @@ class Workgroup:
             error(f"Proposed description has non-printable characters")
             raise ValueError('description')
 
-        # Get the Requests session
-        if client.client.oauth2_session is not None:
-            session = cast(requests.Session, client.client.oauth2_session)
-        elif client.client.session is not None:
-            session = client.client.session
-
         # Make the Workgroup.
-        # (The constructor already checked if the session exists.)
         post_url = client._url(
             fragment=name,
         )
         debug(f"Filter is '{filter}' — Visibility is '{visibility}'")
         debug(f"Running POST to {post_url} to create workgroup")
-        response = session.post(
+        response = client._session.post(
             post_url,
             json={
                 'description': description,
@@ -387,19 +380,12 @@ class Workgroup:
             else:
                 debug(f"{name} expired in cache.  Re-fetching…")
 
-        # Get the Requests session
-        if client.client.oauth2_session is not None:
-            session = cast(requests.Session, client.client.oauth2_session)
-        elif client.client.session is not None:
-            session = client.client.session
-
         # Make the request for the Workgroup.
-        # (The constructor already checked if the session exists.)
         get_url = client._url(
             fragment=name,
         )
         debug(f"Doing GET of {get_url}")
-        response = session.get(
+        response = client._session.get(
             get_url,
         )
 
@@ -490,19 +476,12 @@ class Workgroup:
         if self.deleted:
             raise EOFError('Workgroup has been deleted')
 
-        # Get the Requests session
-        if self.client.client.oauth2_session is not None:
-            session = cast(requests.Session, self.client.client.oauth2_session)
-        elif self.client.client.session is not None:
-            session = self.client.client.session
-
         # Make the request for the Workgroup.
-        # (The constructor already checked if the session exists.)
         get_url = self.client._url(
             fragment=self.name,
         )
         debug(f"Doing GET of {get_url}")
-        response = session.get(
+        response = self.client._session.get(
             get_url,
         )
 
@@ -1180,20 +1159,14 @@ class Workgroup:
         if not self.can_see_membership:
             raise PermissionError()
 
-        # Get the Requests session
-        if self.client.client.oauth2_session is not None:
-            session = cast(requests.Session, self.client.client.oauth2_session)
-        elif self.client.client.session is not None:
-            session = self.client.client.session
-
         # Our URL includes the fully-qualified workgroup name, plus `privgroup`
         url_fragment = (
             pathlib.PurePosixPath(self.name) /
             pathlib.PurePosixPath('privgroup')
         )
 
-        # (The constructor already checked if the session exists.)
-        response = session.get(
+        # Fetch the privgroup
+        response = self.client._session.get(
             self.client._url(
                 fragment=url_fragment,
             ),
@@ -1320,15 +1293,8 @@ class Workgroup:
         if self.deleted:
             raise EOFError('Workgroup has been deleted')
 
-        # Get the Requests session
-        if self.client.client.oauth2_session is not None:
-            session = cast(requests.Session, self.client.client.oauth2_session)
-        elif self.client.client.session is not None:
-            session = self.client.client.session
-
         # Make the request for the Workgroup.
-        # (The constructor already checked if the session exists.)
-        response = session.put(
+        response = self.client._session.put(
             self.client._url(
                 fragment=self.name
             ),
@@ -1541,15 +1507,8 @@ class Workgroup:
         if self.deleted:
             raise EOFError('Workgroup has (already) been deleted')
 
-        # Get the Requests session
-        if self.client.client.oauth2_session is not None:
-            session = cast(requests.Session, self.client.client.oauth2_session)
-        elif self.client.client.session is not None:
-            session = self.client.client.session
-
         # Make the request to delete the Workgroup.
-        # (The constructor already checked if the session exists.)
-        response = session.delete(
+        response = self.client._session.delete(
             self.client._url(
                 fragment=self.name
             ),

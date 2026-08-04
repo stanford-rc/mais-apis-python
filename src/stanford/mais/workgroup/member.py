@@ -418,16 +418,9 @@ class WorkgroupMembershipContainer(
             pathlib.PurePosixPath(value)
         )
 
-        # Get the Requests session
-        if workgroup.client.client.oauth2_session is not None:
-            session = cast(requests.Session, workgroup.client.client.oauth2_session)
-        elif workgroup.client.client.session is not None:
-            session = workgroup.client.client.session
-
         # Do a PUT call to make the add.
         # In addition to the path, we need to provide the identifier type.
-        # (The constructor already checked if the session exists.)
-        response = session.put( # type:ignore[union-attr]
+        response = workgroup.client._session.put(
             workgroup.client._url(
                 fragment=url_path,
             ),
@@ -527,16 +520,9 @@ class WorkgroupMembershipContainer(
             pathlib.PurePosixPath(value)
         )
 
-        # Get the Requests session
-        if workgroup.client.client.oauth2_session is not None:
-            session = cast(requests.Session, workgroup.client.client.oauth2_session)
-        elif workgroup.client.client.session is not None:
-            session = workgroup.client.client.session
-
         # Do a DELETE call to do the removal.
         # In addition to the path, we need to provide the identifier type.
-        # (The constructor already checked if the session exists.)
-        response = session.delete( # type: ignore[union-attr]
+        response = workgroup.client._session.delete(
             workgroup.client._url(
                 fragment=url_path,
             ),

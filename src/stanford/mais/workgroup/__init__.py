@@ -168,12 +168,32 @@ class WorkgroupClient():
     Each instance provides the following attributes:
     """
 
-    client: stanford.mais.client.MAISClient
+    client: dataclasses.InitVar[stanford.mais.client.MAISClient]
     """A :class:`~stanford.mais.client.MAISClient` instance.
 
-    This configures the API endpoint (accessed via ``client.urls['workgroup']``)
-    and client key/cert to use.  It must be provided when calling the class
-    constructor.
+    This is used to determine what session and base URL to use.  This must be
+    provided when calling the class constructor, and is only used during
+    instantiation.
+
+    Here are the rules for determining what session base URL we use, depending
+    on what is available:
+
+    1. If an ``oauth2_session`` is available, and there is an ``oauth`` URL
+       available for the Workgroup API, use OAuth2 authentication.
+
+    2. If a ``session`` is available, and there is a ``cert`` URL available
+       for the Workgroup API, use client-certificate authentication.
+
+    3. If both session types and both URLs are available, use OAuth2
+       authentication.
+
+    :raises TypeError: No URLs are available for the Workgroup API.
+
+    :raises TypeError: No sessions are available (no authentication was configured).
+
+    :raises TypeError: There is an auth/URL mismatch: Either only client-cert
+        auth was available with only an OAuth URL, or only OAuth auth was
+        available with only a client-cert URL.
     """
 
     _cache: MutableMapping[str, weakref.ReferenceType['Workgroup']] = dataclasses.field(repr=False, default_factory=dict)
@@ -183,27 +203,92 @@ class WorkgroupClient():
     client.  It speeds up repeated accesses of workgroups.
     """
 
-    def __post_init__(self) -> None:
+    _session: requests.Session = dataclasses.field(init=False)
+    """The Session to use for all API calls.
+
+    This will either point to :attr:`~stanford.mais.client.MAISClient.session`
+    or :attr:`~stanford.mais.client.MAISClient.oauth2_session`.  Exactly which
+    one is used depends on what auth methods and URLs are available.
+
+    See ``client`` for details.
+    """
+
+    _baseurl: str = dataclasses.field(init=False)
+    """The base URL to use for all API calls.
+
+    This will contain the Workgroup API base URL to use.  Exactly which one is
+    used depend on what auth methods and URLs are available.
+
+    See ``client`` for details.
+    """
+
+    def __post_init__(self,
+        client: stanford.mais.client.MAISClient,
+    ) -> None:
         """Check provided constructor variables.
 
         This checks the provided client, and (if needed) sets up the Requests
         session.
 
-        :raises TypeError: A client was not provided, or the client is not configured for TLS authentication.
+        :param client: The client provided to the constructor.
         """
         debug('In __post_init__')
 
         # Check the client type
-        if not isinstance(self.client, stanford.mais.client.MAISClient):
+        if not isinstance(client, stanford.mais.client.MAISClient):
             raise TypeError('client')
 
         # Check if some form of auth is available
-        if self.client.oauth2_session is not None:
-            debug('Using OAuth2 authentication')
-        elif self.client.session is not None:
-            debug('Using client-certificate authentication')
-        else:
+        oauth_auth_available = False
+        cert_auth_available = False
+        if client.oauth2_session is not None:
+            debug('OAuth2 authentication is available')
+            oauth_auth_available = True
+        if client.session is not None:
+            debug('Client-certificate authentication is available')
+            cert_auth_available = True
+
+        # Error out if we don't have any form of auth available
+        if (not oauth_auth_available) and (not cert_auth_available):
             raise TypeError('Client-certificate or OAuth authentication is required')
+
+        # Check what endpoints are available
+        oauth_endpoint_available = False
+        cert_endpoint_available = False
+        if 'oauth' in client.urls['workgroup']:
+            debug('OAuth2 endpoint is available')
+            oauth_endpoint_available = True
+        if 'cert' in client.urls['workgroup']:
+            debug('Client-certificate endpoint is available')
+            cert_endpoint_available = True
+
+        # Decide what to use, or else error out
+        if oauth_auth_available and oauth_endpoint_available:
+            debug('Will use OAuth authentication')
+            object.__setattr__(
+                self,
+                '_session',
+                cast(requests.Session, client.oauth2_session)
+            )
+            object.__setattr__(
+                self,
+                '_baseurl',
+                client.urls['workgroup']['oauth']
+            )
+        elif cert_auth_available and cert_endpoint_available:
+            debug('Will use client-certificate authentication')
+            object.__setattr__(
+                self,
+                '_session',
+                client.session
+            )
+            object.__setattr__(
+                self,
+                '_baseurl',
+                client.urls['workgroup']['cert']
+            )
+        else:
+            raise TypeError('Mismatch between available auth & available API endpoint')
 
         # That's it!
         return None
@@ -359,16 +444,11 @@ class WorkgroupClient():
         )
 
         # Make the request for the Workgroup.
-        # (The constructor already checked if the session exists.)
         get_url = self._url(
             fragment=get_fragment,
         )
         debug(f"Doing GET of {get_url}")
-        if self.client.oauth2_session is not None:
-            session = cast(requests.Session, self.client.oauth2_session)
-        elif self.client.session is not None:
-            session = self.client.session
-        response = session.get(
+        response = self._session.get(
             get_url,
         )
 
@@ -448,7 +528,6 @@ class WorkgroupClient():
             raise ValueError('Search string is empty')
 
         # Make the request for the Workgroup.
-        # (The constructor already checked if the session exists.)
         get_url = self._url(
             query_dict={
                 'type': target_type,
@@ -456,11 +535,7 @@ class WorkgroupClient():
             },
         )
         debug(f"Doing GET of {get_url}")
-        if self.client.oauth2_session is not None:
-            session = cast(requests.Session, self.client.oauth2_session)
-        elif self.client.session is not None:
-            session = self.client.session
-        response = session.get(
+        response = self._session.get(
             get_url,
         )
 
@@ -669,15 +744,9 @@ class WorkgroupClient():
             query string.  May be empty.
         """
 
-        # Get the base URL, preferring OAuth over client-cert
-        if self.client.oauth2_session is not None:
-            base_url = self.client.urls['workgroup']['oauth']
-        else:
-            base_url = self.client.urls['workgroup']['cert']
-
         # We can't use urllib.parse.urljoin, because it interprets the colon in
         # the workgroup name.  So, extract the path and use pathlib.
-        url_components = urllib.parse.urlparse(base_url)
+        url_components = urllib.parse.urlparse(self._baseurl)
 
         url_path = pathlib.PurePosixPath(url_components.path)
         if fragment is None:
