@@ -20,11 +20,12 @@ import requests
 import responses
 
 from stanford.mais.client import MAISClient
-from stanford.mais.client.tests.mock import add_token_responses
 from stanford.mais.account import AccountClient
-from stanford.mais.account.tests.mock import add_account_responses
 from stanford.mais.workgroup import WorkgroupClient
-from stanford.mais.workgroup.tests.mock import add_workgroup_responses
+
+from mock_client import add_token_responses
+from mock_account import add_account_responses
+from mock_workgroup import add_workgroup_responses
 
 # These are fixtures that will be used in various tests.
 

@@ -23,7 +23,7 @@ import ssl
 import time
 from authlib.integrations.requests_client import OAuthError
 from stanford.mais.client import MAISClient
-from stanford.mais.client.tests.mock import add_token_responses
+from mock_client import add_token_responses
 
 services = (
     'account',

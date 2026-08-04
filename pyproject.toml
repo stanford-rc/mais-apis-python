@@ -163,7 +163,7 @@ exclude_dirs = [
     # the same method of configuration as the assert_used plugin.  So, we have
     # to ignore the files entirely.
     # See https://github.com/PyCQA/bandit/issues/982
-    "src/stanford/mais/client/tests/mock.py",
+    "tests/mock_client.py",
     "tests/conftest.py",
     "tests/test_client.py",
 ]

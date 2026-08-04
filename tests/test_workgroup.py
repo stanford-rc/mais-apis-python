@@ -44,7 +44,7 @@ def test_noauthclient():
 def test_authmismatch(snakeoil_cert):
     # For this test, we are making custom MAISClient instances.
     # So, we need to mock OAuth token generation
-    from stanford.mais.client.tests.mock import add_token_responses
+    from mock_client import add_token_responses
     add_token_responses()
 
     # Make a client that has OAuth creds, but only a cert endpoint.
