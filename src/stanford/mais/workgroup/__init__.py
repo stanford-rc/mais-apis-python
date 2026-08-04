@@ -22,7 +22,7 @@ import enum
 import logging
 import pathlib
 import requests
-from typing import Literal
+from typing import cast, Literal
 import urllib.parse
 import weakref
 import stanford.mais.client
@@ -197,9 +197,13 @@ class WorkgroupClient():
         if not isinstance(self.client, stanford.mais.client.MAISClient):
             raise TypeError('client')
 
-        # Check if cert auth is available
-        if self.client.session is None:
-            raise TypeError('Client-certificate authentication is required')
+        # Check if some form of auth is available
+        if self.client.oauth2_session is not None:
+            debug('Using OAuth2 authentication')
+        elif self.client.session is not None:
+            debug('Using client-certificate authentication')
+        else:
+            raise TypeError('Client-certificate or OAuth authentication is required')
 
         # That's it!
         return None
@@ -360,7 +364,11 @@ class WorkgroupClient():
             fragment=get_fragment,
         )
         debug(f"Doing GET of {get_url}")
-        response = self.client.session.get( # type: ignore[union-attr]
+        if self.client.oauth2_session is not None:
+            session = cast(requests.Session, self.client.oauth2_session)
+        elif self.client.session is not None:
+            session = self.client.session
+        response = session.get(
             get_url,
         )
 
@@ -448,7 +456,11 @@ class WorkgroupClient():
             },
         )
         debug(f"Doing GET of {get_url}")
-        response = self.client.session.get( # type: ignore[union-attr]
+        if self.client.oauth2_session is not None:
+            session = cast(requests.Session, self.client.oauth2_session)
+        elif self.client.session is not None:
+            session = self.client.session
+        response = session.get(
             get_url,
         )
 
@@ -657,9 +669,15 @@ class WorkgroupClient():
             query string.  May be empty.
         """
 
+        # Get the base URL, preferring OAuth over client-cert
+        if self.client.oauth2_session is not None:
+            base_url = self.client.urls['workgroup']['oauth']
+        else:
+            base_url = self.client.urls['workgroup']['cert']
+
         # We can't use urllib.parse.urljoin, because it interprets the colon in
         # the workgroup name.  So, extract the path and use pathlib.
-        url_components = urllib.parse.urlparse(self.client.urls['workgroup']['cert'])
+        url_components = urllib.parse.urlparse(base_url)
 
         url_path = pathlib.PurePosixPath(url_components.path)
         if fragment is None:

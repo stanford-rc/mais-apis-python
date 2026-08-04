@@ -29,7 +29,7 @@ import enum
 import logging
 import pathlib
 import requests
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, cast, Literal, TYPE_CHECKING
 import weakref
 
 # Finally, do local imports
@@ -419,7 +419,10 @@ class WorkgroupMembershipContainer(
         )
 
         # Get the Requests session
-        session = workgroup.client.client.session
+        if workgroup.client.client.oauth2_session is not None:
+            session = cast(requests.Session, workgroup.client.client.oauth2_session)
+        elif workgroup.client.client.session is not None:
+            session = workgroup.client.client.session
 
         # Do a PUT call to make the add.
         # In addition to the path, we need to provide the identifier type.
@@ -525,7 +528,10 @@ class WorkgroupMembershipContainer(
         )
 
         # Get the Requests session
-        session = workgroup.client.client.session
+        if workgroup.client.client.oauth2_session is not None:
+            session = cast(requests.Session, workgroup.client.client.oauth2_session)
+        elif workgroup.client.client.session is not None:
+            session = workgroup.client.client.session
 
         # Do a DELETE call to do the removal.
         # In addition to the path, we need to provide the identifier type.
