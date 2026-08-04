@@ -19,6 +19,13 @@ Fixes:
   ``Workgroup.last_update`` has been updated, along with the narrative
   documentation.  (#45)
 
+Fixes:
+
+* ``WorkgroupClient`` had an errant ``print`` statement in the internal
+  ``_search_by_target`` method, which has now been removed.  Anytime that
+  ``search_by_user``, ``search_by_certificate``, or ``search_by_workgroup`` was
+  run, the response JSON would be printed to standard output.
+
 Other:
 
 * The URLs for the Workgroup PROD and UAT APIs changed in January 2026.  This
