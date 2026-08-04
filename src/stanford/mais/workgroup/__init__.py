@@ -466,7 +466,6 @@ class WorkgroupClient():
         # Decode the JSON, and get our search results
         debug('Got a response!')
         response_json = response.json()
-        print(response_json)
 
         # We get a dict list of members and a list of administrators
         result_sets: dict[Literal['members', 'administrators'], set] = {
