@@ -27,6 +27,8 @@ Other:
 * We now set a custom HTTP User-Agent: In case we ever cause problems for MaIS
   APIs, this will help them identify the SDK that is causing the trouble!  (#46)
 
+* The repository's ``.gitignore`` now ignores ``.env`` files.
+
 0.55.0
 ------
 
