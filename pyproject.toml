@@ -112,7 +112,10 @@ testpaths = [
 requires = [
     "tox>=4.28.3",
 ]
-env_list = "py{311,312,313,314}-{minimal,latest}"
+env_list = [
+    { product = [["py311", "py312", "py313", "py314"], ["minimal", "latest"]] },
+    "report",
+]
 
 [tool.tox.env_run_base]
 deps = [
@@ -123,6 +126,8 @@ deps = [
     "pytest-cov >=4.0.0",
     "pytest-responses",
     "responses",
+    { replace = "if", condition = "factor.minimal", then = { replace = "ref", of = ["tool", "tox", "env", "minimal", "deps"] }, else = [], extend = true },
+    { replace = "if", condition = "factor.latest", then = { replace = "ref", of = ["tool", "tox", "env", "latest", "deps"] }, else = [], extend = true },
 ]
 commands = [
     ["pytest", "--cov", "--cov-append", "--cov-report=", "--strict-config", "--strict-markers", "-W", "error"],
