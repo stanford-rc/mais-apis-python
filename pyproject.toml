@@ -127,7 +127,7 @@ deps = [
 commands = [
     ["pytest", "--cov", "--cov-append", "--cov-report=", "--strict-config", "--strict-markers", "-W", "error"],
 ]
-set_env = { PYTHONTRACEMALLOC = "20" }
+# set_env = { PYTHONTRACEMALLOC = "20" }  # Tanks performance, only enable if needed
 
 [tool.tox.env.minimal]
 deps = [
