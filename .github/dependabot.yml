@@ -32,6 +32,10 @@ updates:
         patterns:
           - "*"
 
+    # Wait for an update to be out for 7 days before including it
+    cooldown:
+      default-days: 7
+
     ignore:
       - dependency-name: "sphinx" # See Issue #56
 
@@ -47,3 +51,5 @@ updates:
       gha:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
