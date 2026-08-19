@@ -16,8 +16,6 @@ jobs:
           - "3.14"
 
     steps:
-      - uses: GitHubSecurityLab/actions-permissions/monitor@56b81d5792a64ef3925978f6c0695ddc41685c27
-
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Set up Python ${{ matrix.python }}
