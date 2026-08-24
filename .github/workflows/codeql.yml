@@ -10,14 +10,14 @@ on:
   schedule:
     - cron: '0 10 * * 2'
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   bandit-analyze:
     name: Bandit Analyze
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
 
     steps:
     - name: Checkout repository
@@ -33,10 +33,6 @@ jobs:
   codeql-analyze:
     name: CodeQL Analyze
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
 
     steps:
     - name: Checkout repository
