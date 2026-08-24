@@ -6,7 +6,8 @@
 on:
   push:
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   common:
@@ -18,8 +19,6 @@ jobs:
     needs:
       - common
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
