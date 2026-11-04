@@ -54,7 +54,7 @@ test = [
     "mypy >= 1.0.0",
     "types-Authlib",
     "types-requests",
-    "pytest >=8.4.1, <9.2.0",
+    "pytest >=8.4.1, <9.3.0",
     "pytest-cov",
     "pytest-responses",
     "requests >=2.30.0, <3.0",
